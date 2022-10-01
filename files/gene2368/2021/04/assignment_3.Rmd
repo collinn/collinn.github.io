@@ -1,0 +1,266 @@
+---
+title: Assignment 3
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Useful latex
+
+You will often find yourself needing mathematical notation in order to clearly express an idea, and while many word processors have this function, they are often wonky and misaligned. In light of this, I highly recommend that everybody learns a little bit of latex (styled $\LaTeX$). An excellent resource for doing so, as well as an online editor, can be found [here](https://www.overleaf.com/learn/latex/Main_Page). For now, we can briefly consider some of the fundamentals and how to use them in markdown.
+
+Latex expressions will always be enclosed between single or double dollar signs (\$). Single signs will put the latex expression inline, while double signs will create a block expression. Compare the output of this document with $p < 0.05$ and $$p < 0.05$$
+
+A variable in latex usually begins with a `\`, followed by the name of the variable. Some common ones that you can use here for reference include $\mu$, $\sigma$, $\alpha$, $\beta$, and $\sim$
+
+Subscripts and superscripts can be created by appending either a `_` or `^` to the expression, i.e., $\mu_0$ and $\sigma^2$. To include more than one character, you will need to enclose the subscript or superscript in brackets `{}`, for example $\mu_{01}$.
+
+Finally, some latex constructs are designed like a function in that they take arguments in addition to the command. For example, to place a horizontal line over a variable to express that it is an average, we can use $\overline{X}$ or $\bar{X}$. Similarly, we often use a "hat" to denote an that a variable is a statistic. If we are interested in the value of $\sigma^2$, we may compute a statistic that we denote $\hat{\sigma}^2$.
+
+Latex is not limited to simply mathematical notation. It can be used for a tremendous number of purposes including construction of tables, typesetting a document, creating slides (like we use in class). While we won't cover these in any detail, it is worthwhile, at least, to know that such a resource exists. 
+
+## Concept Questions
+
+1. The null hypothesis is a hypothesis about (i) the sample (ii) the population
+
+2. Suppose a scientist carriest out 100 hypothesis tests. Unbeknownst to her, in all 100 cases, the null hypothesis is true, that is, $\mu = \mu_0$. If she uses the cutoff $p < 0.15$, how many mistakes would you expect that she makes? Why type of error is this?
+
+3. A researcher performs a study on a test statistic and finds a $p$-value of 0.51. What does this statement mean with regards to the null hypothesis and the data collected?
+
+4. An investigator wishes to examine whether there is a relationship between a particular candidate gene and susceptibility to a particular clinical syndrome.  In actuality, there is such an association, but the sample size is rather modest, and the investigator fails to identify this relationship, i.e., he did not reject the null hypothesis of no association. What type of error is this?
+
+## Revist the CLT in R
+
+Although we considered in class the case in which our variable of interest followed a normal distribution, $X \sim N(\mu, \sigma^2)$, the utility of the Central Limit Theorem is not limited to such cases: it holds for all distributions with finite variance. 
+
+Here, we will consider the case of the [Gamma distribution](https://en.wikipedia.org/wiki/Gamma_distribution). Like the normal distribution, the gamma distribution has two parameters, including the shape parameter $\alpha$ and the rate parameter $\beta$ (it can also be parameterized with shape and scale parameters, but we will focus on the shape/rate case here). The mean value for a gamma distribution is given as $\frac{\alpha}{\beta}$, with variance $\frac{\alpha}{\beta^2}$.
+
+Included below is a function in R called `gamma_mean_sampler`, which takes four arguments:
+
+1. The true mean value of the gamma distribution
+2. The true variance
+3. The number of observations to collect in each sample, `n`
+4. The total number of simulations to run, `N`
+
+You'll notice that functions in R can be given a default value, as in the case of `N = 1e4`. This indicates that if you do not include a value for `N` when running the function, it will automatically assign the value.
+
+```{r}
+gamma_simulator <- function(mean, variance, n, N = 1e4) {
+  alpha <- mean^2 / variance
+  beta <- mean / variance
+  x <- replicate(N, rgamma(n, shape = alpha, rate = beta))
+  colnames(x) <- paste0("Simulation_", 1:N)
+  rownames(x) <- paste0("Sample_", 1:n)
+  structure(.Data = x, mean = mean)
+}
+
+## Easier way to look at our matrices, will only show 
+# the first 5 columns and rows
+peek <- function(x) {
+  rc <- pmin(dim(x), c(5,5))
+  x[1:rc[1], 1:rc[2]]
+}
+```
+
+This function will return a $n \times N$ matrix, where $N$ is the total number of simulations and $n$ is the total number of samples collected. A matrix in R differs from a data.frame used previously in a number of ways, namely, we cannot access a column using the `$` as the we did before. Nonetheless, most genetic and microarray data is provided as a matrix, so it will be worth exploring a bit here. 
+
+We can think of this matrix as all of our "observed" data, where each column represents one experiment being done, and each row represents an observation in our sample. It will be helpful to note that a real life study would be the case in which $N = 1$. 
+
+Finally, we will include two functions that will help us construct a confidence interval for each value of $\overline{X}$, and a second to tell us what percentage of these confidence intervals contain the true mean value. All we need to know for now is how to use these functions.
+
+```{r}
+# make interval for each simulation
+make_ci <- function(x, alpha = 0.05) {
+  # critical value, z_{\alpha}
+  z <- qt(1 - alpha/2, length(x) - 1)
+  # 'applies' function to each column of our matrix
+  conf_int <- apply(x, 2, function(y) {
+    n <- length(y)
+    sdev <- sd(y)
+    yb <- mean(y)
+    yb + c(-z*sdev/sqrt(n), z * sdev/sqrt(n))
+  })
+  attr(conf_int, "mean") <- attr(x, "mean")
+  rownames(conf_int) <- paste0(c(alpha/2, 1 - alpha/2), "%")
+  t(conf_int)
+}
+
+# determine percentage of intervals containing the mean
+contain_mean <- function(intervals) {
+  mu <- attr(intervals, "mean")
+  total <- apply(intervals, 1, function(int) {
+    mu > int[1] & mu < int[2]
+  })
+  mean(total)
+}
+```
+
+The goal of this exercise is to get a better feel of exactly what kind of statements we are making when we talk about frequentist probability. Let's start by running $N = 50$ simulations from a gamma distribution with $\mu = 1$ and $\sigma^2 = 1$, and for each simulation, let's collect $n = 20$ samples.
+
+```{r}
+x <- gamma_simulator(mean = 1, variance = 1, n = 20, N = 50)
+```
+
+Because these matrices can get big, I've included the `peek` function above to be able to examine the first five rows and columns. We can also use `dim` to find the dimensions.
+
+```{r}
+peek(x)
+dim(x)
+```
+
+As we are interested in the mean value of our experiment, we will want to compute the mean of each column of our matrix. We can do that with the `colMeans` function in R:
+
+```{r}
+xbar <- colMeans(x)
+xbar 
+```
+
+In this case, we see that we now have 50 separate values for our estimate of $\overline{X}$, one coming from each of the simulations. In class, we generated a large number of these estimates and then used quantiles to determine where 95\% of our samples of $\overline{X}$  fell; however, this is *not quite* the statement we are trying to make. 
+
+Rather, our claim is that we can construct an interval around each of these values where $(1-\alpha)$\% of these intervals will contain the true value of the mean (or rather, $\alpha$\% do not). Based on a given value for `alpha`, the `make_ci` function will construct these intervals as was done in class
+
+```{r}
+## Note that we are passing in `x`, our matrix, and not `xbar`
+intervals <- make_ci(x, alpha = 0.05)
+head(intervals) # only shows first 6, but there are 50 of them
+```
+
+Just as our values for $\overline{X}$ were different between simulations, so are the intervals constructed here. We will end by determining how many of these intervals contain the true mean value from our distribution
+
+```{r}
+contain_mean(intervals)
+```
+
+To review the above, the steps we took to carry out this experiment were:
+
+```{r, eval = FALSE}
+## run simulation from gamma distribution
+x <- gamma_simulator(mean, variance, n, N)
+
+## Create vector of xbar. Create histogram and notice variability
+xbar <- colMeans(x)
+
+## Construct confident interval at level alpha
+ints <- make_ci(x)
+
+## Determine what percentage of simulated intervals contained true mean value
+contain_mean(ints)
+```
+
+To make the assignment a bit easier, I will combine these all into one function, which will run the simulation, create the histogram, and return the percentage of intervals containing the mean
+
+```{r}
+## Use this function!
+runSim <- function(mean, variance, n, N) {
+  x <- gamma_simulator(mean, variance, n, N)
+  hist(colMeans(x))
+  ints <- make_ci(x)
+  contain_mean(ints)
+}
+```
+
+### Simulation Questions
+
+For each of these questions, please include the code with your submission
+
+1. First reconsider the example that was shown above. When we ran the last line `contain_mean(intervals)`, it is likely that this number was not exactly 0.95. What is this number telling us, based on the simulations we ran? Would this number be the same if we ran the simulation again using all of the same numbers? Why or why not? Verifying by running `runSim` with the same values used above, with `mean = 1, variance = 1, n = 20, N = 50`.
+
+2. Run the same simluation above, but now with `variance = 5` and `N = 100`. Do this several times (you only need to include one of them here). How does the histogram change between iterations? What about the percentage of intervals containing the mean? Try again with $n = 5$ and compare
+
+
+3. For this question, we will have to use the individual functions included in `runSim`. I've provided the code to get started. What we are interested in here are the values of $(L, U)$ for our interval. As $\overline{X}$ is random, it makes sense to assume that both $L$ and $U$ will be random as well. 
+  
+```{r}
+## Run a simulation with 10,000 trials
+x <- gamma_simulator(mean = 1, variance = 1, n = 5, N = 1e4)
+
+## Let's look at xbar
+xbar <- colMeans(x)
+hist(xbar)
+var(xbar)
+mean(xbar)
+
+## construct confidence intervals for each of our trials
+ints <- make_ci(x)
+
+## Look at first 20 intervals
+head(ints, n = 20)
+
+## The mean of each column gives us estimates for (L, U)
+(cm <- colMeans(ints))
+
+par(mfrow = c(1, 2))
+hist(ints[, 1], main = "Histogram of lower bound")
+abline(v = cm[1], lty = 2, col = 'red')
+hist(ints[, 2], main = "Histogram of upper bound")
+abline(v = cm[2], lty = 2, col = 'red')
+
+## variance
+var(ints[, 1]) # lower bound
+var(ints[, 2]) #upper bound
+```
+
+Run the code above and make note of the output. In particular, note histograms for `xbar` and the upper and lower bounds to the interval (in doing so, get an idea of their mean and variance). Now, copy the code block below and change the number of samples to $n = 100$
+
+```{r}
+# put code here
+```
+
+What do you notice about how our bounds change? How is the width of our intervals (and their randomness) associated with our estimate of $\overline{X}$ and the sample size?
+
+5. Reconsider the statements made in the Central Limit Theorem. What impact does the size of our sample $n$ have on how close the distribution of $\overline{X}$ is to being normal? What relationship does the variance of our population variable have with the number of observations we need to make in order to co mpute a reliable statistic?
+
+6.Provide a rough estimate of how long this assignment took to finish. It can be tricky for me to gauge, and I can use this information in organizing future assignments. You might also comment how you feel regarding the material so far. Do you feel comfortable with what motivates the construction of our intervals, and how they might be random?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  

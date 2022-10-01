@@ -1,0 +1,194 @@
+---
+title: "GENE:6234 Assignment  2"
+author: "name"
+date: "02/02/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Using R
+
+For this class, we will be using R for exploring and analyzing our datasets. Knowledge of R is not expected, and I will do all that I can to provide enough of an example to get you started. Three resources that are a great start for independent learning, in order of difficulty, are included here:
+
+- [R for Data Science](https://r4ds.had.co.nz/)
+- [The R Inferno](https://www.burns-stat.com/pages/Tutor/R_inferno.pdf)
+- [Advanced R](https://adv-r.hadley.nz/)
+
+A note on the first, however: the author makes use of his own ecosystem in describing the R landscape (tidyverse), and that is what is presented in that text. You might find it useful for general application as it is widely used with a large number of resources online, but I highly recommend against using if you intend to make heavy use of R in our own research. For now, we are going to cover the bare minimum to get us started.
+
+To include R code in this document, it should be formatted like this
+
+    ```{r}
+    # Comments with pound sign
+    x <- 1 
+    ```
+
+The most common data structure that you will find in R is called a data.frame. A number of them are included with R, and a full list can be found typing `library(help = "datasets")` into the console. Here, we consider the dataset `Orange`, giving a collection of observations for the age and circumference of orange trees over a period of time. We can print and examine the top of the data with the `head` command. We can also determine the number of rows and columns with them `dim` (dimensions) command, which returns rows and columns.
+
+```{r}
+head(Orange)
+dim(Orange)
+nrow(Orange)
+ncol(Orange)
+```
+
+We can also get the variables in a data.frame by using the `names` function
+
+```{r}
+names(Orange)
+```
+
+We see that `Orange` includes three variables, `Tree`, `age`, and `circumference`. We can extract a column of a data.frame in a number of ways:
+
+```{r}
+age1 <- Orange$age
+age2 <- Orange[['age']]
+identical(age1, age2)
+```
+
+A single column of a data.frame is (generally) considered a vector. Unlike a data.frame, a vector has no dimensions, but it does have a length, indicating the number of elements or observations
+
+```{r}
+age <- Orange$age
+dim(age)
+length(age)
+```
+
+For a given vector, we can perform a number of operations
+
+```{r}
+age <- Orange$age
+mean(age)
+median(age)
+var(age)
+sd(age)
+summary(age)
+```
+
+We can also consider a histogram of a vector
+
+```{r}
+hist(age)
+```
+
+In addition to this, there are a number of operations that we may wish to perform on multiple vectors. Here, we consider the correlation between vectors, as well as a scatter plot
+
+```{r}
+age <- Orange$age
+circ <- Orange$circumference
+
+# Pearson correlation
+cor(age, circ)
+
+# Spearman correlation
+cor(age, circ, method = "spearman")
+
+plot(x = age, y = circ)
+```
+
+For any function used in R, you can find help or documentation by typing `?` with the function name, i.e., `?plot`
+
+Brief review of the functions covered above:
+
+```{r, eval = FALSE}
+# exploring a dataset and it's properties
+head
+dim
+nrow
+ncol
+length
+names
+
+# statistics
+mean
+median
+var
+sd
+summary
+cor
+
+# graphics
+plot
+hist
+```
+
+## Datasets
+
+For each of the datasets in the homework problems below, you can access the data by simply typing the name into the console of RStudio, i.e., `women`, `faithful`, etc. 
+
+## Problem 1
+
+Here, we consider the `women` dataset in R, which includes the height and weight of the given observations.  Use the examples above to answer the following questions
+
+a. How many observations are in the `women` dataset?
+
+b. Plot the relationship between height and weight. What do you notice?
+
+c. Based on the results of (2), do you believe that Pearson or Spearman correlation will be larger? Why? Confirm your intuition. 
+
+## Problem 2
+
+We next consider the `faithful` dataset from the Old Faithful geyser in Yellowstone national park, which includes two variables: `eruptions` describes the time, in minutes, of an eruption, while `waiting` describes the the waiting time until the next eruption.
+
+a. Create a histogram of the waiting times for a geyser eruption. What do you notice about this plot? Do the same for eruptions. How are these similar?
+
+b. Create a scatterplot showing the relations between the two variables. What do you see? What conclusions might you draw from this?
+
+
+
+## Problem 4
+
+In a pilot study exploring an experimental treatment, children were randomized into two groups, with one undergoing a treatment regimen using the experimental treatment, and the other a similar series of applications using a placebo. Microbial counts were taken at the end of the study period. When the treatment assignment was unblinded, it was found that Group A was the experimental group, and Group B was the placebo group. Included below are boxplots and descriptive statistics of the microbial counts of the two groups.
+
+```{r, echo = FALSE, fig.align='center'}
+## Ensures the same numbers are generated each time
+set.seed(128)
+
+## Randomly draw from two distributions
+A <- rgamma(n = 17, 1, 2e-3)
+B <- .5*rgamma(n = 20, 1.5, 7e-4)
+
+## Construct data.frame with values and group names
+df <- data.frame(val = c(A, B), 
+                 group = rep(c("A", "B"), c(17, 20)))
+
+## Boxplot of data.frame with points added for mean
+boxplot(val ~ group, data = df, col = 'white', 
+        pars = list(boxwex = 0.2), xlab = "Group", ylab = "Number of Organisms", 
+        main = "Microbial Counts for Two Groups of Children")
+points(1, mean(A), pch = 4)
+points(2, mean(B), pch = 4)
+
+## Summary of data.frame by group
+by(df, factor(df$group), summary)
+```
+
+---
+
+a. Comment and interpret the plots and statistics above, in particular discussing such aspects as central tendancy, variability, and skewness.
+
+b. These data pertain only to the end of the study period. What other information would you want to collect if you were responsible for planning this study?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

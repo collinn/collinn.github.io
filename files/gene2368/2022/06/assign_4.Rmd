@@ -1,0 +1,180 @@
+---
+title: "Assignment 4"
+date: "4/22/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Some R code
+
+This assignment will involve reading in a csv file and performing an analysis. In this first section, we will cover some of the previous lectures, as well as some of the tools we might need. We will use random data for this example
+
+```{r}
+enzyme <- data.frame(A = rnorm(12, 3, 2), 
+                     B = rnorm(12, 5, 2))
+
+boxplot(enzyme)
+head(enzyme)
+```
+
+By looking at the first 6 rows, we see that this dataset has two columns, labeled A and B.
+
+In R syntax, we subset a dataset with `data[row, column]`. For example, to grab a particular column, we can either type the column names in quotes, or input a number indicating which column we want. We can grab A and B individually subsetting as such
+
+```{r}
+A <- enzyme$A
+B <- enzyme$B  
+
+## Or this
+A <- enzyme[, "A"]
+B <- enzyme[, "B"]
+
+A
+B
+
+## We could also do this, but I don't recommend it
+# A <- enzyme[, 1]
+# B <- enzyme[, 2]
+```
+
+This is helpful if we want to compute a statistic for a specific column. For example, the mean and standard deviation of column A can be found
+
+```{r}
+A <- enzyme[, "A"]
+mean(A)
+sd(A)
+```
+
+Having grabbed each column separately, we can use these values to perform a t-test
+
+```{r}
+## Assuming equal variance is two sample t-test
+t.test(A, B, var.equal = TRUE)
+
+## Assuming var not equal is Welch's t-test
+t.test(A, B, var.equal = FALSE)
+```
+
+If the data were paired, we would pass an additional argument to indicate this
+
+```{r}
+t.test(A, B, paired = TRUE)
+```
+
+### Constructing confidence intervals
+
+We saw in a previous lecture that when the value of $\sigma^2$ was known, our confidence intervals could be constructed as 
+
+$$
+\overline{X} \pm z_{\alpha/2} \times \sigma/\sqrt{n}
+$$
+In the situation when $\sigma^2$ is unknown, we replace $\sigma$ with the sample standard deviation $s$
+
+$$
+\overline{X} \pm z_{\alpha/2} \times s/\sqrt{n}
+$$
+What we didn't cover was how to compute the value for $z_{\alpha/2}$. Assuming that our statistic is normally distributed and that $\alpha = 0.05$, we can find this value with the `qnorm` function (q for quantile, norm for normal)
+
+```{r}
+alpha <- 0.05
+z <- qnorm(1 - alpha/2)
+z
+```
+
+Note: $1 - \alpha/2$ in this case is 0.975, indicating that we want the 97.5% quantile. Since the normal distribution is symmetric, $-z$ represents the 2.5% quantile. These values are indicated in the plot below:
+
+```{r, echo=FALSE, fig.align='center'}
+x <- seq(-4, 4, 0.01)
+y <- dnorm(x)
+z <- 1.96
+curve(dnorm(x), from = -4, to = 4, main = "Standard Normal",
+      lwd = 4, col = 'steelblue', xlab = "Z", ylab = "density",
+      xaxt = 'n')
+axis(1, at = c(-z, 0, z), labels = c(expression(-z[alpha/2]), 0, expression(z[alpha/2])))
+polygon(c(x[x < -z], x[x == -z], min(x)),
+        c(y[x < -z], 0, 0),
+        col = 'pink',angle = 45, density = 65,
+        border = FALSE)
+polygon(c(x[x > z], max(x), x[x == z]),
+        c(y[x > z], 0, 0),
+        col = 'pink',angle = 45, density = 65,
+        border = FALSE)
+```
+
+Using the formula above, we can compute a confidence interval for the mean value of group A
+
+```{r}
+meanA <- mean(A)
+sdA <- sd(A)
+n <- length(A)
+z <- qnorm(1 - alpha/2)
+
+c(meanA - z * sdA / sqrt(n), meanA + z * sdA / sqrt(n))
+```
+
+Since our variance was estimated here, we might also consider doing the same for a t-test. The critical value is gotten the same way with the function `qt` (q for quantile, t for t-distribution). However, for the `qt` function, we also need to include an argument for degrees of freedom, which  is $n-1$
+
+```{r}
+meanA <- mean(A)
+sdA <- sd(A)
+n <- length(A)
+t <- qt(1 - alpha/2, df = n - 1)
+
+c(meanA - t * sdA / sqrt(n), meanA + t * sdA / sqrt(n))
+```
+
+
+Taking the ideas above together, we can perform our own paired t-test by looking at the difference directly
+
+```{r}
+## difference in two groups
+diff <- A - B
+
+## Mean, standard error, and sample size
+mean_d <- mean(diff)
+sd_d <- sd(diff)
+n <- length(diff)
+
+## Get appropriate t-statistic
+t <- qt(1 - 0.05/2, df = n - 1)
+
+## Confidence interval for mean difference
+c(mean_d - t * sd_d / sqrt(n), mean_d + t * sd_d / sqrt(n))
+```
+
+If our null hypothesis was that the mean difference was $0$, we would fail to reject, as this value was included in our final confidence interval.
+
+For this assignment, we will be walking through a similar study. You may use the code above as  reference, though you are free to use the `t.test` function in R as well. The course website also includes an `.Rmd` file for your answer. Please use that document with the Knit option to make your homework submission a pdf. 
+
+## Two Sample t-Test
+
+An investigator wishes to compare enzyme levels in two subpopulations of D. melanogaster, A and B, in a standardized experiment. She independently selects a random sample of 50 individuals from each of the two subpopulations and measures the enzyme level of each individual. The investigator plans to use a parametric approach to analyzing the data. Assume that the distributional assumptions associated with the parametric approach are indeed valid for the purposes of this exercise. The data for this problem can be found on the course website, `enzyme.csv`. To read the data into R, you can use the following code
+
+```{r, eval=FALSE}
+## Make sure enzyme.csv in the same directory as your Rmd file
+enzyme <- read.csv("enzyme.csv")
+A <- enzyme$A
+B <- enzyme$B
+```
+<br/>
+
+
+1. What is the name of the parametric statistical procedure the investigator should be using to test the null hypothesis that the mean difference in outcome is zero? 
+
+2. What is the value of the test statistic and it's p-value?
+
+3. How many degrees of freedom are associated with this test?
+
+4. What is the mean difference in outcome? What is its standard error? For this, create a vector `diff <- A-B` and use the `mean` and `sd` function to find the relevant statistics of this vector.
+
+5. What is a 95% confidence interval for the true mean difference in enzyme levels?
+
+6. What assumptions went into this procedure?
+
+7. Find the variance of group A and group B. What are they? Should our t test assume equal variances?
+
+8. What conclusions would you make for this study?
+
