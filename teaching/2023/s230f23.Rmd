@@ -1,0 +1,152 @@
+---
+title: "STA-230 - Introduction to Data Science (Fall 2023)"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: false
+---
+
+$~$
+
+Last updated: `r format(Sys.time(), "%a %b %e %Y, %H:%M")`
+
+### Syllabus
+
+Welcome to the course website for Sta-230, Introduction to Data Science. To begin, you can find the course syllabus linked below:
+
+- [Click here](syllabus230f23.html) to view the course syllabus
+
+You can locate course content by scrolling, or by using the navigation bar in the upper left.  
+
+Please note: material will not be posted until we've reached that point in the course.
+
+### Labs
+
+Sta-230 uses a *workshop style* class format. This means that the majority of our class time will be devoted towards collaboratively working through guided lab activities. You should consult the syllabus for a more detailed description of lab procedures and expectations.
+
+**Lab Topics and Links**:
+
+- Introduction to `R`
+    - Lab 1 (intro), Lab 2 (R Markdown), Optional Lab (common hypothesis tests)
+- Data visualization
+    - Lab 3 (intro to `ggplot`), Lab 4 (effective data visualizations)
+- Data manipulation
+    - Lab 5 (reshaping data with `tidyr`), Lab 6 (manipulation with `dplyr`), Lab 7 (merging and joining)
+    - Optional lab (functions, iteration, and files)
+- Working with strings
+    - Lab 8 (string processing with `stringr`)
+- Interactive data visualizations
+    - Lab 9 (interactive graphics with `plotly`), Lab 10 (maps with `ggplot` and `leaflet`)
+- R Shiny applications
+    - Lab 11 (intro to `shiny`)
+- Principal component analysis
+    - Lab 12 (intro to PCA)
+- Clustering
+    - Lab 13 (partitional clustering), Lab 14 (hierarchical clustering)
+- Modeling a numeric outcome
+    - Lab 15 (modeling a numeric outcome), Lab 16 (cross-validation)
+- Modeling a categorical outcome
+    - Lab 17 (modeling a categorical outcome), Lab 18 (decision tree models)
+
+
+<!-- - Introduction to `R` -->
+<!--     - [Lab 1 (intro)](s230s23/intro1.html), [Lab 2 (R Markdown)](s230s23/intro2.html), [Optional Lab (common hypothesis tests)](s230s23/ht.html) -->
+<!-- - Data visualization -->
+<!--     - [Lab 3 (intro to `ggplot`)](s230s23/ggplot.html), [Lab 4 (effective data visualizations)](s230s23/ggplot2.html) -->
+<!-- - Data manipulation -->
+<!--     - [Lab 5 (reshaping data with `tidyr`)](s230s23/tidyr.html), [Lab 6 (manipulation with `dplyr`)](s230s23/dplyr.html), [Lab 7 (merging and joining)](s230s23/joins.html) -->
+<!--     - [Optional lab (functions, iteration, and files)](s230s23/misc.html) -->
+<!-- - Working with strings -->
+<!--     - [Lab 8 (string processing with `stringr`)](s230s23/strings.html) -->
+<!-- - Interactive data visualizations -->
+<!--     - [Lab 9 (interactive graphics with `plotly`)](s230s23/plotly.html), [Lab 10 (maps with `ggplot` and `leaflet`)](s230s23/maps.html) -->
+<!-- - R Shiny applications -->
+<!--     - [Lab 11 (intro to `shiny`)](s230s23/shiny.html) -->
+<!-- - Principal component analysis -->
+<!--     - [Lab 12 (intro to PCA)](s230s23/pca.html) -->
+<!-- - Clustering -->
+<!--     - [Lab 13 (partitional clustering)](s230s23/clustering1.html), [Lab 14 (hierarchical clustering)](s230s23/clustering2.html) -->
+<!-- - Modeling a numeric outcome -->
+<!--     - [Lab 15 (modeling a numeric outcome)](s230s23/model1.html), [Lab 16 (cross-validation)](s230s23/model2.html) -->
+<!-- - Modeling a categorical outcome -->
+<!--     - [Lab 17 (modeling a categorical outcome)](s230s23/model3.html), [Lab 18 (decision tree models)](s230s23/trees.html) -->
+
+
+### Homework Assignments
+
+Throughout the semester there will be 6-7 homework assignments:
+
+- Homework #1 (coming soon)
+  - Due data: TBD
+<!-- - [Homework #1](s230s23/hw1.html) -->
+<!--     - [.Rmd template file](s230s23/hw1.zip) -->
+<!-- - Due date: Wednesday 2/1 at 11:59pm -->
+<!-- - [Homework #2](s230s23/hw2.html) -->
+<!--     - Due date: Wednesday 2/15 at 11:59pm -->
+<!-- - [Homework #3](s230s23/hw3.html) -->
+<!--     - Due date: Friday 3/3 at 11:59pm -->
+<!-- - [Homework #4](s230s23/hw4.html) -->
+<!--     - Due date: Monday 4/10 at 11:59pm -->
+<!-- - [Homework #5](s230s23/hw5.html) -->
+<!--     - Due date: Wednesday 4/19 at 11:59pm -->
+<!-- - [Homework #6](s230s23/hw6.html) -->
+<!--     - Due date: Wednesday 5/3 at 11:59pm -->
+<!-- - [Homework #7](s230s23/hw7.html) -->
+<!--     - Due date: Friday 5/12 at 11:59pm -->
+<!-- - *Note*: this assignment focuses on data ethics and involves reading and reflection rather than `R` coding. -->
+        
+### Projects
+
+Work in Progress
+
+<!-- There will be 3 major projects during the semester. Details on each project will be posted no later than 2 weeks before the project's first deadline. -->
+
+<!-- 1. Data cleaning and visualization take-home -->
+<!--     - [Description (available now)](s230s23/takehome1.html) -->
+<!--     - Instructions and Data (emailed Wednesday 2/15 at noon) -->
+<!--     - Due Sunday 2/19 at 11:59pm -->
+<!-- 2. R Shiny application -->
+<!--     - [Project Description](s230s23/project2.html) -->
+<!--     - All app code is due Friday 3/17 at 11:59pm -->
+<!-- 3. Data analysis (final) -->
+<!--     - [Project Description](s230s23/final.html) -->
+<!--     - Update email is due Monday 5/1 at 11:59pm, your email should include a 1-paragraph written description of your progress accompanied by a code file or screenshots. -->
+
+
+### Recommended Readings
+
+The following readings are *recommended* in conjunction with the block of material they cover. They are intended to provide another perspective on the topics we'll cover:
+
+- Introduction to R
+    - [Ch 4 (R basics) - R for Data Science](https://r4ds.had.co.nz/workflow-basics.html)
+    - [Ch 27 (R Markdown - R for Data Science)](https://r4ds.had.co.nz/r-markdown.html)
+<!-- - Data Visualization -->
+<!--     - [Ch 3 (Data visualization) - R for Data Science](https://r4ds.had.co.nz/data-visualisation.html) -->
+<!--     - [Ch 2.1, 2.2, 2.3, 2.4 (Data visualization case study) - Modern Data Science with R](https://mdsr-book.github.io/mdsr2e/ch-vizI.html) -->
+<!--     - [Ch 3 (ggplot) - Modern Data Science with R](https://mdsr-book.github.io/mdsr2e/ch-vizII.html) -->
+<!-- - Data Manipulation -->
+<!--     - [Ch 12 (Tidy data) - R for Data Science](https://r4ds.had.co.nz/tidy-data.html) -->
+<!--     - [Ch 4 (Data wrangling) - Modern Data Science with R](https://mdsr-book.github.io/mdsr2e/ch-dataI.html) -->
+<!--     - [Ch 5 (Joins) - Modern Data Science with R](https://mdsr-book.github.io/mdsr2e/ch-join.html) -->
+<!--     - [Ch 13 (Relational data) - R for Data Science](https://r4ds.had.co.nz/relational-data.html) -->
+<!-- - Working with strings -->
+<!--     - [Ch 14 (Strings) - R for Data Science](https://r4ds.had.co.nz/strings.html) -->
+<!-- - Interactive Data Visualizations -->
+<!--     - [Ch 2.1 (Intro Plotly) - Interactive web-based data visualization with R, plotly, and shiny](https://plotly-r.com/overview.html#intro-plotly) -->
+<!--     - [Ch 17 (Maps and Geospatial data) - Modern Data Science with R](https://mdsr-book.github.io/mdsr2e/ch-spatial.html#motivation-whats-so-great-about-geospatial-data) -->
+<!-- - Principal Component Analysis -->
+<!--     - [Ch 12.1 and 12.2 (PCA) - Intro to Statistical Learning](https://hastie.su.domains/ISLR2/ISLRv2_website.pdf) -->
+<!-- - Clustering  -->
+<!--     - [Ch 12.4 (Clustering) - Intro to Statistical Learning](https://hastie.su.domains/ISLR2/ISLRv2_website.pdf) -->
+<!-- - Modeling a numeric outcome -->
+<!--     - [Ch 2.1 and 2.2 (Concepts in statistical learning) - Intro to Statistical Learning](https://hastie.su.domains/ISLR2/ISLRv2_website.pdf) -->
+<!--     - [Ch 3.1, 3.2, and 3.3 (Linear regression) - Intro to Statistical Learning](https://hastie.su.domains/ISLR2/ISLRv2_website.pdf) -->
+<!-- - Cross-validation -->
+<!--     - [Stanford's Intro to Statistical Learning video 5.2 (k-fold CV)](https://www.youtube.com/watch?v=AMfvd_hLssE&list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&index=28) -->
+<!--     - [Stanford's Intro to Statistical Learning video 5.3 (CV the right and wrong way)](hhttps://www.youtube.com/watch?v=jgoa28FR__Y&list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&index=29) -->
+<!-- - Modeling a categorical outcome -->
+<!--     - [Ch 4.1, 4.2, and 4.3 (Classification and logistic regression) - Intro to Statistical Learning](https://hastie.su.domains/ISLR2/ISLRv2_website.pdf) -->
+<!-- - Tree-based models -->
+<!--      - [Ch 8.1 and 8.2 (Decision trees and random forests) - Intro to Statistical Learning](https://hastie.su.domains/ISLR2/ISLRv2_website.pdf) -->
