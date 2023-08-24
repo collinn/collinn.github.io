@@ -29,7 +29,7 @@ Sta-230 uses a *workshop style* class format. This means that the majority of ou
 **Lab Topics and Links**:
 
 - Introduction to `R`
-    - Lab 1 (intro), Lab 2 (R Markdown), Optional Lab (common hypothesis tests)
+    - [Lab 1 (intro)](labs/intro1.html), Lab 2 (R Markdown), Optional Lab (common hypothesis tests)
 - Data visualization
     - Lab 3 (intro to `ggplot`), Lab 4 (effective data visualizations)
 - Data manipulation
