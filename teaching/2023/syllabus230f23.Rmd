@@ -9,11 +9,13 @@ output:
 
 
 
-# Syllabus - Sta-230 (Fall 2023)
+# Syllabus - STA-230 (Fall 2023)
 
 Last updated: `r format(Sys.time(), "%a %b %e %Y, %H:%M")`
 
 ### Course Information
+
+<img style="float: right; width:40%; height:40%;" src="run_r.png"> 
 
 **Instructor**:
 
@@ -61,6 +63,8 @@ After completing this course, students should be able to:
 $~$
 
 ### Policies
+
+**Email**
 
 **Class Sessions**
 
@@ -166,6 +170,6 @@ $~$
 5. Introduction to unsupervised learning (principal component analysis, dimension reduction, and clustering)
 6. Introduction to supervised learning (cross-validation, performance metrics, regression, classification, and machine learning methods)
 
-### Citation
+### Acknowledgement
 
 This syllabus and course are the product of Professor Ryan Miller who graciously permitted me to use. I take full responsibility for any errors or omissions that have occured during my adoption process.
