@@ -382,4 +382,4 @@ colnames(my_data) # prints the names of the variables (columns) of 'my_data'
 ```
 
 
-**Question #5**: Use indices and a logical vector to subset `my_data` (the Happy Planet data from Question #1) to show only those countries with a life expectancy greater than 80. (**Hint:** Use `$`)
+**Question #5**: Use indices and a logical vector to subset `my_data` (the Happy Planet data from Question #1) to show only those countries with a life expectancy greater than 80. (*Hint:* Use `$`)
