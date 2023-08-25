@@ -1809,10 +1809,17 @@ x &lt; 8</code></pre>
 <pre class="r"><code># In R we use &quot;==&quot; to check equality
 x == 8</code></pre>
 <pre><code>## [1] FALSE FALSE FALSE  TRUE FALSE FALSE</code></pre>
+<p>Note that this is an example of a <em>vectorized operation</em>; for
+each element in the input <code>x</code>, we receive a corresponding
+value in the output. We see this first in the expression
+<code>x &lt; 8</code>, where this is <code>TRUE</code> for the first
+three elements of <code>x</code> (5, 6, 7) and <code>FALSE</code> for
+the last three elements (8, 9, 10). Verify to yourself that the output
+makes sense for the expression <code>x == 8</code>.</p>
 <p>We can use this trick to subset <code>x</code> to keep only values
 greater than 7. What is happening is that <code>R</code> is returning
 all of the values where the indices are <code>TRUE</code> and not
-returning the ones where they are <code>FALSE</code></p>
+returning the ones where they are <code>FALSE</code>.</p>
 <pre class="r"><code># Here we assign the logical vector to a variable, &quot;idx&quot;
 idx &lt;- x &gt; 7
 idx</code></pre>
@@ -1884,9 +1891,7 @@ use the <code>$</code> operator:</p>
 <pre class="r"><code>my_data &lt;- read.csv(&quot;https://remiller1450.github.io/data/HappyPlanet.csv&quot;)
 
 # The $ accesses the variable named &#39;Country&#39; within &#39;my_data&#39;
-countries &lt;- my_data$Country
-head(countries) # head() is a function that shows the first part of an object, see ?head</code></pre>
-<pre><code>## [1] &quot;Albania&quot;   &quot;Algeria&quot;   &quot;Angola&quot;    &quot;Argentina&quot; &quot;Armenia&quot;   &quot;Australia&quot;</code></pre>
+countries &lt;- my_data$Country</code></pre>
 <p>We can also subset using either of the methods discussed in the
 previous section, namely those with the <code>[</code> or
 <code>[[</code> operators</p>
@@ -1938,12 +1943,19 @@ firstFive</code></pre>
 possible. Instead, if we wish to extract just the observation for
 Albania (the first country), we could create a <em>logical vector</em>
 and use that to subset our dataset</p>
+<pre class="r"><code># The head() function returns the first few elements of a vector or data frame
+head(my_data$Country == &quot;Albania&quot;)</code></pre>
+<pre><code>## [1]  TRUE FALSE FALSE FALSE FALSE FALSE</code></pre>
 <pre class="r"><code># my_data$Country == &quot;Albania&quot; returns a logical vector
 my_data[my_data$Country == &quot;Albania&quot;, ] # don&#39;t forget the comma</code></pre>
 <pre><code>##   Country Region Happiness LifeExpectancy Footprint  HLY   HPI HPIRank
 ## 1 Albania      7       5.5           76.2       2.2 41.7 47.91      54
 ##   GDPperCapita   HDI Population
 ## 1         5316 0.801       3.15</code></pre>
+<p>Here, <code>my_data$Country == &quot;Albania&quot;</code> is returning a
+logical vector that is <code>TRUE</code> for the first entry and
+<code>FALSE</code> for all of the rest, explaining why only a single row
+of the <code>data.frame</code> is returned.</p>
 <p>As shown above, the <code>head</code> function will print the first
 few rows of an object. Here are a few other functions might use when
 working with and exploring a new data set:</p>
@@ -1960,7 +1972,7 @@ working with and exploring a new data set:</p>
 <p><strong>Question #5</strong>: Use indices and a logical vector to
 subset <code>my_data</code> (the Happy Planet data from Question #1) to
 show only those countries with a life expectancy greater than 80.
-(<em>Hint:</em> Use <code>$</code>)</p>
+(<em>Hint:</em> Use the <code>$</code> operator)</p>
 </div>
 </div>
 

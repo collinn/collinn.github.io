@@ -266,7 +266,11 @@ x < 8
 # In R we use "==" to check equality
 x == 8
 ```
-We can use this trick to subset `x` to keep only values greater than 7. What is happening is that `R` is returning all of the values where the indices are `TRUE` and not returning the ones where they are `FALSE`
+
+Note that this is an example of a *vectorized operation*; for each element in the input `x`, we receive a corresponding value in the output. We see this first in the expression `x < 8`, where this is `TRUE` for the first three elements of `x` (5, 6, 7) and `FALSE` for the last three elements (8, 9, 10). Verify to yourself that the output makes sense for the expression `x == 8`.
+
+
+We can use this trick to subset `x` to keep only values greater than 7. What is happening is that `R` is returning all of the values where the indices are `TRUE` and not returning the ones where they are `FALSE`.
 
 ```{r}
 # Here we assign the logical vector to a variable, "idx"
@@ -300,6 +304,7 @@ class(my_list[2]) # this remains a list because of single bracket
 my_list[[2]]
 class(my_list[[2]]) # a vector because of double bracket
 ```
+
 As data frames are lists, this is true for them as well:
 
 ```{r}
@@ -311,6 +316,7 @@ class(df[2]) # data.frame
 df[[2]]
 class(df[[2]]) # vector
 ```
+
 
 
 **Question #4**: Use indices to print the Happiness score (column #3) of Hong Kong (row #57) in the object `my_data` (the Happy Planet data from Question #1).
@@ -328,7 +334,6 @@ my_data <- read.csv("https://remiller1450.github.io/data/HappyPlanet.csv")
 
 # The $ accesses the variable named 'Country' within 'my_data'
 countries <- my_data$Country
-head(countries) # head() is a function that shows the first part of an object, see ?head
 ```
 
 We can also subset using either of the methods discussed in the previous section, namely those with the `[` or `[[` operators
@@ -368,9 +373,14 @@ firstFive
 Just as before, we want to avoid using hard-coded numbers if possible. Instead, if we wish to extract just the observation for Albania (the first country), we could create a *logical vector* and use that to subset our dataset
 
 ```{r}
+# The head() function returns the first few elements of a vector or data frame
+head(my_data$Country == "Albania")
+
 # my_data$Country == "Albania" returns a logical vector
 my_data[my_data$Country == "Albania", ] # don't forget the comma
 ```
+
+Here, `my_data$Country == "Albania"` is returning a logical vector that is `TRUE` for the first entry and `FALSE` for all of the rest, explaining why only a single row of the `data.frame` is returned.
 
 As shown above, the `head` function will print the first few rows of an object. Here are a few other functions might use when working with and exploring a new data set:
 
@@ -382,4 +392,4 @@ colnames(my_data) # prints the names of the variables (columns) of 'my_data'
 ```
 
 
-**Question #5**: Use indices and a logical vector to subset `my_data` (the Happy Planet data from Question #1) to show only those countries with a life expectancy greater than 80. (*Hint:* Use `$`)
+**Question #5**: Use indices and a logical vector to subset `my_data` (the Happy Planet data from Question #1) to show only those countries with a life expectancy greater than 80. (*Hint:* Use the `$` operator)
