@@ -1794,51 +1794,32 @@ object. In this example we access the second position of the object
 position of <code>x</code>:</p>
 <pre class="r"><code>x[c(2,4)]</code></pre>
 <pre><code>## [1] 6 8</code></pre>
-<p>A very useful trick when subsetting involves making use of
-<em>logical vectors</em> discussed briefly in the previous section. For
-example, logical vectors can be constructed with equality/inequality
-operations. Here, we consider our vector <code>x</code> from above and
-ask if each of the elements is less than 8 or equal to 8, respectively
-(note: this is an example of a <em>vectorized</em> operation):</p>
-<pre class="r"><code># Recall x is 5:10
-x</code></pre>
-<pre><code>## [1]  5  6  7  8  9 10</code></pre>
-<pre class="r"><code># A logical vector indicating for which indices this inequality is true
-x &lt; 8</code></pre>
-<pre><code>## [1]  TRUE  TRUE  TRUE FALSE FALSE FALSE</code></pre>
-<pre class="r"><code># In R we use &quot;==&quot; to check equality
-x == 8</code></pre>
-<pre><code>## [1] FALSE FALSE FALSE  TRUE FALSE FALSE</code></pre>
-<p>Note that this is an example of a <em>vectorized operation</em>; for
-each element in the input <code>x</code>, we receive a corresponding
-value in the output. We see this first in the expression
-<code>x &lt; 8</code>, where this is <code>TRUE</code> for the first
-three elements of <code>x</code> (5, 6, 7) and <code>FALSE</code> for
-the last three elements (8, 9, 10). Verify to yourself that the output
-makes sense for the expression <code>x == 8</code>.</p>
-<p>We can use this trick to subset <code>x</code> to keep only values
-greater than 7. What is happening is that <code>R</code> is returning
-all of the values where the indices are <code>TRUE</code> and not
-returning the ones where they are <code>FALSE</code>.</p>
-<pre class="r"><code># Here we assign the logical vector to a variable, &quot;idx&quot;
-idx &lt;- x &gt; 7
-idx</code></pre>
-<pre><code>## [1] FALSE FALSE FALSE  TRUE  TRUE  TRUE</code></pre>
-<pre class="r"><code># We can use idx to subset x
-x[idx]</code></pre>
-<pre><code>## [1]  8  9 10</code></pre>
-<pre class="r"><code># We can also subset this without assigning to variable
-x[x &gt; 7]</code></pre>
-<pre><code>## [1]  8  9 10</code></pre>
 <p>Some objects, such as data frames, have multiple dimensions,
 requiring indices in each dimension (separated by commas) to describe a
-single element’s position:</p>
+single element’s position. Indices in the first position indicate a row,
+while those in the second position indicate a column.</p>
 <pre class="r"><code>df &lt;- data.frame(x = 1:5, y = 6:10, z = letters[1:5]) 
-df[2,3] # The element in row 2, column 3</code></pre>
-<pre><code>## [1] &quot;b&quot;</code></pre>
-<pre class="r"><code>df[2,] # Everything in row 2</code></pre>
+df</code></pre>
+<pre><code>##   x  y z
+## 1 1  6 a
+## 2 2  7 b
+## 3 3  8 c
+## 4 4  9 d
+## 5 5 10 e</code></pre>
+<pre class="r"><code>df[2, ] # Everything in row 2</code></pre>
 <pre><code>##   x y z
 ## 2 2 7 b</code></pre>
+<pre class="r"><code>df[, 3] # Everything in column 3</code></pre>
+<pre><code>## [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot; &quot;e&quot;</code></pre>
+<pre class="r"><code>df[2,3] # The element in row 2, column 3</code></pre>
+<pre><code>## [1] &quot;b&quot;</code></pre>
+<p>As was the case with vectors, we can use multiple indices to select
+multiple rows (or columns)</p>
+<pre class="r"><code># Selects 2nd and 4th columns
+df[c(2, 4), ]</code></pre>
+<pre><code>##   x y z
+## 2 2 7 b
+## 4 4 9 d</code></pre>
 <p>Although we will not work with many lists directly in this course, it
 is worth being aware of a special case when subsetting with a list.
 Whenever the single bracket <code>[</code> is used to subset a list, the
@@ -1872,6 +1853,8 @@ df[[2]]</code></pre>
 <pre><code>## [1]  6  7  8  9 10</code></pre>
 <pre class="r"><code>class(df[[2]]) # vector</code></pre>
 <pre><code>## [1] &quot;integer&quot;</code></pre>
+<p>Note here that when no comma is used in the indices for a data frame,
+the index is used to identify a column.</p>
 <p><strong>Question #4</strong>: Use indices to print the Happiness
 score (column #3) of Hong Kong (row #57) in the object
 <code>my_data</code> (the Happy Planet data from Question #1).</p>
@@ -1939,26 +1922,13 @@ firstFive</code></pre>
 ## 3         2335 0.446      16.10
 ## 4        14280 0.869      38.75
 ## 5         4945 0.775       3.02</code></pre>
-<p>Just as before, we want to avoid using hard-coded numbers if
-possible. Instead, if we wish to extract just the observation for
-Albania (the first country), we could create a <em>logical vector</em>
-and use that to subset our dataset</p>
-<pre class="r"><code># The head() function returns the first few elements of a vector or data frame
-head(my_data$Country == &quot;Albania&quot;)</code></pre>
-<pre><code>## [1]  TRUE FALSE FALSE FALSE FALSE FALSE</code></pre>
-<pre class="r"><code># my_data$Country == &quot;Albania&quot; returns a logical vector
-my_data[my_data$Country == &quot;Albania&quot;, ] # don&#39;t forget the comma</code></pre>
-<pre><code>##   Country Region Happiness LifeExpectancy Footprint  HLY   HPI HPIRank
-## 1 Albania      7       5.5           76.2       2.2 41.7 47.91      54
-##   GDPperCapita   HDI Population
-## 1         5316 0.801       3.15</code></pre>
-<p>Here, <code>my_data$Country == &quot;Albania&quot;</code> is returning a
-logical vector that is <code>TRUE</code> for the first entry and
-<code>FALSE</code> for all of the rest, explaining why only a single row
-of the <code>data.frame</code> is returned.</p>
-<p>As shown above, the <code>head</code> function will print the first
-few rows of an object. Here are a few other functions might use when
-working with and exploring a new data set:</p>
+<p>Just as before, though, we want to avoid using hard-coded numbers if
+possible. We will explore how to do this in the next section.</p>
+<p>There are a few functions that we might use when exploring a new data
+set. The first of these are <code>head()</code> and <code>tail()</code>
+which print out the first and last few rows of a data set (or elements
+of a vector) respectively. Here are a few other functions that may be
+useful:</p>
 <pre class="r"><code>dim(my_data) # prints the dimensions of &#39;my_data&#39;</code></pre>
 <pre><code>## [1] 143  11</code></pre>
 <pre class="r"><code>nrow(my_data) # prints the number of rows of &#39;my_data&#39;</code></pre>
@@ -1969,10 +1939,222 @@ working with and exploring a new data set:</p>
 <pre><code>##  [1] &quot;Country&quot;        &quot;Region&quot;         &quot;Happiness&quot;      &quot;LifeExpectancy&quot;
 ##  [5] &quot;Footprint&quot;      &quot;HLY&quot;            &quot;HPI&quot;            &quot;HPIRank&quot;       
 ##  [9] &quot;GDPperCapita&quot;   &quot;HDI&quot;            &quot;Population&quot;</code></pre>
-<p><strong>Question #5</strong>: Use indices and a logical vector to
-subset <code>my_data</code> (the Happy Planet data from Question #1) to
-show only those countries with a life expectancy greater than 80.
-(<em>Hint:</em> Use the <code>$</code> operator)</p>
+<p><strong>Question #5 (Part 1)</strong>: Write code that prints out the
+last three observations in the Happy Planet data set.</p>
+<p><strong>Question #5 (Part 2)</strong>: Write code that finds the
+median value of life expectancy <em>for the last 10 observations</em> in
+the Happy Planet data (Hint: <code>?median</code>)</p>
+</div>
+<div id="logical-conditions-and-subsetting" class="section level3">
+<h3>Logical Conditions and Subsetting</h3>
+<p>As we mentioned in the last section, we often want to avoid
+subsetting our data by using numbers for row/column positions. Usually
+when we are subsetting data, we have a set of criteria in mind that
+describes the portion we wish to retain. While there are a number of
+ways we may go about doing this, one very common method involves making
+use of <em>logical vectors</em> which, as we saw previously, are vectors
+made up of only the values <code>TRUE</code> and <code>FALSE</code>.</p>
+<p>A natural way of constructing logical vectors is with the use of
+<em>logical operators</em>, the main set of which is given below:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Operator</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>==</code></td>
+<td align="left">equal to</td>
+</tr>
+<tr class="even">
+<td align="left"><code>!=</code></td>
+<td align="left"><em>not</em> equal to</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>&lt;</code></td>
+<td align="left">greater than (strict)</td>
+</tr>
+<tr class="even">
+<td align="left"><code>&lt;=</code></td>
+<td align="left">greater than or equal to</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>&gt;</code></td>
+<td align="left">less than (strict)</td>
+</tr>
+<tr class="even">
+<td align="left"><code>&gt;=</code></td>
+<td align="left">less than or equal to</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>&amp;</code></td>
+<td align="left">and</td>
+</tr>
+<tr class="even">
+<td align="left"><code>|</code></td>
+<td align="left">or</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>!</code></td>
+<td align="left">not</td>
+</tr>
+</tbody>
+</table>
+<p>To illustrate, let’s begin by considering a vector <code>x</code>
+which takes integer values from 5 to 10 and ask two questions: which
+values in the vector are less than 8 and which values are equal to 8,
+respectively.</p>
+<pre class="r"><code>x &lt;- 5:10
+x</code></pre>
+<pre><code>## [1]  5  6  7  8  9 10</code></pre>
+<pre class="r"><code># A logical vector indicating for which indices this inequality is true
+x &lt; 8</code></pre>
+<pre><code>## [1]  TRUE  TRUE  TRUE FALSE FALSE FALSE</code></pre>
+<pre class="r"><code># A logical vector indicating for which values this equality is true
+x == 8</code></pre>
+<pre><code>## [1] FALSE FALSE FALSE  TRUE FALSE FALSE</code></pre>
+<p>Note that this is an example of a <em>vectorized</em> operation,
+meaning that for each element in the input <code>x</code>, we will
+receive a corresponding value in the output. We see this in the first
+expression <code>x &lt; 8</code>, where the inequality is
+<code>TRUE</code> for the first three elements (5, 6, 7) and
+<code>FALSE</code> for the last three elements (8, 9, 10). Verify for
+yourself that the output makes sense for <code>x == 8</code>.</p>
+<p>As with all operations in <code>R</code>, we can assign the logical
+vector output to a named variable. We can use this trick to subset
+<code>x</code> to keep only values greater than 8. What is happening is
+that <code>R</code> is returning all of the values where the indices are
+<code>TRUE</code> and not returning the ones where they are
+<code>FALSE</code>.</p>
+<pre class="r"><code># Here we assign the logical vector to a variable, &quot;idx&quot;
+idx &lt;- x &gt; 8
+idx</code></pre>
+<pre><code>## [1] FALSE FALSE FALSE FALSE  TRUE  TRUE</code></pre>
+<pre class="r"><code># We can use idx to subset x
+x[idx]</code></pre>
+<pre><code>## [1]  9 10</code></pre>
+<pre class="r"><code># We can also subset this without assigning to variable
+x[x &gt; 8]</code></pre>
+<pre><code>## [1]  9 10</code></pre>
+<p>For situations in which we prefer to have indicies instead of logical
+vectors, we can use the <code>which()</code> function which returns the
+index for each position that is <code>TRUE</code></p>
+<pre class="r"><code>which(x &gt; 8) # this is true for the 5th and 6th element of x</code></pre>
+<pre><code>## [1] 5 6</code></pre>
+<p>Sometimes we will find ourselves in situations in which we want to
+combine logical statements, which we can do with “and”
+(<code>&amp;</code>) and “or” (<code>|</code>). The results of the
+operators match what we would typically expect using spoken language:
+when using <code>&amp;</code>, something is <code>TRUE</code> only if
+both conditions are <code>TRUE</code> and is otherwise false.
+Alternatively, when using <code>|</code>, a statement is
+<code>TRUE</code> if one or both statements are <code>TRUE</code>. Here
+are a few examples:</p>
+<pre class="r"><code># Both of these statements are TRUE
+(3 &gt; 2) &amp; (4 &gt; 1)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>(3 &gt; 2) | (4 &gt; 1)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code># One of these statements is FALSE
+(3 &gt; 2) &amp; (4 &lt; 1)</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>(3 &gt; 2) | (4 &lt; 1)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code># Both of these statements are FALSE
+(3 &lt; 2) &amp; (4 &lt; 1)</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>(3 &lt; 2) | (4 &lt; 1)</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<p>We can combine these just as we did before to extract elements of
+<code>x</code></p>
+<pre class="r"><code># Recall x is 5:10
+x</code></pre>
+<pre><code>## [1]  5  6  7  8  9 10</code></pre>
+<pre class="r"><code># See which values are TRUE and which are FALSE
+x &lt; 7 | x &gt; 9</code></pre>
+<pre><code>## [1]  TRUE  TRUE FALSE FALSE FALSE  TRUE</code></pre>
+<div id="subsetting-with-data" class="section level4">
+<h4>Subsetting with data</h4>
+<p>Once we are comfortable with using logical vectors to subset vectors,
+it is natural to extend this to data frames. For example, in the
+previous section we used a numeric index to subset the Happy Planet data
+in order to access the first observation for Albania. Now, we can be
+explicit in our request with the following:</p>
+<pre class="r"><code>my_data[my_data$Country == &quot;Albania&quot;,   ]</code></pre>
+<pre><code>##   Country Region Happiness LifeExpectancy Footprint  HLY   HPI HPIRank
+## 1 Albania      7       5.5           76.2       2.2 41.7 47.91      54
+##   GDPperCapita   HDI Population
+## 1         5316 0.801       3.15</code></pre>
+<p><strong>Question #6</strong> Explain in a comment why the above code
+works. What is <code>my_data$Country == &quot;Albania&quot;</code>, and how is it
+being used to subset the <code>my_data</code>?</p>
+<p>Because subsetting data frames based on logical conditions is such a
+common operation in <code>R</code>, we have available to us a very
+useful function <code>subset()</code>. <code>subset</code> works by
+taking primarily two arguments: a data frame or object to be subset and
+a logical vector. Here, we create a subset of the Happy Planet data only
+containing those countries whose life expectancy is greater than 80:</p>
+<pre class="r"><code>sub1 &lt;- subset(my_data, LifeExpectancy &gt; 80)
+sub1</code></pre>
+<pre><code>##         Country Region Happiness LifeExpectancy Footprint  HLY   HPI HPIRank
+## 6     Australia      2       7.9           80.9       7.8 63.7 36.64     102
+## 25       Canada      2       8.0           80.3       7.1 64.0 39.40      89
+## 47       France      2       7.1           80.2       4.9 56.6 43.86      71
+## 57    Hong Kong      6       7.2           81.9       5.7 58.6 41.60      84
+## 59      Iceland      2       7.8           81.5       7.4 63.9 38.14      94
+## 65       Israel      3       7.1           80.3       4.8 56.8 44.49      67
+## 66        Italy      2       6.9           80.3       4.8 55.7 44.02      69
+## 68        Japan      6       6.8           82.3       4.9 55.6 43.25      75
+## 119       Spain      2       7.6           80.5       5.7 61.2 43.19      76
+## 122      Sweden      2       7.9           80.5       5.1 63.2 47.99      53
+## 123 Switzerland      2       7.7           81.3       5.0 62.6 48.05      52
+##     GDPperCapita   HDI Population
+## 6          31794 0.962      20.40
+## 25         33375 0.961      32.31
+## 47         30386 0.952      60.87
+## 57         34833 0.937       6.81
+## 59         36510 0.968       0.30
+## 65         25864 0.932       6.92
+## 66         28529 0.941      58.61
+## 68         31267 0.953     127.77
+## 119        27169 0.949      43.40
+## 122        32525 0.956       9.02
+## 123        35633 0.955       7.44</code></pre>
+<p>This works equally well for compound logical expressions</p>
+<pre class="r"><code>sub2 &lt;- subset(my_data, LifeExpectancy &lt;= 70 &amp; Happiness &gt; 6)
+sub2</code></pre>
+<pre><code>##                 Country Region Happiness LifeExpectancy Footprint  HLY   HPI
+## 14               Bhutan      5       6.1           64.7       1.0 39.7 58.50
+## 15              Bolivia      1       6.5           64.7       2.1 42.1 49.35
+## 52            Guatemala      1       7.4           69.7       1.5 51.8 68.37
+## 54               Guyana      1       6.5           65.2       2.6 42.6 45.63
+## 56             Honduras      1       7.0           69.4       1.8 48.7 60.99
+## 70           Kazakhstan      7       6.1           65.9       3.4 40.4 38.54
+## 75                 Laos      6       6.2           63.2       1.1 39.4 57.34
+## 127            Thailand      6       6.3           69.6       2.1 43.5 50.90
+## 129 Trinidad and Tobago      1       6.7           69.2       2.1 46.3 54.21
+##     HPIRank GDPperCapita   HDI Population
+## 14       17         3649 0.579       0.64
+## 15       47         2819 0.695       9.18
+## 52        4         4568 0.689      12.71
+## 54       63         4508 0.750       0.74
+## 56       10         3430 0.700       6.83
+## 70       91         7857 0.794      15.15
+## 75       19         2039 0.601       5.66
+## 127      41         8677 0.781      63.00
+## 129      30        14603 0.814       1.32</code></pre>
+<p>Notice that unlike other instances when subsetting where we had to
+use <code>$</code> to indicate that <code>LifeExpectancy</code> or
+<code>Happiness</code> were columns in <code>my_data</code>, the
+<code>subset</code> function was able to determine that on it’s own.</p>
+<p><strong>Question #7</strong> Create a subset of <code>my_data</code>
+that contains all countries with a population greater than 100 million
+(the relevant column measures population in millions) that also have a
+happiness index of 6 or lower. Then determine the number of observations
+in this subset.</p>
+</div>
 </div>
 </div>
 
