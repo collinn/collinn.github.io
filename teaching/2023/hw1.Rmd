@@ -1,10 +1,3 @@
----
-title: 'Homework #1'
-author: "your_name_here"
-date: "2023-08-29"
-output: html_document
----
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -64,7 +57,7 @@ The data at the URL below  contains information from the Ames Assessor's Office 
 https://remiller1450.github.io/data/AmesHousing.csv
 
   - **Part A** Read this data into R and store it in a data frame named `housing`. Check the class of the variable `MS.SubClass` and compare it with the description given in the link above. Based on your assessment, should this variable be coerced to a different type? Briefly explain
-  - **Part B** Find the total number of homes in this data set with missing values for the variable `Garage.Type`. Demonstrate two different ways in which you might find this number.
+  - **Part B** Find the total number of homes in this data set with missing values for the variable `Garage.Type`. 
   - **Part C** Create a subset of the data set containing homes that are not missing a value for `Garage.Type`. What is the mean value of the variable `Garage.Area` for these homes?
   - **Part D** Using the variable `Exter.Cond` (exterior condition), create a factor ordered from "Poor" condition (`Po`) to "Excellent" condition (`Ex`) following the order given in the detailed description for this variable. Use `barplot()` and `table()` to construct a bar chart showing how many homes are in each category
   
