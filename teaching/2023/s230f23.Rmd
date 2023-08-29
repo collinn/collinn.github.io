@@ -80,6 +80,7 @@ Sta-230 uses a *workshop style* class format. This means that the majority of ou
 Throughout the semester there will be 6-7 homework assignments:
 
 - [Homework #1](hw1.html)
+  - [Template .Rmd File](hw1.Rmd)
   - Due date: 9/6
 <!-- - [Homework #1](s230s23/hw1.html) -->
 <!--     - [.Rmd template file](s230s23/hw1.zip) -->
