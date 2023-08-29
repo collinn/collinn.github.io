@@ -1,0 +1,132 @@
+---
+title: 'Homework #1'
+author: "your_name_here"
+date: "2023-08-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Question 1
+
+In the lab, we briefly discussed the topic of magic numbers, that is, numbers that are "hard-coded" into our code rather than a more explicit statement of our intended actions. Magic numbers make our code less robust to accidents or changes, potentially introducing errors as we iteratively change parts of our analysis.
+
+The code below contains several instances of magic numbers:
+
+```{r}
+x <- c(1,2,3, "four", 5, "six", 7, 6, 2)
+
+x <- as.numeric(x)
+
+# Get rid of NA values
+x <- x[c(1,2,3,5,7,8,9)]
+
+# Create a vector to add to x
+y <- rep(1, length = 7)
+
+# Create new data.frame with x, y, and x+y
+df <- data.frame(x = x, y = y, z = x + y)
+
+## Only keep values where z > 5 and x <= 7 and grab column "z"
+z_new <- df[c(4,5,6), 3]
+
+z_new
+```
+
+Copy the code into the block below and modify it to remove the magic numbers with the appropriate expressions. The value for `z_new` should remain unchanged:
+
+```{r}
+x <- c(1,2,3, "four", 5, "six", 7, 6, 2)
+
+# Write updated code here
+
+z_new
+```
+
+Using the same code that you just rewrote, try it again but this time with a different value for `x`. Verify that the results make sense
+
+```{r}
+## "new" vector x
+x <- c(3, 7, "four", 2)
+
+# Write same updated code here and verify it works
+
+z_new
+```
+
+## Question 2
+
+The data at the URL below  contains information from the Ames Assessor's Office used in computing assessed values for individual residential properties sold in Ames, IA from 2006 to 2010. A detailed description of each of the variables can be found [here](https://jse.amstat.org/v19n3/decock/DataDocumentation.txt).
+
+https://remiller1450.github.io/data/AmesHousing.csv
+
+  - **Part A** Read this data into R and store it in a data frame named `housing`. Check the class of the variable `MS.SubClass` and compare it with the description given in the link above. Based on your assessment, should this variable be coerced to a different type? Briefly explain
+  - **Part B** Find the total number of homes in this data set with missing values for the variable `Garage.Type`. Demonstrate two different ways in which you might find this number.
+  - **Part C** Create a subset of the data set containing homes that are not missing a value for `Garage.Type`. What is the mean value of the variable `Garage.Area` for these homes?
+  - **Part D** Using the variable `Exter.Cond` (exterior condition), create a factor ordered from "Poor" condition (`Po`) to "Excellent" condition (`Ex`) following the order given in the detailed description for this variable. Use `barplot()` and `table()` to construct a bar chart showing how many homes are in each category
+  
+```{r}
+# Part A
+
+# Part B
+
+# Part C
+
+# Part D
+```
+  
+
+## Question 3
+
+The Washington Post maintains a database of fatal shootings by police officers in the line of duty. Details on their methodology can be found [here](https://github.com/washingtonpost/data-police-shootings).
+
+The URL below contains data for all individuals entered into the database between 2015 and 2019
+
+https://remiller1450.github.io/data/Police2019.csv
+
+### Part A 
+
+Write code that reads data from the given url and stores it as a data.frame named `police`. Find the average age of individuals in the data set, removing missing values as necessary
+
+```{r}
+# put code here
+```
+
+### Part B
+
+Included in this data is an indicator for state. Report the five states with the largest number of fatal shootings by police. Using magic numbers is OK here. (Hint: `?sort`).
+
+```{r}
+# put code here
+```
+
+### Part C
+
+To important variables to consider when analyzing police shootings are whether or not the suspect was fleeing and if they were considered a threat, contained in the variables `flee` and `threat_level`, respectively. In this final part, we are going to investigate the relationship between these two variables. We will do so by taking the following steps:
+
+  1. To simplify our analysis (and because the number of observations for this is so small), begin by creating a subset of the `police` data called `police2` where we *remove* all observations where `threat_level` is equal to "undetermined".
+  2. Next, use the `table()` function to create a table from `police2` where the first variable is `threat_level` and the second variable is a logical vector indicating if `flee` is equal to "Not fleeing" or not. Assign this table to the variable `tab`
+  3. Using the `prop.table()` function, first investigate by setting the argument `margin = 1`, so that the proportions are computed by row. Assuming that the subject was *not* fleeing, does it appear as if the threat level changed the probability of a  fatal shooting? Now investigate with `margin = 2` so that the proportions are computed by row. Assuming that the threat level of the subject was "attack", does it appear as if the subject fleeing or not changed the probability of a fatal shooting? Based on this, how would you describe the relationship between the `flee` and `threat_level` variables?
+
+```{r}
+# put code here
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
