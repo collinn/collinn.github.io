@@ -1,0 +1,388 @@
+---
+title: "Lab #1 (continued) - R Markdown and Other Essentials"
+output: 
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scoll: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.align = 'center')
+```
+
+This lab is intended to introduce additional topics that are essential for your understanding of `R` and will be needed as a precursor for performing more advanced data science tasks.
+
+**Directions** (Read before starting)
+
+  1. Please *work together* with your assigned partner. Make sure you both fully understand something before moving on
+  2. Record your answers to lab questions separately from lab examples -- you and your partner should only turn in responses to lab questions, nothing more and nothing less
+  3. Please ask for help, clarification, or just check-in if anything seems unclear.
+  
+## Preamble
+
+### Packages
+
+As we have seen, the `R` language comes standard with a number of functions that are useful in data analysis tasks. To facilitate more complex operations, many people have developed their own sets of functions, typically distributed as a cohesive suite known as a *package*. The most popular packages are stored on the [CRAN](https://cran.r-project.org/) repository and can be installed directly to your computer. For example, here we install the package `ggplot2`:
+
+```{r, eval=FALSE}
+install.packages("ggplot2")
+```
+Once a package has been installed, it needs to be loaded into your R session using the `library()` function before it can be used. You'll need to re-load the package *each time* you create a new session, but you'll only need to install it once.
+
+Once a package has been loaded, you will be able to freely use the functions in the package.
+
+```{r, warning = FALSE}
+library(ggplot2)
+
+# Plot the `women` dataset in R
+qplot(women$height, women$weight)
+```
+
+### R Markdown
+
+In our first lab we introduced the R Script file type, a simple text file that is intended to include only executable R code and comments. 
+
+Here, we introduce R Markdown, a hybrid type of file that permits the interweaving of `R` code alongside text utilizing the "Markdown" authoring framework. An R Markdown file thus permits you to both:
+
+  1. Write and execute `R` code
+  2. Generate high quality, reproducible reports
+
+To begin using R Markdown, we begin by verifying that we have the package correctly installed
+
+```{r, eval = FALSE}
+install.packages("rmarkdown")
+```
+
+Once this has been installed, we can create a new R Markdown file by selecting: File -> New File -> R Markdown. There are a few components of the r markdown document that are worth examining more closely.
+
+At the top of the document is the **header**:
+
+  - The section begins and ends with three `-` characters
+  - It contains the title, author, date, etc., that appear at the top of the page
+  - It is used to format details of the document, i.e., table of contents, page numbers, etc.,
+
+The second thing we see is a **code chunk**:
+
+  - Code chunks are initiated by $\text{```\{r\}}$ and closed by $\text{```}$
+  - The $\text{```}$ wrappers tell R Markdown that what appears inside is code that should be executed.  The first code chunk, initiated by $\text{```\{r setup\}}$ sets up options that will be used in executing your `R` code when your report is built. For now, you should keep this chunk as it appears and place your actual code inside of other code chunks.
+  - You can execute the `R` code in a chunk by highlighting the relevant code and  using *Ctrl-Enter*.
+
+Next, we have a number of formatting options that will render the text in **markdown**:
+
+  - Section headers are constructed using \#: the number of \# will determine the level (size) of the header
+  - Enclosing text in tick marks can be used to type non-exectued code: \`summary()\` -> `summary()` 
+  - The use of asterisks can make text bold or italics: \*\*bold\*\* -> **bold** and \*italics\* -> *italics*
+
+Finally, R Markdown allows us to type ordinary text outside of code chunks, creating a streamlined way to integrate written text into the same document as your code and output.
+
+There are a couple of very important problems that R Markdown is intended to solve. First, it serves to create documents that seamlessly blend R code, output (including plots), and text into a polished report. It also serves to ensure the reproducibility of a report. When interactively doing data analysis, it is easy to change important aspects of the data or iteratively make changes to an object, but unless each step is explicitly written down and reported, it may very well become impossible to reproduce. By contrast, when an R Markdown report is generated, it clears everything from the environment and starts from scratch -- only code that is included in the R Markdown file is used in the generated report. This means that starting with the raw data, anybody who generates a report with R Markdown on their machine can be sure that they are going to end up with the same results.
+
+To generate this document, we must compile our R Markdown file using the `Knit` button (a blue yarn ball) located at the top of the screen. Alternatively, one can knit with *Ctrl+Shift+K*.
+
+**Question #8**: Create a new R Markdown file and delete all of the template code that appears beneath the "r setup" block. Change the title to "Lab #1" and the author to your and your partner's name. Next, create section header labels for each of the questions in this lab and the previous lab (there are 14 total). Do this using three # characters followed by "Question X". Move your answers from your R Script for the first part of Lab 1 to this document.
+
+**Question #8 (continued)**: R Markdown will use LaTex typesetting for any text wrapped in $\$$ characters.  For example, $\$\text{\\beta}\$$ will appear as a the Greek letter $\beta$ after you knit your document.  To practice this, include $\$\text{H_0: \\mu = 0}\$$ in a sentence (the sentence can say anything, but it should *not* be inside an R code chunk or a section header).
+
+## Lab
+
+For the second half of our introduction to R labs, we are going to focus on two topics: summarizing our data and addressing miscellaneous issues when handling data.
+
+### Data Summaries
+
+Data summaries are precisely what the name suggests: summaries of data. Good data summaries are critical for condensing potentially enormous volumes of information into concise metrics that describe relevant properties of our data. Different types of data are better suited to different summaries, and we begin by considering a few of these in the next sections.
+
+#### Numeric Summaries
+
+Numeric summaries are useful to describing data that take on continuous values, for example, height, weight, BMI, age, etc.,. Numeric summaries serve to tell us important details about a variable, including the maximum and minimum values (and also the range), as well as the mean and standard deviation of values. Each of these is conveniently associated with a different function in R
+
+```{r}
+## Extract life expectancy as a vector
+my_data <- read.csv("https://remiller1450.github.io/data/HappyPlanet.csv")
+life <- my_data$LifeExpectancy
+
+mean(life) # mean
+sd(life) # standard deviation
+min(life) # minimum
+median(life) # median
+max(life) # maximum
+range(life) # min and maximum 
+```
+
+
+We also have functions available to tell us *quantiles* of numeric data.  The quantiles of a numeric value tell us about the distribution of values. For example:
+
+```{r}
+# The 35th quantile
+quantile(life, probs = 0.35)
+```
+tells us that 35\% of the life expectancy data has values less than 66.18 years.
+
+Finally, we consider the `summary()` function which offers a quick summary of some of the most common numerical summary functions.
+
+```{r}
+summary(life)
+```
+
+
+**Question #9 (Part 1)** What class of `R` object does the function `range()` return? Show how we can use this to find the distance between the minimum and maximum values.
+
+**Question #9 (Part 2)** The [interquartile range](https://en.wikipedia.org/wiki/Interquartile_range) is an important metric for indicating how dispersed our data is by indicating the range of the middle 50\% of our data. Use any of the functions described above to give the IQR of population size from the Happy Planet dataset. 
+
+$~$
+
+
+#### Tables
+
+For categorical variables such as sex, ethnicity, disease or treatment status, *frequency tables* are a more concise way of summarizing the information. Here for example, consider the Happy Planet dataset which categorizes each of the countries in its list to belonging to one of seven different regions. The `table()` function allows us to quickly see how these regions compares:
+
+```{r}
+table(my_data$Region)
+```
+One *especially* useful trick is recognizing that logical vectors are excellent candidates for categorical variables and can be used to summarize numeric variables in a very similar way. For example, here we consider how many countries have a life expectancy greater than 75 years:
+
+```{r}
+table(my_data$LifeExpectancy > 75)
+```
+Using the `table()` function, we construct *two-way frequency tables* showing the relationship between categorical variables:
+
+```{r}
+table(my_data$Region, my_data$LifeExpectancy > 75)
+```
+Here, for example, we see that in Region 1, only 7 countries have a life expectancy greater than 75 years, while the remaining 17 countries are less. Similar observations can be made about each of the other regions.
+
+Finally, we consider `prop.table`, which takes an object of class `table` as an argument and returns proportions based on the value of `margin`.
+
+```{r}
+## Assign table to variable tab
+tab <- table(my_data$Region, my_data$LifeExpectancy > 75)
+class(tab) # object of class table
+
+## This gives proportion of row data
+prop.table(tab, margin = 1)
+
+## This gives proportion of column data
+prop.table(tab, margin = 2)
+```
+**Question #10** Data science involves not only knowing how to manipulate data, but also how to ask questions and make inferences based on the results. Consider the two results given for `prop.table` for when  `margin = 1` and `margin = 2`, and specifically consider the second row of each of these outputs, associated with region 2. Why are these values different? What statements can be made about region 2 based on each of these outputs. 
+
+
+#### Plots
+
+Plots are ubiquitous in data science for their ability to quick illustrate important aspects of a wide variety of data types. Though for this class we will spend considerable time learning to construct publication-quality plots with the `ggplot2` package, here we briefly illustrate a few common plots that are included in base R.
+
+First, for numerical data we have [box plots](https://en.wikipedia.org/wiki/Box_plot) that demonstrate the spread of data, similar to what is reported with the `summary()` function.
+
+```{r}
+boxplot(my_data$LifeExpectancy)
+```
+
+For categorical data, the bar plot is a method for visually summarizing table data
+
+```{r}
+tab <- table(my_data$Region)
+barplot(tab)
+```
+
+Finally, a scatter plot is an excellent tool for quickly illustrating the relationship between two numeric variables. Here, we show the relationship between the average height and weight for American women aged 30-39 (see `?women` to learn more about this data set)
+
+```{r}
+plot(x = women$height, women$weight)
+```
+
+
+
+**Question #11 (Part 1):** Look at the documentation for the `boxplot` function (`?boxplot`) and determine which argument makes the box plot horizontal. Plot a horizontal box plot for the regions in the Happy Planet data.
+
+**Question #11 (Part 2):** Look at the documentation for the `faithful` dataset in R (`?faithful`) which includes two variable related to the Old Faithful geyser, the waiting time between eruptions and the duration of the eruption. Create a plot investigating the relationship between these two variables with the duration of eruptions on the x-axis and the time spent waiting on the y-axis. What are some conclusions that you can draw about this relationship?
+
+### Miscellaneous 
+
+We conclude this lab with a section addressing a few more topics that may arise when working with data. These include coercion, missing data, and factors.
+
+#### Coercion
+
+In the first lab, we introduced three important types of vectors:
+
+  1. *numeric vectors* -- for example, `x = c(1, 2, 3)`
+  2. *character vectors* -- for example, `x = c("a", "b", "c")
+  3. *logical vectors* -- for example, `x = c(TRUE, FALSE, TRUE)`
+  
+We also noted that a property of vectors is that each element of the vector must be the same type, and when these types are mixed, they will be *coerced* into the broadest category.
+
+```{r}
+mix_vec <- c(1, 2, 3, "a", "b", "c")
+class(mix_vec)
+```
+
+Here, we see that each of the elements is coerced to a `character`, the broadest class of vectors. Similarly, we note that internally, a logical vector with `TRUE/FALSE` is categorized as `1/0` (this is especially useful to know). The consequence of this is that logical vectors will be coerced to a numeric when the two exist together:
+
+```{r}
+mix_vec <- c(TRUE, FALSE, 1, 2)
+mix_vec
+class(mix_vec)
+```
+
+Somewhat unfortunately, this convention is not consistent when coercing with characters
+
+```{r}
+mix_vec <- c(TRUE, FALSE, "a")
+mix_vec
+```
+
+Just as vectors can be automatically coerced based on their element types, we can manually coerce to whatever type we wish with the functions `as.numeric()`, `as.logical()`, and `as.character()`:
+
+```{r}
+vec <- c("1", "2", "3")
+as.numeric(vec)
+```
+If an element of a vector *cannot* be coerced, it is stored as a special element, `NA`
+
+```{r}
+mix_vec <- c("1", "2", "3", "a")
+as.numeric(mix_vec)
+```
+We will look at these more in the next section.
+
+
+**Question #12** Consider the following code:
+
+```{r}
+v <- c(TRUE, TRUE, FALSE)
+
+v_num <- as.numeric(v)
+v_char <- as.character(v_num)
+v_logical <- as.logical(v_char)
+
+v_logical
+```
+Why did `v_logical` return only `NA` values? Look at the documentation for `?as.logical` to see how it handles character vectors. How is this different than how it handles numeric vectors? Modify the above code by adding one line (and changing a variable name, if necessary) so that `v_logical` returns `c(TRUE, TRUE, FALSE)`
+
+$~$
+
+#### Missing Data
+
+Real data sometimes contains *missing values* which, as we saw, are stored in `R` as a special element, `NA`. Sometimes this is introduced by coercion or from other operations in `R`, but most commonly it comes directly from the raw data that you are working with.
+
+We can determine if elements in a vector have `NA` values with the function `is.na`
+
+```{r}
+x <- c("1", "2", "3", "a")
+x <- as.numeric(x)
+is.na(x)
+```
+Just as useful, we can combine this with the "not" logical operator `!` that was introduced in Lab 1. By this logic, something that is "not" TRUE is FALSE and something that is "not" FALSE is TRUE. We can use this to subset our data with a logical vector just as we did in Lab 1.
+
+```{r}
+# Returns TRUE if they are NA
+is.na(x)
+
+# The "!" operator gives the inverse of a logical vector
+!is.na(x)
+
+# Returns only non-NA values
+x[!is.na(x)]
+```
+Missing values can be problems for functions unless they are explicitly addressed. For example, both the `sum` and `mean` functions will return `NA` if any of the values in the vector are `NA`
+
+```{r}
+sum(x) # returns NA
+mean(x) # returns NA
+
+sum(x, na.rm = TRUE) # correct
+mean(x, na.rm = TRUE) # correct
+```
+
+This seems to create more work than is necessary, but the reasoning behind it is quite simple from the prospective of a data scientist: if any of your values are `NA`, it is important to be aware of them. If functions such as `mean` and `sum` simply removed them without notice, it would be entirely possible for them to slip by undetected. By setting the default as it is, the programmer is immediately notified of any potential issues, with the option to then ignore them if desired.
+
+**Question 13:** Find the median value of the "GDPperCapita" variable in the Happy Planet dataset, removing missing values if necessary. Report the country names corresponding to any missing values that you removed.
+
+#### Factors
+
+This section borrows heavily from the relevant section in [R for Data Science](https://r4ds.had.co.nz/factors.html).
+
+We conclude this lab with a brief discussion on a fourth type of vector known as a *factor*. Factors are primarily intended to be categorical variables, particularly when there are a known, small number of distinct values that a variable can take. This is in contrast to character vectors which may contain any number of distinct values. To illustrate this with an example, factors may be used to represent the months in a year (for which there are exactly 12) whereas character vectors may be better suited to recording subjects' names (of which there may be any number).
+
+Suppose that we are interested in a variable that records months
+
+```{r}
+x1 <- c("Dec", "Apr", "Jan", "Mar")
+```
+
+Using a standard character vector, we run into a few possible issues:
+
+  1. Though there are only 12 possible values, we could still introduce a typo
+
+```{r}
+x2 <- c("Dec", "Apr", "Jam", "Mar")
+```
+
+  2. They are sorted alphabetically which is less useful here
+  
+```{r}
+sort(x1)
+```
+When creating factor variables, we begin by understanding that there are two distinct parts:
+
+  1. There are the values themselves in our vector, which are the *factors*
+  2. There is the list of all of the valid values that the factors may take, or the *levels*
+  
+Since there are only 12 possible values for our months variable, these will be our levels
+
+```{r}
+month_levels <- c(
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+)
+```
+
+And we can use these to create our factor vector
+
+```{r}
+y1 <- factor(x1, levels = month_levels)
+y1 # prints out value of factor and the possible levels
+sort(y1) # sorted how we wish
+```
+
+If we do have a typo or include a value that is not a valid level, we will get an `NA` in return
+
+```{r}
+y2 <- factor(x2, levels = month_levels)
+y2
+```
+Finally, because the factors are sorted by level rather than alphabetically, we have more control over how the vector is presented in plots
+
+```{r}
+# See ?month.abb to see a number of built-in constants that make fake data easier
+x <- month.abb[c(1,3,2,5,12,11,10,10,3,4,1,3,2,7)]
+barplot(table(x)) # sorted alphabetically
+
+# Sorted by correct month
+y <- factor(x, levels = month_levels)
+barplot(table(y))
+```
+
+**Question 14:** The code below loads the "colleges" data set, containing information pertaining to all primarily undergraduate institutions with at least 400 full-time students in the 2019-2020 academic year
+
+```{r}
+colleges <- read.csv("https://remiller1450.github.io/data/Colleges2019.csv")
+```
+
+  - **Part A** Create a subset of this data that contains all schools that admit less than 50\% of applicants (Adm_Rate less than 50\%) *and* are located in the "Great Lakes" region. You will use this subset for Parts B and C.
+  - **Part B** Using the subset created in Part A, find the average value of "Salary10yr_median", the median salary of a school's alumni 10 years following graduation. Remove missing data if necessary and report how many colleges were removed.
+  - **Part C** The "Great Lakes" region consists of 5 different states: IL, IN, MI, OH, and WI. Using the subset created in Part A, create a barplot that displays the number of colleges in each of these states. All of these states *must* be included in the barchart, even if the total number of colleges meeting the criteria from Part A is zero.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
