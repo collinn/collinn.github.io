@@ -1,0 +1,206 @@
+---
+title: "ggplot2 lab"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+knitr::opts_chunk$set(echo = TRUE, fig.align = "center", fig.width = 4, fig.height = 4)
+```
+
+
+# Getting Started
+
+Takes data.frame, each line an observation
+Follows grammar so that we can build upon what we know (instead of list of rules)
+
+1. Data -- information we wish to visually represent
+2. Aesthetics -- map between data and visual properties, i.e., xy axes, color, shape, etc
+3. Layer -- describe how to render observations
+
+## Data
+
+mpg dataset, see `?mpg`, information on make, model, year, displacement, cylinders, transmission, drive drain, cty and hwy miles, fuel type and car
+
+```{r}
+head(as.data.frame(mpg))
+```
+## Aesthetics
+
+Here, short and sweet, we are going to look at relationship between  hwy miles and engine displacement (size)
+
+```{r}
+ggplot(data = mpg, aes(x = displ, y = hwy))
+```
+
+
+Here, we have specified data we want (mpg) and have determined axes, but we have not yet specified how we want data rendered
+
+## Layers
+
+accommodates a lot of layers that can be added together, but we start simply. Usually created with a `geom_` function indicating geometry of representation:
+
+  - `geom_point` - scatter plots
+  - `geom_bar` - bar graph for categoricals
+  - `geom_smooth` - smoother for data
+  - `geom_boxplot` - box plot
+  - `geom_histogram` - histograms
+  - `geom_violin` - violin plot
+  
+Relationship between two continuous variables uses scatter plot. When building graphics with ggplot, we use `+` to add to them. Best convention is to end with `+` on each line and then start a new line for every new piece of plot
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point() # new line, adding points
+```
+
+
+ggplot allows us to add arbitrary number of layers to plot, allowing us to create precise graphics. Here, we take the scatter plot that we already have an add a data smoother giving us an estimate of best fit
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point() +
+  geom_smooth() # again on a new line
+```
+
+The `geom_` functions usually take additional arguments that can modify the output. For example, `geom_smooth` uses a loess curve by default, but if we wished to fit the data to a linear model, we could do so by specifying in an argument
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point() +
+  geom_smooth(method = "lm") 
+
+# Interesting that bc of color arg smooth does it on groups
+# ggplot(mpg, aes(displ, hwy, color = factor(cyl))) +
+#   geom_point() +
+#   geom_smooth(method = "lm") 
+```
+
+## Working with groups
+
+Use plotting to identify patterns, helps to briefly compare. Let's consider relationship between hwy miles and displacement again, yet see if there is any further information associated with the drive train. We can do this in the aes function by setting `color = drv`. Alternatively, `shape = drv`
+
+```{r}
+ggplot(mpg, aes(displ, hwy, color = cyl)) +
+  geom_point() 
+
+ggplot(mpg, aes(displ, hwy, shape = drv)) +
+  geom_point() 
+```
+
+We can combine aesthetics to compress even more information into the plot, but we must be careful with balance and not overload to make unreadable (art to plotting). Let's try investigating `class` as well by assigning it to color
+
+```{r}
+ggplot(mpg, aes(displ, hwy, color = class, shape = drv)) +
+  geom_point() 
+```
+
+
+For this next example, we will consider the distribution of mileage of cars in the dataset. As this is a numeric variable, we can do so with a histogram. We will also specify with an argument to `geom_histogram` how many total bins we want
+
+```{r}
+ggplot(mpg, aes(x = hwy)) + # no need to specify a variable for y axis
+  geom_histogram(bins = 25)
+```
+
+If we wanted to further investigate the relationship between hwy and drive train, we could just add color to the plot, but the nature of histograms makes this unwieldy as the bars will overlap.
+
+```{r}
+ggplot(mpg, aes(x = hwy, fill = drv)) + # no need to specify a variable for y axis
+  geom_histogram(bins = 25)
+```
+
+ 
+```{r, eval = FALSE, include = FALSE}
+# (Note also here that we are setting `fill = drv` rather than `color = drv`; the histogram geom does have a color aesthetic, but its not what we intend)
+ggplot(mpg, aes(x = hwy, color = drv)) + # no need to specify a variable for y axis
+  geom_histogram(bins = 25)
+```
+ 
+Instead, we can split apart our groups with a technique known as *faceting*. Although not *strictly* necessary, it is most typical to split plots by a character or factor vector rather than a numeric. Here, we plot our histogram again, this time faceting on the `drv` variable. We do this with the `facet_wrap` function, which takes as its argument the variable we wish to facet, along with a tilde, i.e., `~variable`
+
+```{r, fig.width = 6}
+ggplot(mpg, aes(x = hwy, fill = drv)) + # let's keep color variable
+  geom_histogram(bins = 25) +
+  facet_wrap(~drv) # note that it is ~drv
+```
+
+
+## Bar Charts
+
+A note on bar charts
+
+```{r}
+x <- sample(letters[1:5], size = 30, replace = TRUE)
+
+xtab <- as.data.frame(table(x))
+xdf <- as.data.frame(x)
+
+# xdf is a data.frame with one column
+xdf
+
+# xtab is a data.frame with two columns
+xtab
+```
+
+General rule that each row is an observation. So if we are looking at letters collected, see that we have 30. That makes us think 30 rows, which is what we see for xdf, this works fine.
+
+However, sometimes your row is not an individual observation, but a summary of observations. See that `xtab` has each row indicate how frequently each letter showed up. Now we have an x and y variable, but if we try to do this we get an error. We can do this by changing the `stat` argument to be identity (instead of default of counting)
+
+
+```{r}
+ggplot(xdf, aes(x)) + geom_bar()
+ggplot(xtab, aes(x, Freq)) + geom_bar()
+ggplot(xtab, aes(x, Freq)) + geom_bar(stat = "identity")
+```
+
+## Extra
+
+```{r}
+ggplot(mpg, aes(class, hwy)) + geom_boxplot()
+```
+
+
+## Theme
+
+legend, color
+
+## Adding complexity
+
+```{r}
+# would be good to have them make this one
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point() + 
+  geom_smooth() +
+  facet_wrap(~year)
+```
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point(aes(color = "blue"))
+
+# What is happening here?
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point(color = "blue")
+```
+
+
+Setting aesthetics in plots vs layers (wow this makes a lot of sense)
+
+```{r}
+# pg 95-96
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
