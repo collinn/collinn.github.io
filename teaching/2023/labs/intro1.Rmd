@@ -375,10 +375,10 @@ A natural way of constructing logical vectors is with the use of *logical operat
 |:-----|:---------------|
 | `==` | equal to |
 | `!=` | *not* equal to |
-| `<` | greater than (strict) |
-| `<=` | greater than or equal to |
-| `>` | less than (strict) |
-| `>=` | less than or equal to |
+| `<` | less than (strict) |
+| `<=` | less than or equal to |
+| `>` | greater than (strict) |
+| `>=` | greater than or equal to |
 | `&` | and |
 | `|` | or |
 | `!` | not |
