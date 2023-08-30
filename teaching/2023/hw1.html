@@ -9,9 +9,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
+<meta name="author" content="your_name_here" />
 
+<meta name="date" content="2023-08-29" />
 
-<title>hw1.knit</title>
+<title>Homework #1</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -348,6 +350,9 @@ display: none;
 
 
 
+<h1 class="title toc-ignore">Homework #1</h1>
+<h4 class="author">your_name_here</h4>
+<h4 class="date">2023-08-29</h4>
 
 </div>
 
@@ -379,7 +384,8 @@ z_new &lt;- df[c(4,5,6), 3]
 z_new</code></pre>
 <pre><code>## [1] 6 8 7</code></pre>
 <p>Copy the code into the block below and modify it to remove the magic
-numbers with the appropriate expressions. The value for
+numbers with the appropriate expressions. Leave a comment for each
+modification explaining why the change is made. The value for
 <code>z_new</code> should remain unchanged:</p>
 <pre class="r"><code>x &lt;- c(1,2,3, &quot;four&quot;, 5, &quot;six&quot;, 7, 6, 2)
 
@@ -395,6 +401,7 @@ x &lt;- c(3, 7, &quot;four&quot;, 2)
 # Write same updated code here and verify it works
 
 z_new</code></pre>
+<p><span class="math inline">\(~\)</span></p>
 </div>
 <div id="question-2" class="section level2">
 <h2>Question 2</h2>
@@ -403,32 +410,39 @@ Assessor’s Office used in computing assessed values for individual
 residential properties sold in Ames, IA from 2006 to 2010. A detailed
 description of each of the variables can be found <a href="https://jse.amstat.org/v19n3/decock/DataDocumentation.txt">here</a>.</p>
 <p><a href="https://remiller1450.github.io/data/AmesHousing.csv" class="uri">https://remiller1450.github.io/data/AmesHousing.csv</a></p>
-<ul>
-<li><strong>Part A</strong> Read this data into R and store it in a data
-frame named <code>housing</code>. Check the class of the variable
+<div id="part-a" class="section level3">
+<h3>Part A</h3>
+<p>Read this data into R and store it in a data frame named
+<code>housing</code>. Check the class of the variable
 <code>MS.SubClass</code> and compare it with the description given in
 the link above. Based on your assessment, should this variable be
-coerced to a different type? Briefly explain</li>
-<li><strong>Part B</strong> Find the total number of homes in this data
-set with missing values for the variable <code>Garage.Type</code>.</li>
-<li><strong>Part C</strong> Create a subset of the data set containing
-homes that are not missing a value for <code>Garage.Type</code>. What is
-the mean value of the variable <code>Garage.Area</code> for these
-homes?</li>
-<li><strong>Part D</strong> Using the variable <code>Exter.Cond</code>
-(exterior condition), create a factor ordered from “Poor” condition
-(<code>Po</code>) to “Excellent” condition (<code>Ex</code>) following
-the order given in the detailed description for this variable. Use
-<code>barplot()</code> and <code>table()</code> to construct a bar chart
-showing how many homes are in each category</li>
-</ul>
-<pre class="r"><code># Part A
-
-# Part B
-
-# Part C
-
-# Part D</code></pre>
+coerced to a different type? Briefly explain</p>
+<pre class="r"><code># code here</code></pre>
+</div>
+<div id="part-b" class="section level3">
+<h3>Part B</h3>
+<p>Find the total number of homes in this data set with missing values
+for the variable <code>Garage.Type</code></p>
+<pre class="r"><code># code here</code></pre>
+</div>
+<div id="part-c" class="section level3">
+<h3>Part C</h3>
+<p>Create a subset of the data set containing homes that are not missing
+a value for <code>Garage.Type</code>. What is the mean value of the
+variable <code>Garage.Area</code> for these homes?</p>
+<pre class="r"><code># code here</code></pre>
+</div>
+<div id="part-d" class="section level3">
+<h3>Part D</h3>
+<p>Using the variable <code>Exter.Cond</code> (exterior condition) and
+the full housing dataset (from Part A), create a factor ordered from
+“Poor” condition (<code>Po</code>) to “Excellent” condition
+(<code>Ex</code>) following the order given in the detailed description
+for this variable. Use <code>barplot()</code> and <code>table()</code>
+to construct a bar chart showing how many homes are in each category</p>
+<pre class="r"><code># code here</code></pre>
+<p><span class="math inline">\(~\)</span></p>
+</div>
 </div>
 <div id="question-3" class="section level2">
 <h2>Question 3</h2>
@@ -438,21 +452,21 @@ officers in the line of duty. Details on their methodology can be found
 <p>The URL below contains data for all individuals entered into the
 database between 2015 and 2019</p>
 <p><a href="https://remiller1450.github.io/data/Police2019.csv" class="uri">https://remiller1450.github.io/data/Police2019.csv</a></p>
-<div id="part-a" class="section level3">
+<div id="part-a-1" class="section level3">
 <h3>Part A</h3>
 <p>Write code that reads data from the given url and stores it as a
 data.frame named <code>police</code>. Find the average age of
 individuals in the data set, removing missing values as necessary</p>
 <pre class="r"><code># put code here</code></pre>
 </div>
-<div id="part-b" class="section level3">
+<div id="part-b-1" class="section level3">
 <h3>Part B</h3>
 <p>Included in this data is an indicator for state. Report the five
 states with the largest number of fatal shootings by police. Using magic
 numbers is OK here. (Hint: <code>?sort</code>).</p>
 <pre class="r"><code># put code here</code></pre>
 </div>
-<div id="part-c" class="section level3">
+<div id="part-c-1" class="section level3">
 <h3>Part C</h3>
 <p>To important variables to consider when analyzing police shootings
 are whether or not the suspect was fleeing and if they were considered a

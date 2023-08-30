@@ -1,3 +1,10 @@
+---
+title: 'Homework #1'
+author: "your_name_here"
+date: "2023-08-29"
+output: html_document
+---
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -29,7 +36,7 @@ z_new <- df[c(4,5,6), 3]
 z_new
 ```
 
-Copy the code into the block below and modify it to remove the magic numbers with the appropriate expressions. The value for `z_new` should remain unchanged:
+Copy the code into the block below and modify it to remove the magic numbers with the appropriate expressions. Leave a comment for each modification explaining why the change is made. The value for `z_new` should remain unchanged:
 
 ```{r}
 x <- c(1,2,3, "four", 5, "six", 7, 6, 2)
@@ -50,27 +57,48 @@ x <- c(3, 7, "four", 2)
 z_new
 ```
 
+$~$
+
+
 ## Question 2
 
 The data at the URL below  contains information from the Ames Assessor's Office used in computing assessed values for individual residential properties sold in Ames, IA from 2006 to 2010. A detailed description of each of the variables can be found [here](https://jse.amstat.org/v19n3/decock/DataDocumentation.txt).
 
 https://remiller1450.github.io/data/AmesHousing.csv
 
-  - **Part A** Read this data into R and store it in a data frame named `housing`. Check the class of the variable `MS.SubClass` and compare it with the description given in the link above. Based on your assessment, should this variable be coerced to a different type? Briefly explain
-  - **Part B** Find the total number of homes in this data set with missing values for the variable `Garage.Type`. 
-  - **Part C** Create a subset of the data set containing homes that are not missing a value for `Garage.Type`. What is the mean value of the variable `Garage.Area` for these homes?
-  - **Part D** Using the variable `Exter.Cond` (exterior condition), create a factor ordered from "Poor" condition (`Po`) to "Excellent" condition (`Ex`) following the order given in the detailed description for this variable. Use `barplot()` and `table()` to construct a bar chart showing how many homes are in each category
-  
+### Part A
+
+Read this data into R and store it in a data frame named `housing`. Check the class of the variable `MS.SubClass` and compare it with the description given in the link above. Based on your assessment, should this variable be coerced to a different type? Briefly explain
+
 ```{r}
-# Part A
-
-# Part B
-
-# Part C
-
-# Part D
+# code here
 ```
-  
+
+### Part B
+
+Find the total number of homes in this data set with missing values for the variable `Garage.Type`
+
+```{r}
+# code here
+```
+
+### Part C
+
+Create a subset of the data set containing homes that are not missing a value for `Garage.Type`. What is the mean value of the variable `Garage.Area` for these homes?
+
+```{r}
+# code here
+```
+
+### Part D
+
+Using the variable `Exter.Cond` (exterior condition) and the full housing dataset (from Part A), create a factor ordered from "Poor" condition (`Po`) to "Excellent" condition (`Ex`) following the order given in the detailed description for this variable. Use `barplot()` and `table()` to construct a bar chart showing how many homes are in each category
+
+```{r}
+# code here
+```
+
+$~$
 
 ## Question 3
 
