@@ -193,7 +193,7 @@ plot(x = women$height, women$weight)
 
 
 
-**Question #11 (Part 1):** Look at the documentation for the `boxplot` function (`?boxplot`) and determine which argument makes the box plot horizontal. Plot a horizontal box plot for the regions in the Happy Planet data.
+**Question #11 (Part 1):** Look at the documentation for the `barplot` function (`?barplot`) and determine which argument makes the bar plot horizontal. Plot a horizontal bar plot for the regions in the Happy Planet data.
 
 **Question #11 (Part 2):** Look at the documentation for the `faithful` dataset in R (`?faithful`) which includes two variable related to the Old Faithful geyser, the waiting time between eruptions and the duration of the eruption. Create a plot investigating the relationship between these two variables with the duration of eruptions on the x-axis and the time spent waiting on the y-axis. What are some conclusions that you can draw about this relationship?
 

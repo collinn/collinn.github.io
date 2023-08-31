@@ -27,11 +27,12 @@ Last updated: `r format(Sys.time(), "%a %b %e %Y, %H:%M")`
 
 **Office Hours**:
 
-- Noyce 2216, TBD
+- Noyce 2216, Monday 2-3, Tuesday 1030-1130, Thursday 1-2
 
 **Class Mentors**
 
-TBD
+- STA-230-01 Yuki Huang (huangyuk@grinnell.edu)
+- STA-230-02 Anne Bader (baderann@grinnell.edu)
 
 **Course Description**:
 
