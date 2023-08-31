@@ -1,0 +1,242 @@
+---
+title: "Lab #3 - Plotting with `ggplot2`"
+output: 
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scoll: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      fig.align = 'center', 
+                      fig.height = 4, 
+                      fig.width = 4)
+```
+
+# Preamble
+
+Really here just words for quick discussion, what it is, why we want it, etc., 
+
+# Lab
+
+## Overview of ggplot2
+
+Package intended to follow "grammar of graphics" made of independent components that can be added together to build plot. Every ggplot2 plot has three components:
+
+1. Data -- the information we wish to visually represent
+2. Aesthetics -- A map between the data and visual properties, i.e., xy axes, color, shape, etc.
+3. Layers -- How each of the observations in the data is rendered, i.e., scatter plot, box plot, etc.,
+
+We will be doing stuff with these
+
+### Data
+
+For this lab, we will be using the `mpg` dataset that is included in the `ggplot2` package. This dataset contains a subset of fuel economy data that the EPA for models in 1999 and 2008. A description of all of the variables can be read with `?mpg`, which we look at briefly here:
+
+```{r}
+library(ggplot2) # load package first
+
+## In ggplot2 it is stored as a different object so we convert to data.frame first
+mpg <- as.data.frame(mpg)
+head(mpg)
+```
+
+### Aesthetics
+
+The aesthetics of a `ggplot2` plot (which I will hereby simply call a "ggplot") establish the most general properties relating our collected data to the visual representation we wish to create. Suppose for example we wish to consider the relationship between engine displacement and highway fuel economy in the `mpg` dataset. The first order of business would be to establish these variables as the x and y axes.
+
+```{r}
+## Every ggplot begins with ggplot()
+ggplot(mpg, aes(x = displ, y = hwy))
+```
+
+The resulting plot is a simple XY plane with `displ` set as the x-axis and `hwy` set as the y axes. Further, note that the range of the x and y axes are already determined based on the ranges of values for the variables in `mpg`. While `aes()` (short for aesthetics) can take a number of interesting values, for now we will leave it as is and move on to creating a layer for our plot.
+
+### Layers
+
+We can think of layers as being the particular details of how we want our data to be portrayed on the ggplot. These can range from simple plots of the xy coordinates as in a scatter plot to more detailed summaries of the data. Notably, a ggplot can have an arbitrary number of layers added to it, which we "add" to a plot with `+`. We will utilize this later in the lab as we work to create more interesting plots. For now, we will begin by adding a layer that generates points with the function `geom_point()`.
+
+When adding layers to a ggplot, it is best practice to end a line with `+` and only include one additional layer on each subsequent line
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point()
+```
+
+Compared with the plot above, note that we still have the same xy-coordinate system generated with `ggplot(mpg, aes(displ, hwy))`, but we have now "added" a layer of scatter points that sit on top of the initial plot. As we continue working with ggplot, this will be a helpful way to think about the process.
+
+Most (but not all) layers that we might add in ggplot begin with `geom_` to help indicate that they can be thought of as the actual, geometric elements (lines, points, etc.,) that you will see on the plot. In addition to `geom_point()`, there are a few others that are worth being aware of:
+
+  - `geom_point` - scatter plots
+  - `geom_jitter` -- scatter plot with "jittered" coordinates
+  - `geom_bar` - bar graph for categorical data
+  - `geom_smooth` - smoother for data
+  - `geom_boxplot` - box plot
+  - `geom_histogram` - histograms
+  - `geom_violin` - violin plot
+  
+**Question X** Use `geom_boxplot()` to create a box plot with the `mpg` data with the `class` variable on the x-axis and `hwy` on the y-axis.
+
+```{r}
+ggplot(mpg, aes(class, hwy)) + geom_boxplot()
+```
+
+
+
+## Working with Groups
+
+Plots of data are primarily generated to quickly convey interesting relationships that exist in our data. In the scatter plot we just generated, we are immediately able to see that a larger engine displacement is generally associated with reduced highway fuel economy. One question we may have is whether or not this pattern is the same across multiple types of vehicles. We can ask questions like this by modifying the aesthetics of our plots.
+
+A standard XY plot has two dimensions (one horizontal, one vertical), but we can add a third dimension that incorporates color into our figure. Here, we set the color to group by drive train (four wheel drive, front wheel drive, rear wheel drive) using a color argument in `aes()` and setting it equal to the variable `drv`
+
+```{r}
+ggplot(mpg, aes(displ, hwy, color = drv)) +
+  geom_point()
+```
+
+Immediately we can see distinct clusters appear in our plot. In addition to adding colors to the points themselves, ggplot also generated a legend (which as we will see is generally associated with the aesthetics of a graph).
+
+In addition to color, we can also set the shapes of the points. And so long as we use the same grouping variable for each, we can combine this aesthetic with color
+
+```{r}
+## Using shapes instead of color
+ggplot(mpg, aes(displ, hwy, shape = drv)) +
+  geom_point()
+
+## We can have multiple aesthetics combined in legend
+ggplot(mpg, aes(displ, hwy, color = drv, shape = drv)) +
+  geom_point()
+```
+
+We can also combine aesthetics for different groups, adding a fourth dimension to our data. In addition to asking about the drive train when considering the relationship between displacement and fuel economy, we could also consider groups based on the vehicles' class
+
+```{r}
+ggplot(mpg, aes(displ, hwy, color = class, shape = drv)) +
+  geom_point()
+```
+
+While this is technically correct, we run the risk of overloading our plot, making it unreadable. Instead of adding an additional aesthetic to our plot, we can instead use a technique known as *faceting* to split our plot across multiple groups. Here, we recreate the plot above except facet on the `drv` variable rather than plot its shape. We do this with the function `facet_wrap()` which takes its argument in the form `~variable` (note the tilde)
+
+```{r, fig.width = 6}
+ggplot(mpg, aes(displ, hwy, color = class)) +
+  geom_point() +
+  facet_wrap(~drv)
+```
+**Question X** question to facet wrap, setting variable as color
+
+## Adding Layers
+
+Once the main ggplot has been created with `ggplot()`, any number of layers can subsequently be added to the graphic. A common layer to add to an underlying graphic is that of a *data summary*, often a statistic, that further summarizes trends in the data. Here, consider the scatter plot displaying the relationship between `displ` and `hwy`, but now with an additional layer that adds a smoothing function to the data.
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point() +
+  geom_smooth()
+```
+
+Note that neither `geom_point()` or `geom_smooth()` require additional information about the plot: aesthetics that are set in `ggplot()` are automatically inherited by subsequent levels. If an aesthetic is only set within a single layer, it will only apply to that layer.
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point(aes(color = drv)) +
+  geom_smooth()
+```
+
+We will look at the relationship between aesthetics and layers more in the next section.
+
+Layers can also be added that provide a statistical summary of the data. For example, consider a box plot illustrating the relationship between vehicle drive train and displacement. Note that the components of the box plot represent the median, the quartiles, and whiskers that are typically some multiple of the IQR:
+
+```{r}
+ggplot(mpg, aes(displ, drv)) + 
+  geom_boxplot()
+```
+
+Suppose that we wish to add an indication of the mean value of displacement as well. We can plot statistical summaries of our data with the function `stat_summary()`. Here, we specify the function we wish to compute (`fun = "mean"`) and indicate the geom we wish it to plot (`geom = "point"`). We will also change the color and size to make it easier to see:
+
+```{r}
+ggplot(mpg, aes(displ, drv)) + 
+  geom_boxplot() +
+  stat_summary(geom = "point", fun = "mean", color = "red", size = 2)
+```
+
+**Question XX** use `geom_jitter()` and add summary for mean (blue) and median (red) on class and hwy
+
+```{r, eval = FALSE}
+# answer
+ggplot(mpg, aes(hwy, class)) + 
+  geom_jitter(height = 0.15) +
+  stat_summary(geom = "point", fun = "mean", color = "green", size = 2) +
+  stat_summary(geom = "point", fun = "median", color = "red", size = 2)
+```
+
+
+## More Aesthetics
+
+As was briefly mentioned earlier, aesthetics that are set in `ggplot()` are automatically inherited by subsequent levels, while those set within a single layer will only apply to that layer. For a plot with only a single layer, the relevant aesthetics can be set in either place:
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point()
+
+ggplot(mpg) +
+  geom_point(aes(displ, hwy))
+```
+
+While the resulting plots may appear identical, their construction is different in a very critical way.
+
+**Question X** Try running the code below:
+
+```{r, eval = FALSE}
+ggplot(mpg) +
+  geom_point(aes(displ, hwy)) +
+  geom_smooth()
+```
+
+Why doesn't this work? How would you alter this code to get the desired result?
+
+---
+
+**Question X** Look at and run the code below. If the resulting plots are identical, what difference does it make where the color aesthetic is described?
+
+```{r, eval = FALSE}
+# How are these different?  Even though they look the same
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point(aes(color = drv))
+
+ggplot(mpg, aes(displ, hwy, color = drv)) + 
+  geom_point()
+```
+
+Based on your answer above, detail what happens when the code below is run and explain why each of these plots looks they way they do.
+
+```{r, eval = FALSE}
+## Plot 1
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point(aes(color = drv)) + 
+  geom_smooth()
+
+## Plot 2
+ggplot(mpg, aes(displ, hwy, color = drv)) + 
+  geom_point() +
+  geom_smooth()
+```
+
+
+## Basic Themes
+
+title, axes, legend update, theme
+
+
+
+
+
+
+
+
+
+
+
+
+
