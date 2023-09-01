@@ -76,10 +76,6 @@ $~$
 
 ### Policies
 
-**Email**
-
-Generally, I try not to check my emails after 5pm on weekdays and usually not on weekends either. This isn't to say that it won't ever happen, only that it should not be anticipated. Rest assured, there are very few situations in STA-230 in which an unread email would lead to disasterous consequences. I will do my best to avoid assigning things due outside of these hours, but in the event that a situation like that does arise, you will not be punished for my failure to respond
-
 **Class Sessions**
 
 The core component of our class meetings will be working through hands-on labs in a paired programming environment.  These pairs will be assigned during the first half of the semester. After the first project, you will have the freedom to choose your partner, or work independently near someone that you can occasionally consult with.  During labs it is essential that you and your partner(s) work together, making certain that each of you understand your work equally well.
