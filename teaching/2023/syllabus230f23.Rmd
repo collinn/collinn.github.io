@@ -36,6 +36,8 @@ Last updated: `r format(Sys.time(), "%a %b %e %Y, %H:%M")`
   - Noyce 2401, Tuesday 7-8pm
   - Noyce 2401, Thursday 7-8pm
   
+  <br>
+  
 - STA-230-02 Anne Bader (baderann@grinnell.edu)
   
   - Noyce 2401, Monday 6-7pm 
