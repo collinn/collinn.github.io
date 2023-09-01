@@ -367,9 +367,12 @@ iteratively change parts of our analysis.</p>
 <p>The code below contains several instances of magic numbers:</p>
 <pre class="r"><code>x &lt;- c(1,2,3, &quot;four&quot;, 5, &quot;six&quot;, 7, 6, 2)
 
-x &lt;- as.numeric(x)</code></pre>
-<pre><code>## Warning: NAs introduced by coercion</code></pre>
-<pre class="r"><code># Get rid of NA values
+
+### START ###
+
+x &lt;- as.numeric(x)
+
+# Get rid of NA values
 x &lt;- x[c(1,2,3,5,7,8,9)]
 
 # Create a vector to add to x
@@ -381,19 +384,26 @@ df &lt;- data.frame(x = x, y = y, z = x + y)
 ## Only keep values where z &gt; 5 and x &lt;= 7 and grab column &quot;z&quot;
 z_new &lt;- df[c(4,5,6), 3]
 
+
+### END ###
+
 z_new</code></pre>
 <pre><code>## [1] 6 8 7</code></pre>
-<p>Copy the code into the block below and modify it to remove the magic
-numbers with the appropriate expressions. Leave a comment for each
-modification explaining why the change is made. The value for
+<p>Copy the code from the lines between <code>### START ###</code> and
+<code>### END ###</code> into the block below and modify it to remove
+the magic numbers with the appropriate expressions. Leave a comment for
+each modification explaining why the change is made. The value for
 <code>z_new</code> should remain unchanged:</p>
 <pre class="r"><code>x &lt;- c(1,2,3, &quot;four&quot;, 5, &quot;six&quot;, 7, 6, 2)
 
 # Write updated code here
 
 z_new</code></pre>
-<p>Using the same code that you just rewrote, try it again but this time
-with a different value for <code>x</code>. Verify that the results make
+<pre><code>## [1] 6 8 7</code></pre>
+<p>By removing instances of magic numbers, we can be sure that the
+“logic” of our operations will stay the same, even if the input changes.
+To verify this, copy your updated code again into the block below with
+the new input vector <code>x</code>. Verify that the results make
 sense</p>
 <pre class="r"><code>## &quot;new&quot; vector x
 x &lt;- c(3, 7, &quot;four&quot;, 2)
@@ -401,6 +411,7 @@ x &lt;- c(3, 7, &quot;four&quot;, 2)
 # Write same updated code here and verify it works
 
 z_new</code></pre>
+<pre><code>## [1] 6 8 7</code></pre>
 <p><span class="math inline">\(~\)</span></p>
 </div>
 <div id="question-2" class="section level2">

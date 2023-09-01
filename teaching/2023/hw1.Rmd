@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
 ```
 
 
@@ -16,8 +16,11 @@ In the lab, we briefly discussed the topic of magic numbers, that is, numbers th
 
 The code below contains several instances of magic numbers:
 
-```{r}
+```{r, warning = FALSE}
 x <- c(1,2,3, "four", 5, "six", 7, 6, 2)
+
+
+### START ###
 
 x <- as.numeric(x)
 
@@ -33,10 +36,13 @@ df <- data.frame(x = x, y = y, z = x + y)
 ## Only keep values where z > 5 and x <= 7 and grab column "z"
 z_new <- df[c(4,5,6), 3]
 
+
+### END ###
+
 z_new
 ```
 
-Copy the code into the block below and modify it to remove the magic numbers with the appropriate expressions. Leave a comment for each modification explaining why the change is made. The value for `z_new` should remain unchanged:
+Copy the code from the lines between `### START ###` and `### END ###` into the block below and modify it to remove the magic numbers with the appropriate expressions. Leave a comment for each modification explaining why the change is made. The value for `z_new` should remain unchanged:
 
 ```{r}
 x <- c(1,2,3, "four", 5, "six", 7, 6, 2)
@@ -46,7 +52,7 @@ x <- c(1,2,3, "four", 5, "six", 7, 6, 2)
 z_new
 ```
 
-Using the same code that you just rewrote, try it again but this time with a different value for `x`. Verify that the results make sense
+By removing instances of magic numbers, we can be sure that the "logic" of our operations will stay the same, even if the input changes. To verify this, copy your updated code again into the block below with the new input vector `x`. Verify that the results make sense
 
 ```{r}
 ## "new" vector x
