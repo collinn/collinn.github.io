@@ -33,7 +33,8 @@ Last updated: `r format(Sys.time(), "%a %b %e %Y, %H:%M")`
 
 - STA-230-01 Yuki Huang (huangyuk@grinnell.edu)
 
-  - TBD
+  - Noyce 2401, Tuesday 7-8pm
+  - Noyce 2401, Thursday 7-8pm
   
 - STA-230-02 Anne Bader (baderann@grinnell.edu)
   
