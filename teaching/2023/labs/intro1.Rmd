@@ -473,4 +473,3 @@ sub2
 Notice that unlike other instances when subsetting where we had to use `$` to indicate that `LifeExpectancy` or `Happiness` were columns in `my_data`, the `subset` function was able to determine that on it's own.
 
 **Question #7** Create a subset of `my_data` that contains all countries with a population greater than 100 million (the relevant column measures population in millions) that also have a happiness index of 6 or lower. Then determine the number of observations in this subset.
-
