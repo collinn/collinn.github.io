@@ -1,0 +1,37 @@
+---
+title: "lab 4"
+author: "STA 230"
+date: "2023-09-03"
+output: html_document
+---
+x
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+### Individual Geoms, Collective Geoms, and Constants
+
+A recurring theme of the last few questions has been that of addressing how and where the specification of aesthetics can change the generation of the graph. As we continue working with ggplots, you may begin to notice a pattern develop relating the different aesthetics used to the way they are rendered on the plot. And while this is *not* a formal distinction made by `ggplot2`, a helpful mental model for thinking of these is classifying them as either *individual geoms*, *collective geoms*, and *constants*. While we will not give an exhaustive list here of each of the different ways to use these, we will include a few examples to help orient the way we think about them.
+
+#### Individual Geoms
+
+Individual geoms are those that we typically wish to associate with each observation individually, and they are nearly always associated with numeric values. An example of this that we have already seen is the specification of xy-coordinates. To offer another example, consider a situation in which we use city fuel economy, `cty`, to alter the size of the points created on our scatter plot, with greater fuel economy being associated with larger points:
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(size = cty)) 
+```
+
+Because this is an aesthetic we only want associated with the points, we include it in the `geom_point` function rather than in `ggplot`. To see the utility in specifying aesthetics only within a single level, consider the following plot, and in particular the legend:
+
+```{r}
+ggplot(mpg, aes(displ, hwy, size = cty)) +
+  geom_point() +
+  geom_smooth()
+```
+
+#### Collective Geoms
+
+Unlike the individual geoms, collective geoms are typically associated with discrete groups or factors. This, in effect, creates
+
