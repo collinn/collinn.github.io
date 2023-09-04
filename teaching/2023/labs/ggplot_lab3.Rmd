@@ -14,7 +14,9 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE, 
                       fig.align = 'center', 
                       fig.height = 4, 
-                      fig.width = 4)
+                      fig.width = 4, 
+                      warning = FALSE, 
+                      message = FALSE)
 ```
 
 # Preamble
