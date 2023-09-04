@@ -288,7 +288,7 @@ Why do you think this looks the way that it does?
 
 **Question 9** Now run the following code:
 
-```{r}
+```{r, eval = FALSE}
 ggplot(mpg, aes(displ, hwy, color = factor(cyl))) +
   geom_point()
 ```
