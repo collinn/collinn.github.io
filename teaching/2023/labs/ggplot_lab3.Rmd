@@ -163,13 +163,13 @@ ggplot(mpg, aes(displ, hwy, color = class)) +
   facet_wrap(~drv)
 ```
 
-**Question 3** Replicate the same boxplot from question X, this time facetting on the variable `drv`.
+**Question 3** Replicate the same box plot from question 2, this time faceting on the variable `drv`.
 
-```{r}
-ggplot(mpg, aes(class, hwy)) +
-  geom_boxplot() +
-  facet_wrap(~drv)
-```
+<!-- ```{r} -->
+<!-- ggplot(mpg, aes(class, hwy)) + -->
+<!--   geom_boxplot() + -->
+<!--   facet_wrap(~drv) -->
+<!-- ``` -->
 
 
 ## Adding Layers
@@ -209,18 +209,14 @@ ggplot(mpg, aes(displ, drv)) +
 
 **Question 4** Rather than `geom_boxplot`, add `geom_jitter(height = 0.15)` to create a plot with `displ` on the x axis and `drv` on the y axis. Add summaries for both mean (blue) and median (red).
 
-```{r, eval = FALSE}
-ggplot(mpg, aes(hwy, class)) +
-  geom_jitter(height = 0.15) + 
-  stat_summary(geom = "point", fun = "mean", color = "green", size = 2) +
-  stat_summary(geom = "point", fun = "median", color = "red", size = 2)
+<!-- ```{r, eval = FALSE} -->
+<!-- # answer -->
+<!-- ggplot(mpg, aes(hwy, class)) +  -->
+<!--   geom_jitter(height = 0.15) + -->
+<!--   stat_summary(geom = "point", fun = "mean", color = "green", size = 2) + -->
+<!--   stat_summary(geom = "point", fun = "median", color = "red", size = 2) -->
+<!-- ``` -->
 
-# answer
-ggplot(mpg, aes(hwy, class)) + 
-  geom_jitter(height = 0.15) +
-  stat_summary(geom = "point", fun = "mean", color = "green", size = 2) +
-  stat_summary(geom = "point", fun = "median", color = "red", size = 2)
-```
 
 **Question 5** Notice that in this section, we made several calls to layers that included arguments specifying visual aspects of the data (`stat_summary(..., color = 'red', size = 2)` and `geom_jitter(height = 0.15)`) *without* using the `aes()` function. Why did this still work? What impact did it have on the plots that were created?  (Hint: Think about the specific purpose of `aes` and consider how that differs from the examples we just gave.)
 
@@ -315,10 +311,11 @@ ggplot(mpg, aes(displ, hwy, color = factor(cyl))) +
 
 **Question 10** Create a box plot with `class` as the x axis and hwy as the y. In order to compare these vehicles from when data was first collected to when it was last collected, specify the color aesthetic as `year`. Is this the plot that you would expect? Make whatever modifications necessary to produce the intended graph.
 
-```{r}
-ggplot(mpg, aes(class, hwy, color = year)) + 
-  geom_boxplot()
-```
+<!-- ```{r} -->
+<!-- ggplot(mpg, aes(class, hwy, color = year)) +  -->
+<!--   geom_boxplot() -->
+<!-- ``` -->
+
 
 ---
 
