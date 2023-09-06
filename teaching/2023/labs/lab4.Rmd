@@ -1,37 +1,321 @@
 ---
-title: "lab 4"
+title: "Lab 4 - `ggplot2` continued"
 author: "STA 230"
-date: "2023-09-03"
+date: "2023-09-04"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
-x
+
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, fig.align = "center", 
+                      fig.width = 4, fig.height = 4)
 ```
 
 
-### Individual Geoms, Collective Geoms, and Constants
+# Lab
 
-A recurring theme of the last few questions has been that of addressing how and where the specification of aesthetics can change the generation of the graph. As we continue working with ggplots, you may begin to notice a pattern develop relating the different aesthetics used to the way they are rendered on the plot. And while this is *not* a formal distinction made by `ggplot2`, a helpful mental model for thinking of these is classifying them as either *individual geoms*, *collective geoms*, and *constants*. While we will not give an exhaustive list here of each of the different ways to use these, we will include a few examples to help orient the way we think about them.
+This lab will be a continuation of our exploration of `ggplot2`. Whereas the first lab was oriented around creating a number of standard plots from the data, here we will focus on a number of ancillary issues, including titles and labels, legends, and themes. The bulk of this lab will be focused on the topic of *scales*, which manage the relationship between the data and the resulting aesthetics. We will conclude by taking a closer look at some of the arguments that can be used to augment different layers.
 
-#### Individual Geoms
+## Titles and Axes
 
-Individual geoms are those that we typically wish to associate with each observation individually, and they are nearly always associated with numeric values. An example of this that we have already seen is the specification of xy-coordinates. To offer another example, consider a situation in which we use city fuel economy, `cty`, to alter the size of the points created on our scatter plot, with greater fuel economy being associated with larger points:
+By default, plots made with `ggplot2` do not include a title, and the labels for the axes are taken from the variable names given in `aes()`. This is the case, for example, when we have our plot of engine displacement and highway miles
+
+```{r}
+library(ggplot2)
+
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point()
+```
+
+We can add titles or change the x and y axis labels with the functions `ggtitle`, `xlab`, and `ylab`, respectively
+
+```{r}
+library(ggplot2)
+
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point() +
+  ggtitle("Engine size to fuel economy") + 
+  xlab("Displacement") + 
+  ylab("Fuel Economy (Highway)")
+```
+
+As is typically the case with ggplots, there are multiple ways to accomplish the same goal. The `labs()` function allows us to modify multiple labels at once by specifying them with an argument
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point() +
+  labs(x = "Displacement", y = "Fuel Economy (Highway)", title = "Engine size to fuel economy")
+```
+
+The `labs()` function also takes arguments for any grouping aesthetics. The argument name is the same as what is used for creating the groups:
+
+```{r}
+## Without label
+ggplot(mpg, aes(displ, hwy, shape = factor(cyl))) + 
+  geom_point() 
+
+## With label
+ggplot(mpg, aes(displ, hwy, shape = factor(cyl))) + 
+  geom_point() +
+  labs(shape = "Cylinders") # Since we used shape aesthetic, we use "shape" here
+```
+
+**Question 12** Using the `mpg` dataset, create a boxplot with `class` on the x-axis and `cty` on the y-axis. Add a color aesthetic that accounts for `year` (don't forget to address the fact that, by default, `year` is a continuous variable). Create appropriate labels for the axes, title, and legend.
+
+## Themes
+
+As you might imagine, there are a tremendous variety of options to modify the style of your graphic. The collection of non-data related elements of your plot, including the appearance of titles, labels, legends, tick marks and lines all make up what is known as the *theme*. Elements related to the theme are modified with the `theme()` function; a quick look at `?theme` demonstrates how comprehensive this list can be. Here, however, we consider only a small subset of these items to demonstrate how the process works. It is less important that any of these are memorized; rather, knowing that such possibilties exist should assist you when using search engines to learn how to modify your graphics.
+
+
+The system for modifying themes consists of two components:
+  
+  1. The *elements* that are being modified (i.e., text, tick marks, legend)
+  2. The *element functions* associated with each element that control the visual properties. 
+
+For example, elements consisting of *text* are modified with the element function `element_text()`. We can also see some of the particulars that can be modified with `?element_text`. To motivate this, consider a plot that we constructed in the previous lab:
+
+```{r}
+ggplot(mpg, aes(class, hwy)) + 
+  geom_boxplot()
+```
+
+Because of the width of our figure, all of the labels on the x-axis are bunched together. We can help fix this problem by rotating the axis text on the x axis. That is, we are modifying the element `axis.text.x` (that is, text that is located on the x axis) with the element function `element_text`
+
+```{r}
+ggplot(mpg, aes(class, hwy)) + 
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45))
+```
+
+Here, we see that the rotation has helped with the overlapping, but now the text is running into our plot. We can further alter the _**V**_ erticle ad _**JUST**_ ment with `vjust`
+
+```{r}
+ggplot(mpg, aes(class, hwy)) + 
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
+```
+
+Note: considering a real-world example, it is highly unlikely that you would recall that text on the x-axis is specified with `axis.text.x`. However, if you had a general idea of what it is you wanted to change, it *is likely* that looking through the arguments of `?theme` that you would find something matching what you were looking for. This combined with with diligent search engine use is a potent strategy for solving most problems.
+
+
+**Question 13** For this question, use the code in the block below. To the plot that is generated, modify the following:
+
+  1. Modify the `plot.title` by changing its color to red and writing it in italics.
+  2. Change the size of the title and the text in the legend (two separate things) so that they are much bigger than the default
+
+```{r, eval = FALSE}
+ggplot(mpg, aes(displ, hwy, color = factor(cyl))) + 
+  geom_point() 
+```
+
+
+---
+
+There are a number of pre-built themes that come included in ggplot, serving as a template from which you can further tailor your graphics. Here, for example, we consider a black and white theme, generated by adding `theme_bw()` to our constructed plot:
+
+```{r}
+ggplot(mpg, aes(displ, hwy, color = factor(cyl))) + 
+  geom_point() + 
+  labs(x = "Displacement", y = "Highway", title = "Snappy title", color = "Cylinders") +
+  theme_bw() # adds a black and white theme
+```
+
+
+Other pre-built themes:
+
+- `theme_bw()`
+- `theme_linedraw()`, `theme_light()` and `theme_dark()`
+- `theme_minimal()`
+- `theme_classic()`
+- `theme_void()`
+
+You can judge the differences in these themes below:
+
+```{r, echo = FALSE, fig.height = 4.5, fig.width = 7.5}
+df <- data.frame(x = 1:3, y = 1:3)
+base <- ggplot(df, aes(x, y)) + geom_point()
+p1 = base + theme_grey() + ggtitle("theme_grey()")
+p2 = base + theme_bw() + ggtitle("theme_bw()")
+p3 = base + theme_linedraw() + ggtitle("theme_linedraw()")
+p4 = base + theme_light() + ggtitle("theme_light()")
+p5 = base + theme_dark() + ggtitle("theme_dark()")
+p6 = base + theme_minimal()  + ggtitle("theme_minimal()")
+p7 = base + theme_classic() + ggtitle("theme_classic()")
+p8 = base + theme_void() + ggtitle("theme_void()")
+gridExtra::grid.arrange(p1,p2,p3,p4,p5,p6,p7,p8, nrow = 2)
+```
+
+Any theme can be further customized using `theme()`. 
+
+
+**Question 14** Create a ggplot that includes either a color or shape aesthetic, with appropriately labeled axes, legend, and title. Add any of the pre-built themes shown above. Then, using the `theme` function, further modify the plot so that the legend position is on the bottom (Hint: `?theme`)
+
+
+
+## Scales
+
+We know from our discussion in the previous lab, we know that aesthetics responsible for creating a map from the data used to visual aspects of the plot generated. The specific details of how this mapping occurs are contained within the concept of *scales*. Scales, for example, are responsible for determining the length of the x-axis, or the specific colors and shapes generated by an aesthetic. Here, we are going to limit our discussion to the axes and colors, but the general principles will be true for all of the aesthetics generated by `ggplot2`.
+
+A major concept that will be critical to keep in mind during this section is the distinction between *continuous* and *discrete* values. Continuous values are those that exist on a spectrum without gaps, while discrete values are those that take on a limited (and generally small) number of unique values. In the `mpg` dataset that we have been using so far, the highway fuel economy `hwy` would be an example of a continuous variable, while the class of vehicle, `class`, would be an example of a discrete variable.
+
+### Modifying the axes
+
+Whenever an aesthetic is added to a ggplot, an associated scale is created behind the scenes. For example, as both the vehicle displacement and highway fuel economy are continuous variables, scales for both the x and y axes are made continuous. We can see that when we explicitly add these scales to the plot, nothing changes:
+
+```{r}
+## Scales created behind the scenes
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point()
+
+## That is the exact same as this
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point() + 
+  scale_x_continuous() + # creates continuous x axis 
+  scale_y_continuous() # creates continuous y axis
+```
+
+The same thing occurs when one of the variables is discrete
+
+```{r}
+## Scales created behind the scenes
+ggplot(mpg, aes(drv, hwy)) + 
+  geom_boxplot()
+
+## One of these is now discrete
+ggplot(mpg, aes(drv, hwy)) + 
+  geom_boxplot() + 
+  scale_x_discrete() + 
+  scale_y_continuous()
+```
+
+If we were to try and add a scale that did not match the variable type, we would get an error
+
+```{r, error = TRUE}
+## x is discrete but we try to include continuous, resulting in error
+ggplot(mpg, aes(drv, hwy)) + 
+  geom_boxplot() + 
+  scale_x_continuous() + 
+  scale_y_continuous()
+```
+
+Again, because these scale terms are added automatically behind the scenes, we never have to worry about including them specifically unless we wish to change something about them. For now, we will only concern ourselves with breaks, labels, and transformations.
+
+**Question 15** Using the code block below, explicitly add the scales for the x and y axes that would otherwise show up by default
+
+```{r}
+ggplot(mpg, aes(displ, drv)) + 
+  geom_boxplot()
+```
+
+
+#### Breaks and labels
+
+Breaks and labels refer to the tick marks on the x and y axes. *Breaks* refer to the actual location on the axes we wish to have marks, while *labels* refer to the labels of the breaks. Each of these takes a vector argument, and if both are provided, they must be the same length:
 
 ```{r}
 ggplot(mpg, aes(displ, hwy)) +
-  geom_point(aes(size = cty)) 
+  geom_point() + 
+  scale_x_continuous(breaks = c(2, 4, 4.5, 7), labels = c("2", "4", "4 & 1/2", "7"))
 ```
 
-Because this is an aesthetic we only want associated with the points, we include it in the `geom_point` function rather than in `ggplot`. To see the utility in specifying aesthetics only within a single level, consider the following plot, and in particular the legend:
+When the values are discrete, rather than continuous, the breaks cannot be adjusted as each tick corresponds to a different group. We can, however, change the labels of these groups with a *named vector*. The names of the vector **must** correspond to the names of the group. So, for example, knowing that the `drv` variable has categories "r", "f", and "4", we can make adjustments as such:
 
 ```{r}
-ggplot(mpg, aes(displ, hwy, size = cty)) +
-  geom_point() +
-  geom_smooth()
+ggplot(mpg, aes(hwy, drv)) +
+  geom_boxplot() +
+  scale_y_discrete(labels = c(r = "Rear", f = "Foward", `4` = "4WD"))
 ```
 
-#### Collective Geoms
+A few things to note from this last plot:
+  
+  1. Because `drv` is on the y-axis, we need to be sure to use the y scale
+  2. Ditto for it being discrete
+  3. Named vectors usually consist of characters and numbers. When special characters are used (such as hypens), or when the name is just a number (as in the case above, where the name was just "4", we must enclose the name in backtics \`\` so that R knows what to do with them)
+  
+**Question 16** Using the `mpg` dataset, create a box plot with `cyl` on the y-axis and `cty` on the x-axis. Don't forget that `cyl` should be discrete! Rename the y-axis so that the groups are "4 Cyl", "5 Cyl", etc., instead of the default values. Then, using `theme`, rotate the labels 45 degrees. Finally, modify the x-axis so that it only has tick marks for multiples of 10, including 0 and 40. 
 
-Unlike the individual geoms, collective geoms are typically associated with discrete groups or factors. This, in effect, creates
+
+#### Transformations
+
+This last section on our axes scales involves *transformations* and is generally only associated with continuous variables. These are done with the `trans` argument provided in the scale function. For example, if we wish to plot the relationship between displacement and fuel economy in descending order, we could do this by reversing the relevant axis
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point() + 
+  scale_x_continuous(trans = "reverse")
+```
+
+Other transformations help us identify trends that are on disproportionate scales. For example, consider this contrived dataset where each observation grows by a power of 10. This makes it difficult to see any meaningful relationship earlier in the plot. By adjusting the scale for x to be on a $log_10$ scale, we are able to better see what is going on
+
+```{r}
+df <- data.frame(x = 1:10, # 1 - 10
+                 y = 10^(1:10)) # 10^1 - 10^10
+df
+
+## Very difficult to see this relationship for smaller values
+ggplot(df, aes(x, y)) +
+  geom_point()
+
+## On a more appropriate scale, we see the relationship is linear
+ggplot(df, aes(x, y)) +
+  geom_point() + ylab("log 10 scale") +
+  scale_y_continuous(trans = "log10")
+```
+
+**Question 17** The variable `hwy` in the `mpg` dataset gives us *fuel economy*, which is miles/gallon; however, another common metric is reporting *fuel consumption*, which is a measure of gallons per mile. Use the transformation `"reciprocal"` to create a scatter plot showing the relationship between displacement size and fuel consumption.
+
+
+### Colors
+
+TBD
+
+<!-- control the map from aesthetics to values -->
+
+<!-- use this to show reverse x, log transform, colors, etc.  -->
+
+<!-- but then also show that here we can change axes name, tics, breaks, etc -->
+
+<!-- ```{r} -->
+<!-- library(ggplot2) -->
+
+<!-- ggplot(mpg, aes(displ, hwy)) +  -->
+<!--   geom_point() -->
+
+<!-- ## Acktually-it does this -->
+<!-- ggplot(mpg, aes(displ, hwy)) +  -->
+<!--   geom_point() + -->
+<!--   scale_x_continuous() + # these are both continuous because displ and hwy continuous -->
+<!--   scale_y_continuous() -->
+
+
+<!-- ## Whereas -->
+<!-- ggplot(mpg, aes(displ, drv)) +  -->
+<!--   geom_jitter(height = 0.15) -->
+
+<!-- # Same as... -->
+<!-- ggplot(mpg, aes(displ, drv)) +  -->
+<!--   geom_jitter(height = 0.15) + -->
+<!--   scale_x_continuous() +  -->
+<!--   scale_y_discrete() # because now we have discerte y -->
+
+<!-- ## LIKEWISE -->
+<!-- ggplot(mpg, aes(displ, hwy, color = drv)) +  -->
+<!--   geom_point() -->
+
+<!-- ggplot(mpg, aes(displ, hwy, color = drv)) +  -->
+<!--   geom_point() + -->
+<!--   scale_color_discrete() -->
+
+<!-- ## AND -->
+<!-- ggplot(mpg, aes(displ, hwy, color = cyl)) +  -->
+<!--   geom_point() +  -->
+<!--   scale_color_continuous() -->
+
+<!-- ## BUT WHAT IF -->
+<!-- # ggplot(mpg, aes(displ, hwy, color = cyl)) +  -->
+<!-- #   geom_point() +  -->
+<!-- #   scale_color_discrete() #<- does not work because scale is WRONG -->
+<!-- ``` -->
+
 
