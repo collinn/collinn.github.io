@@ -1,0 +1,316 @@
+---
+title: "Data Visualization with `ggplot2`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.height = 3)
+```
+
+This lab continues our study of data visualization using the `ggplot2` package. The lab will focus on the concepts and strategy behind creating effective visualizations. This lab is a "bonus" lab and should not be included with the write-up for labs 3 and 4. 
+
+
+$~$
+
+## Preamble
+
+### Packages and Datasets
+
+We will continue using the `ggplot2` package:
+
+```{r}
+# install.packages("ggplot2")
+library(ggplot2)
+```
+
+The examples will again use data from The College Scorecard:
+
+```{r}
+colleges <- read.csv("https://remiller1450.github.io/data/Colleges2019.csv")
+```
+
+- **Description**: The `colleges` data set records attributes and outcomes for all primarily undergraduate institutions in the United States with at least 400 full-time students.
+
+$~$
+
+### Creating Effective Visualizations
+
+The fundamental principles of creating effective data visualizations are quite simple. In short, an effective visualization should:
+
+1) Clearly convey a particular message
+2) Let the data speak for itself with minimal distortion
+3) Avoid "sales tactics" and unnecessary frills
+
+It's helpful to understand these principles with a few examples of effective and ineffective visuals:
+
+```{r, echo=FALSE}
+library(dplyr)
+browsers <- data.frame(Browser = rep(c("Opera","Safari","Firefox","IE","Chrome"),2),
+                       Year = rep(c(2000, 2015), each = 5),
+                       Percentage = c(3,21,23,28,26, 2,22,21,27,29)) %>%
+  mutate(Browser = reorder(Browser, Percentage))
+```
+
+#### Example #1
+
+Consider survey data on the popularity of different internet browsers over time:
+
+```{r, echo=FALSE, fig.show="hold", out.width="50%"}
+p1 <- browsers %>% ggplot(aes(x = "", y = Percentage, fill = Browser)) +
+  geom_bar(width = 1, stat = "identity", col = "black")  + coord_polar(theta = "y")  + xlab("") + ylab("") +
+  theme(axis.text=element_blank(), 
+        axis.ticks = element_blank(), 
+        panel.grid  = element_blank()) +
+  facet_grid(.~Year) + labs(title = "Graph #1")
+p1
+
+p2 <-browsers %>%
+  ggplot(aes(x = Browser, y = Percentage, color = factor(Year), fill = factor(Year))) + 
+  geom_bar(stat = "identity", position = "dodge", width=0.5) +
+  labs(y = "Percent using the Browser", color = "Year", fill = "Year", title = "Graph #2") 
+p2
+```
+
+Which graph is more effective? Why?
+
+$~$
+
+#### Example #2
+
+Consider the heights of men and women in the NHANES sample:
+
+```{r, fig.show="hold", out.width="50%", echo = FALSE}
+library(dslabs)
+data(heights)
+
+p1 <- heights %>% group_by(sex) %>% summarize(average = mean(height), se=sd(height)/sqrt(n())) %>%
+  ggplot(aes(sex, average)) +
+  geom_bar(stat = "identity", width=0.5, fill = 4, alpha = 0.1, col = 1) +
+  geom_errorbar(aes(ymin = average - 2*se, ymax = average+2*se), width = 0.25) +
+  ylab("Height in inches (avg)") + xlab("") + labs(title = "Graph #1")
+p1
+
+p2 <- heights %>% 
+  ggplot(aes(sex, height)) + 
+  geom_boxplot(coef=3) + 
+  geom_jitter(width = 0.1, alpha = 0.2) +
+  ylab("Height in inches") + xlab("")  + labs(title = "Graph #2")
+p2
+```
+
+Which graph is more effective? Why?
+
+$~$
+
+## Lab
+
+At this point you will begin working with your partner. Please read through the text/examples and make sure you both understand before attempting to answer the embedded questions.
+
+$~$
+
+### Visual Cues for Encoding Data
+
+The basic idea behind data visualization is to convey a particular message by exploiting human understanding of *visual cues*. The most common strategies involve displaying differences in the observed data via visual differences in:
+
+- Position
+- Length
+- Angle
+- Area
+- Color hue
+- Color brightness/intensity
+
+However, as we saw in Example #1 from the preamble, not all of these are equally effective. For example, bar charts (lengths) are more effective than pie charts (angles and areas).
+
+In fact, we could make the pie chart from Example #1 *even less effective* by removing any possible comparison of *angles* (using a graph called a "donut chart"):
+
+```{r, echo = FALSE}
+browsers %>% ggplot(aes(x = 2, y = Percentage, fill = Browser)) +
+  geom_bar(width = 1, stat = "identity", col = "black")  + 
+  scale_x_continuous(limits=c(0.5,2.5)) + coord_polar(theta = "y") +
+  labs(x = "", y = "", title = "An Ineffective Visual") +
+  theme(axis.text=element_blank(), 
+        axis.ticks = element_blank(), 
+        panel.grid  = element_blank()) +
+  facet_grid(.~Year)
+```
+
+[Research by Cleveland and McGill](https://priceonomics.com/how-william-cleveland-turned-data-visualization/) has shown that assessments based upon *position* and *length* are most accurate. Judgement of *angles* or *color* are somewhat less accurate, but still acceptable. While judgement of *area* and *brightness* are substantially less accurate; and judgement based upon *volume* is the least accurate.
+
+**Question #1**: Consider the following data visualizations with a goal to compare the population of Suffolk County, MA (where Boston is located) versus all other counties in the north eastern United States. 
+
+- **Part A**: Which visual cues are used in each visualization?
+- **Part B**: Which graph does the research of Cleveland and McGill suggest would be more effective? Do you agree?
+
+```{r, fig.show="hold", out.width="50%", echo = FALSE}
+library(usmap) 
+plot_usmap(data = countypop, values = "pop_2015", include = .new_england, color = "red") + 
+  scale_fill_continuous(low = "white", high = "red", name = "Population", label = scales::comma)  +
+  theme(legend.position = "right")
+
+countypop$county = paste(countypop$fips)
+ggplot(data = subset(countypop, abbr %in% c("VT", "NH", "MA", "ME", "RI", "CT")), aes(x = reorder(fips, -pop_2015), y = pop_2015, fill = abbr)) + geom_bar(stat = "identity") +
+  labs(x = "County", y = "Population", fill = "State") + theme(axis.text.x = element_blank())
+```
+
+Note: you do not need to write any `R` code for this question
+
+$~$
+
+### Histograms and Density Plots
+
+Histograms and density plots are used to display the distribution of a quantitative variable. 
+
+Oftentimes you'll use facets to display differences in distribution across subsets of data. In these cases, you should align the scales of your axes (using `scales = fixed` in the faceting function) throughout the graph to facilitate accurate comparisons:
+
+```{r, fig.show="hold", out.width="50%", echo = TRUE}
+ggplot(heights, aes(x = height)) + geom_histogram(aes(y = ..density..), bins = 20) + 
+    facet_wrap(~sex, nrow = 1, scales = "free") + labs(title = "Graph #1 (Difficult)")
+ggplot(heights, aes(x = height)) + geom_histogram(aes(y = ..density..), bins = 20) + 
+    facet_wrap(~sex, nrow = 2, scales = "fixed") + labs(title = "Graph #2 (Effective)")
+```
+
+Notice how the *vertical alignment* and *common axes* allow for a clear comparison of the distributions of male and female heights in the NHANES data.
+
+Alternatively, depending upon the number of comparisons, you might want to consider a single plot:
+
+```{r}
+ggplot(heights, aes(x = height, color = sex, fill = sex)) + geom_histogram(aes(y = ..density..), alpha = 0.5, bins = 20)  + labs(title = "Graph #3 (Also effective?)")
+```
+
+*Note*: the argument `y = ..density..` instructs `geom_histogram()` to use the *density scale* for the heights of the histogram bars (displayed using the y-axis).
+
+**Question #2**: Using the "colleges" data, create a set of distinct histograms that *effectively* display the distribution of the variable "Enrollment" across the following regions: "South East", "South West", "Far West", "Mid East", "Great Lakes", "Plains", and "New England". Do not display enrollments in any other regions.
+
+$~$
+
+
+### Dotplots, Boxplots, and Violin Plots
+
+Histograms and density plots are great at showing the shape of a variable's distribution, but they struggle to be effective in scenarios where many groups are being compared. In these situations *dot plots*, *box plots*, and *violin plots* are suitable alternatives that tend to scale better when the number of groups to compare is relative large.
+
+However, simply choosing a different geom is insufficient to make an effective graph. Consider following three dot plots that each display the relationship between the mean of "Avg_Fac_Salary" and the variables "Region" and "Private". 
+
+```{r, fig.show="hold", out.width="33.3%", echo = FALSE}
+## Data subset used for these graphs
+datasub = subset(colleges, Region %in% c("South East", "South West", "Far West", "Mid East", "Great Lakes", "Plains", "New England"))
+
+## Dot plot #1
+ggplot(datasub, aes(x = Avg_Fac_Salary, y = Private, color = Region)) +  labs(title = "Dot Plot #1") + stat_summary(fun.data = mean_se)
+
+## Dot plot #2
+ggplot(datasub, aes(x = Avg_Fac_Salary, y = Private)) +  labs(title = "Dot Plot #2") + stat_summary(fun.data = mean_se, color = "red", alpha = 0.3) + facet_wrap(~Region)
+
+## Dot plot #3
+ggplot(datasub, aes(x = Avg_Fac_Salary, y = reorder(Region, X = Avg_Fac_Salary, FUN = mean, na.rm = TRUE), color = Private)) +  labs(title = "Dot Plot #3", y = "Region") + stat_summary(fun.data = mean_se)
+```
+
+- Dot plot #1 is ineffective because it's too difficult to quickly compare within a region.
+- Dot plot #2 effectively allows for comparisons within a region, but comparing between regions is difficult because the facet panels are unorganized and take up too much space.
+- Dot plot #3 is the *most effective* of these graphs because it allows for comparisons within a region, and it also facilitates comparisons between regions through compactness and reordering of the y-axis
+
+For simplicity these graphs only show the mean $\pm$ 1 standard error for each region. But you could attempt to show the entire distribution using `geom_violin()` in place of or in addition to `stat_summary()`, or you could show a more detailed statistical summary using `geom_boxplot()`:
+
+```{r}
+ggplot(datasub, aes(x = Avg_Fac_Salary, y = reorder(Region, X = Avg_Fac_Salary, FUN = mean, na.rm = TRUE), color = Private)) + geom_violin() +  labs(title = "Using geom_violin", y = "Region")
+ggplot(datasub, aes(x = Avg_Fac_Salary, y = reorder(Region, X = Avg_Fac_Salary, FUN = mean, na.rm = TRUE), color = Private)) + geom_boxplot() +  labs(title = "Using geom_boxplot", y = "Region")
+```
+
+*Note*: The examples above also illustrate the `reorder()` function, which can rearrange the categories of a variable according to a function of another variable in the data. In these examples, the categories of "Region" are rearranged by the mean value of "Avg_Fac_Salary" within each region.
+
+**Question #3**: In the United States, federal law defines a [Hispanic-serving institution (HSI)](https://en.wikipedia.org/wiki/Hispanic-serving_institution) as a college or university where 25% or more of the total undergraduate student body is Hispanic or Latino. The code below uses this definition and the `ifelse()` function to add a new binary categorical variable, "HSI", to the colleges data.  For this question, your goal is to create a graph that effectively compares the variable "Net_Tuition" for HSI and non-HSI colleges in the states of "CA", "FL", "NY" and "TX". That is, your graph should allow for easy comparisons of the variables "Net_Tuition" (or a summary of it), "HSI", and "State" (displaying only the four aforementioned states). *Hint*: You should remove any colleges with missing values of "HSI" by including a logical condition involving `!is.na()` (which will return `TRUE` if a college is *not* missing that variable).
+
+```{r}
+colleges$HSI = ifelse(colleges$PercentHispanic >= 0.25, "HSI", "No")
+```
+
+$~$
+
+### Scatterplots
+
+Scatter plots are primarily used to display relationships between two numeric variables using position. However, aesthetics like color, point character, or brightness allow for additional variables to be included in the graph.  Below are a series of tips for making more effective scatter plots:
+
+##### 1. Use annotations rather than legends
+
+The most natural way to add a third variable into a scatter plot is the color aesthetic. By default, adding `color` into `aes` will create a legend on the side of the plot describing how the chosen variable is mapped to the colors seen on the graph. 
+
+From a visual processing perspective this is less efficient than placing color annotations near the relevant regions of the plot:
+
+```{r}
+data("iris")
+ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) + geom_point() + labs(title = "Using a legend")
+
+ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) + geom_point() + labs(title = "Using annotations") + 
+  guides(color="none") +  ## This removes the "guides" for the color aesthetic
+  annotate(geom = "text", x = c(2.5, 4, 6), y = c(0.25,0.75,1.25), label = c("Setosa", "Versicolor", "Virginica"), color = c("red", "darkgreen", "blue"))
+```
+
+The example above demonstrates how annotations can allow a viewer to understand the essence of a scatter plot more quickly.
+
+$~$
+
+##### 2. Use scale transformations to show more of the data
+
+The goal of any graph is to *show your data*. If outliers or skew are leading to a lot of blank space in your graph, you might consider a scale transformation:
+
+```{r}
+ggplot(colleges, aes(x = Enrollment, y = Net_Tuition)) + geom_point() + labs(title = "A few outliers dominate your attention")
+```
+
+Sometimes scale transformations can lead to new insights:
+
+```{r}
+ggplot(colleges, aes(x = Enrollment, y = Net_Tuition)) + geom_point() + labs(title = "Two distinct clusters?") + scale_x_continuous(trans = "log2")
+ggplot(colleges, aes(x = Enrollment, y = Net_Tuition, color = Private)) + geom_point() + labs(title = "Simpson's Paradox!") + scale_x_continuous(trans = "log2") + 
+  guides(color="none") + 
+  annotate(geom = "text", x = c(2000, 52000), y = c(52000,25000), label = c("Private", "Public"), color = c("red","cyan3"))
+```
+
+$~$
+
+##### 3. Avoid using scale transformations that hide or obscure important information
+
+In some situations, outliers distract from the main purposes of a graph, but in other situations the outliers are the most interesting aspect of the data. Shown below is a counter example to Tip #2:
+
+```{r, echo = FALSE}
+mil = read.csv("https://stat2labs.sites.grinnell.edu/Handouts/MilSpendBasic/FullCIADataset.csv")
+ggplot(mil, aes(x = GDPcapita, y = military*GDP/1000000000, label = country)) + geom_point() + labs(y = "Military Spending (billions)", x = "GDP per Capita") + 
+  annotate(geom = "text", x = c(60000, 45000, 13000, 23000), y = c(80000,30000,35000,18000), label = c("United States", "European Union", "China", "Russia"), color = c("blue","cyan3", "orange", "red"))
+```
+
+In this application, people generally have the greatest interest in knowing the military expenditures of the small number of countries that are currently viewed as having strong geopolitical aspirations. The smaller countries are less interesting, and the main purpose of displaying them is to highlight just how extreme the spending of the world's top military powers is relative to the average nation.
+
+$~$
+
+##### 4. Know when to use a diverging color gradient
+
+A third numeric variable can be included in a scatter plot using color, size or brightness, with color being the most effective choice. When mapping numeric values to different colors there are two possible options: 
+
+- *sequential scales* - most useful in distinguishing high values from low values (the "viridis" scale is an example)
+- *diverging scales* - used to put equal emphasis on both the high and low ends of the data range
+
+```{r, fig.show="hold", out.width="50%", echo = FALSE}
+ggplot(colleges, aes(x = Cost, y = Adm_Rate, color = Salary10yr_median)) + geom_point() + 
+  scale_color_distiller(palette="GnBu", type = "seq") + labs(title = "Sequential Colors")
+
+ggplot(colleges, aes(x = Cost, y = Adm_Rate, color = Salary10yr_median)) + geom_point() + 
+  scale_color_distiller(palette="Spectral", type = "div") + labs(title = "Diverging Colors")
+```
+
+The examples above use pre-built color palettes via the function `scale_color_distiller()`. You should read the help documentation of this function to see a list of possible color palette choices.
+
+$~$
+
+**Question #4**: Using the "colleges" data, create a scatter plot displaying the relationship between the variables "Cost", "ACT_median", and "Private". Use annotations rather than a legend to display the color aesthetic.
+
+```{r, echo = FALSE, eval = FALSE}
+ggplot(colleges, aes(x = Cost, y = ACT_median, color = Private)) + geom_point()
+```
+
+**Question #5**: Create a scatter plot that displays *three numeric variables* from the "colleges" data. Then, briefly write a few sentences justifying the choices (ie: diverging vs. sequential scales, etc.) you made in constructing the plot.
+
+
