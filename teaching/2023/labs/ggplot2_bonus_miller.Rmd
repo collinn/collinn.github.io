@@ -265,10 +265,14 @@ Sometimes scale transformations can lead to new insights:
 
 ```{r}
 ggplot(colleges, aes(x = Enrollment, y = Net_Tuition)) + geom_point() + labs(title = "Two distinct clusters?") + scale_x_continuous(trans = "log2")
-ggplot(colleges, aes(x = Enrollment, y = Net_Tuition, color = Private)) + geom_point() + labs(title = "Simpson's Paradox!") + scale_x_continuous(trans = "log2") + 
-  guides(color="none") + 
+```
+
+```{r, eval = FALSE, include = FALSE}
+ggplot(colleges, aes(x = Enrollment, y = Net_Tuition, color = Private)) + geom_point() + labs(title = "Simpson's Paradox!") + scale_x_continuous(trans = "log2") +
+  guides(color="none") +
   annotate(geom = "text", x = c(2000, 52000), y = c(52000,25000), label = c("Private", "Public"), color = c("red","cyan3"))
 ```
+
 
 $~$
 

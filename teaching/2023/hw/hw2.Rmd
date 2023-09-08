@@ -1,0 +1,42 @@
+---
+title: "Homework 2 - `ggplot2`"
+author: "your_name_here"
+date: "2023-09-08"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      fig.width = 6, 
+                      fig.height = 6, 
+                      fig.align = 'center')
+```
+
+## Question 1
+
+The data frame `diamonds`, like `mpg`, is included in the `ggplot2` package. This data records the attributes of several thousand diamonds sold by a wholesale online retailer. For this question, your goal is to recreate the graph shown below as closely as possible. A few hints:
+
+  + Pay attention to scales, theme, and labels
+  + Find what transformations are available for continuous x axis
+  + The argument `alpha = 0.3` is used in one of the layers to give each point 30% opacity
+  + Default colors are used
+
+```{r}
+library(ggplot2)
+data("diamonds")
+```
+
+```{r, echo = FALSE, cache=TRUE}
+ggplot(diamonds, aes(carat,  price, color = color)) +
+  geom_point(alpha = 0.3) + theme_bw() + scale_x_continuous(trans = "log2") +
+  labs(x = "Carat", y = "Sale Price ($)", color = "Color Grade", title = "Diamond Sales") + theme(legend.position = "bottom")
+```
+
+
+## Question 2
+
+## Question 3
+
+## Question 4

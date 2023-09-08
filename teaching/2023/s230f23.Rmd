@@ -33,7 +33,7 @@ Sta-230 uses a *workshop style* class format. This means that the majority of ou
     - Labs due as a single document on pweb 9/6
 - Data visualization
     - [Lab 3 (intro to `ggplot`)](labs/ggplot_lab3.html), [Lab 4 (Themes and Scales - `ggplot`)](labs/lab4.html), [Bonus Lab (`ggplot`)](labs/ggplot2_bonus_miller.html)
-    - Labs due (excluding bonus) as a single document 9/13
+    - Labs due (excluding bonus) as a single document 9/13 at 11:59pm
 - Data manipulation
     - Lab 5 (reshaping data with `tidyr`), Lab 6 (manipulation with `dplyr`), Lab 7 (merging and joining)
     - Optional lab (functions, iteration, and files)
@@ -80,11 +80,11 @@ Sta-230 uses a *workshop style* class format. This means that the majority of ou
 
 Throughout the semester there will be 6-7 homework assignments:
 
-- [Homework #1](hw1.html)
-  - [Template .Rmd File](hw1.Rmd)
+- [Homework #1](hw/hw1.html)
+  - [Template .Rmd File](hw/hw1.Rmd)
   - Due date: 9/6
-- [Homework #2](hw2.html)
-  - Due date: 9/15
+- [Homework #2](hw/hw2.html)
+  - Due date: 9/15 at 11:59pm
 <!-- - [Homework #1](s230s23/hw1.html) -->
 <!--     - [.Rmd template file](s230s23/hw1.zip) -->
 <!-- - Due date: Wednesday 2/1 at 11:59pm -->
