@@ -14,6 +14,12 @@ knitr::opts_chunk$set(echo = TRUE,
                       fig.align = 'center')
 ```
 
+When creating your markdown file for this homework, remember to format your submission according to these rules:
+
+  - Mark question and part headers with "#" (remember, more "#" results in smaller header). Do not put anything in the header besides the question or part number
+  - Only include code and comments related to code in the code blocks
+  - Include all other text outside of the code chunks and outside of the headers
+
 ## Question 1
 
 The data frame `diamonds`, like `mpg`, is included in the `ggplot2` package. This data records the attributes of several thousand diamonds sold by a wholesale online retailer. For this question, your goal is to recreate the graph shown below as closely as possible. A few hints:
@@ -37,6 +43,98 @@ ggplot(diamonds, aes(carat,  price, color = color)) +
 
 ## Question 2
 
+[Simpson's paradox](https://en.wikipedia.org/wiki/Simpson%27s_paradox) is a phenomenon in statistics in which a trend that exists in a large group disappears or even reverses within subsets of a group. An example of this arises when considering the relationship between body mass and longevity. When all animals are considered together, it is generally true that larger animals have longer life spans than shorter ones (for example, elephants tend to live longer than mice). *However*, within a particular species, the opposite is true -- small body sizes tend to correspond with greater longevity (that is, smaller elephants tend to live longer than larger ones). In other words, when considered in aggregate, one trend appears to be true, and when considered in subsets, the opposite appears to be the case.
+
+For this problem, we will use the College Scorecard data from 2019 recording attributes and outcomes for all primarily undergraduate institutions in the United States with at least 400 full-time students. Note: this data was introduced in the bonus lab, but it is not necessary that you have done it there to do this problem.
+
+```{r}
+colleges <- read.csv("https://remiller1450.github.io/data/Colleges2019.csv")
+```
+
+$~$
+
+#### Part 1
+
+Using the `colleges` data, create a scatter plot with `Enrollment` on the x-axis and `Net_Tuition` on the y-axis. What do you notice about this graph? Create a second scatter plot, this time adding the `log2` transformation to the x-axis. Does anything stand out in this transformed plot?
+
+```{r, eval = FALSE, include = FALSE}
+ggplot(colleges, aes(Enrollment, Net_Tuition)) + 
+  geom_point() + scale_x_continuous(trans = "log2") +
+  geom_smooth(method = "lm")
+```
+
+
+#### Part 2
+
+Using the transformed plot in Part 1, add a smoothing layer with the argument `method = "lm"` to create a line of best fit. What appears to be the relationship between tuition and enrollment?
+
+```{r, eval = FALSE, include = FALSE}
+ggplot(colleges, aes(Enrollment, Net_Tuition)) + 
+  geom_point() + scale_x_continuous(trans = "log2") +
+  geom_smooth(method = "lm")
+```
+
+#### Part 3
+
+To the transformed plot in Part 1 (that is, without the smoothing layer), now add color to the scatter plot based on the variable `Private`. How do the two groups compare?
+
+```{r, eval = FALSE, include = FALSE}
+ggplot(colleges, aes(Enrollment, Net_Tuition)) + 
+  geom_point(aes(color = Private)) + scale_x_continuous(trans = "log2")
+```
+
+#### Part 4
+
+Create a plot with the following characteristics:
+
+  + Scatter plot with Enrollment on the x-axis and tuition on the y-axis, with the x-axis transformed on the `"log2"` scale. Color the points according to `Private`
+  + Add a layer showing the line of best fit for all of the colleges together
+  + Add a layer showing the line of best fit for each group, using the same colors as were provided in the scatter plot
+
+```{r, eval = FALSE, include = FALSE}
+ggplot(colleges, aes(Enrollment, Net_Tuition)) + 
+  geom_point(aes(color = Private)) + scale_x_continuous(trans = "log2") +
+  geom_smooth(method = "lm") +
+  geom_smooth(method = "lm", aes(color = Private))
+```
+
+What appears to be the relationship between tuition and enrollment in private and public colleges? How is this different than the relationship between enrollment and tuition between *all* of the colleges? Use the plot you created to justify your answer. 
+
+
 ## Question 3
 
-## Question 4
+For this question, we are going to use the `HairEyeColor` dataset provided in R. As it is stored as a table by default, we will begin by turning it into a data frame
+
+```{r}
+hair <- as.data.frame(HairEyeColor)
+```
+
+#### Part 1
+
+Using this data, create a ggplot with the following characteristics:
+
+  + Have `Sex` on the x-axis and `Freq` on the y-axis and color the groups by eye color
+  + Create a layer that is a bar chart with the bars for hair color placed side-by-side rather than stacked, adding the argument `stat = "identity"` to the layer so that it knows that the variable `Freq` represents a count
+  + Change the default colors of the group so that the colors in the plot correspond with eye color
+
+```{r, eval = FALSE, include = FALSE}
+ggplot(hair, aes(Sex, Freq, fill = Eye)) + geom_bar(stat = "identity", position = "dodge") + facet_wrap(~Hair)
+```
+
+Using the plot that you made, answer the following questions:
+
+  1. Within each hair color, does the distribution of eye color appear to be similar or different between sexes?
+  2. Are there any trends that you notice in the relationship between hair and eye color? Specifically:
+    + Are there any hair colors with a strong association with eye color? What about hair color with little differentiation between eye colors?
+    + How does the distribution of eye color in individuals with black hair compare with the distribution of eye color for those with brown hair?
+    
+#### Part 2
+
+Create a subset of the `hair` dataset to only include individuals with brown hair. Create a bar chart similar to Part 1 (sex on x-axis, frequency on y-axis, color with eyes), but this time changing the `position` argument so that within each sex, the bars sum up to one. Based on this plot, which sex seems to have a greater composition of brown eyes? Which appears to have a greater composition of blue eyes?
+
+```{r, eval = FALSE, include = FALSE}
+hairm <- subset(hair, Hair == "Brown")
+
+ggplot(hairm, aes(Sex, Freq, fill = Eye)) + geom_bar(stat = "identity", position = "fill")
+```
+
