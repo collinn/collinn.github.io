@@ -114,7 +114,8 @@ hair <- as.data.frame(HairEyeColor)
 Using this data, create a ggplot with the following characteristics:
 
   + Have `Sex` on the x-axis and `Freq` on the y-axis and color the groups by eye color
-  + Create a layer that is a bar chart with the bars for hair color placed side-by-side rather than stacked, adding the argument `stat = "identity"` to the layer so that it knows that the variable `Freq` represents a count
+  + Create a layer that is a bar chart with the bars for Eye color placed side-by-side rather than stacked, adding the argument `stat = "identity"` to the layer so that it knows that the variable `Freq` represents a count
+  + Use facetting to break apart each of the groups by hair color to create four separate graphs
   + Change the default colors of the group so that the colors in the plot correspond with eye color
 
 ```{r, eval = FALSE, include = FALSE}
