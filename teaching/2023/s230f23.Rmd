@@ -35,7 +35,7 @@ Sta-230 uses a *workshop style* class format. This means that the majority of ou
     - [Lab 3 (intro to `ggplot`)](labs/ggplot_lab3.html), [Lab 4 (Themes and Scales - `ggplot`)](labs/lab4.html), [Bonus Lab (`ggplot`)](labs/ggplot2_bonus_miller.html)
     - Labs due (excluding bonus) as a single document 9/13 at 11:59pm
 - Data manipulation
-    - Lab 5 (reshaping data with `tidyr`), Lab 6 (manipulation with `dplyr`), Lab 7 (merging and joining)
+    - [Lab 5 (reshaping data with `tidyr`)](labs/tidyr.html), Lab 6 (manipulation with `dplyr`), Lab 7 (merging and joining)
     - Optional lab (functions, iteration, and files)
 - Working with strings
     - Lab 8 (string processing with `stringr`)
