@@ -248,7 +248,7 @@ In Example #2, the "sep" argument is not explicitly provided. In this situation,
 **Question 3 (Part A)**: Using either the `pivot_longer()` or `pivot_wider()` function, create a version of the `tidy_polls` data containing the variables `Candidate` and `Percentage`, where `Candidate` is taken from the names of the last four columns of the data frame, and "Percentage" is taken from the values contained in these columns. It should look like this:
 
 ```{r, echo = FALSE}
-tt <- pivot_longer(tidy_polls, cols = c("Clinton..D.", "Trump..R.", "Johnson..L.", "Stein..G."), names_to = "Candidate", values_to = "Percentage")
+tt <- pivot_longer(polls, cols = c("Clinton..D.", "Trump..R.", "Johnson..L.", "Stein..G."), names_to = "Candidate", values_to = "Percentage")
 head(tt, n = 4)
 ```
 
