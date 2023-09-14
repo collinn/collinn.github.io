@@ -40,6 +40,7 @@ Sta-230 uses a *workshop style* class format. This means that the majority of ou
     - Labs due (excluding bonus) as a single document 9/13 at 11:59pm
 - Data manipulation
     - [Lab 5 (reshaping data with `tidyr`)](labs/tidyr.html)
+      + [Visual aid](scratch/pivot_summary.pdf)
     - [Lab 6 (manipulation with `dplyr`)](labs/dplyr.html)
     - Lab 7 (merging and joining)
     - Labs due (excluding bonus) as a single document 9/22 at 11:59pm

@@ -10,26 +10,103 @@ editor_options:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, 
                       fig.align = 'center', 
-                      fig.height = 4, 
-                      fig.width = 4) 
-solutions <-  TRUE
+                      warning = FALSE, 
+                      message = FALSE,
+                      fig.height = 5, 
+                      fig.width = 6) 
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+solutions <-  T
 ```
 
 ## Question 1
 
-blah blah blah
+The `babynames` package contains a dataset called `babynames` documenting the number and frequency of all names that appear at least 5 times within a given year as recorded by the US Social Security Administration.
 
-```{r, echo = solutions, class.source="bg-success", class.output = "bg-success"}
-library(ggplot2)
-diamonds <- diamonds[sample(seq_len(nrow(diamonds)), 500), ]
-ggplot(diamonds, aes(carat,  price, color = color)) +
-  geom_point(alpha = 0.3) + theme_bw() + scale_x_continuous(trans = "log2") +
-  labs(x = "Carat", y = "Sale Price ($)", color = "Color Grade", title = "Diamond Sales") + theme(legend.position = "bottom")
+The code below will load the package that contains the dataset. You will need to install the package first before it can be used.
 
-4+7
+```{r}
+# install.packages("babynames")
+library(babynames)
+```
+
+### Part A
+
+Create a subset of `babynames` that contains information on the names `"Ryan", "Jeff", "Shonda", "Jonathan", "Collin", "Anna"`. Next, use `ggplot` and the geom `geom_line()`, colored by name, to create a line chart of each name's frequency by year. What is happening that is making this graph look so chaotic? Look at the data frame and explain the issue in 1-2 sentences.
+
+```{r, echo = solutions, class.source="bg-success", class.output = "bg-success", eval = solutions}
+dat <- babynames %>% 
+  filter(name %in% c("Ryan", "Jeff", "Shonda", "Jonathan", "Collin", "Anna"))
+
+ggplot(dat, aes(year, n, color = name)) + geom_line()
+
+## Issue is that it records male and female for both which occur at very different frequencies
+```
+
+### Part B
+
+Create a new graph that fixes the problem you identified in part A and appropriately displays the frequency of each name over time. Don't forget the [logical operators](https://collinn.github.io/teaching/2023/labs/intro1.html#Logical_Conditions_and_Subsetting) covered in Lab 1.
+
+```{r, echo = solutions, class.source="bg-success", class.output = "bg-success", eval = solutions}
+## They probably won't use `xor`
+# dat %>% 
+#   filter(xor((name %in% c("Anna", "Shonda")), sex == "M"))
+
+dat2 <- dat %>% 
+  filter((name %in% c("Anna", "Shonda") & sex == "F") | name %in% c("Ryan", "Jeff", "Jonathan", "Collin") & sex == "M")
+ggplot(dat2, aes(year, n, color = name)) + geom_line(linetype = "dashed")
 ```
 
 
 ## Question 2
 
+The data frame `economics` is included in the `ggplot2` package and contains US economic data provided by the [US Federal Reserve](https://fred.stlouisfed.org/)
+
+```{r, eval = FALSE}
+library(ggplot2)
+data(economics)
+```
+
+### Part A
+
+First, only retain the variables in the economics data associated with date, personal consumption
+
+Write code that transforms the economics data from wide to long format, so that each row contains one economic outcome (`pce`, `psavert`, `unemped`, and `unemploy`). 
+
+```{r, echo = solutions, class.source="bg-success", class.output = "bg-success", eval = solutions}
+eco_long <- economics %>% 
+  select(date, psavert, uempmed) %>% 
+  pivot_longer(cols = !date, 
+               names_to = "Metric", 
+               values_to = "Value")
+```
+
+
+### Part B
+
+Using the data you created in Part A, create a line graph in `ggplot` the places `uempmed` and `psavert` on the y-axis and `date` on the x-axis. Use the `color` aesthetic to differentiate each of the variables. In the space below your code, briefly described if these variables appear to be related and what that relationship might be. (Hint: See `?economics` for a descriptor of the variables)
+
+
+```{r, echo = solutions, class.source="bg-success", class.output = "bg-success", eval = solutions}
+ggplot(eco_long, aes(date, Value, color = Metric)) +
+  geom_line()
+```
+
+
+
 ## Question 3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
