@@ -1,0 +1,35 @@
+---
+title: "Homework 3"
+author: "your-name-here"
+date: "2023-09-15"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      fig.align = 'center', 
+                      fig.height = 4, 
+                      fig.width = 4) 
+solutions <-  TRUE
+```
+
+## Question 1
+
+blah blah blah
+
+```{r, echo = solutions, class.source="bg-success", class.output = "bg-success"}
+library(ggplot2)
+diamonds <- diamonds[sample(seq_len(nrow(diamonds)), 500), ]
+ggplot(diamonds, aes(carat,  price, color = color)) +
+  geom_point(alpha = 0.3) + theme_bw() + scale_x_continuous(trans = "log2") +
+  labs(x = "Carat", y = "Sale Price ($)", color = "Color Grade", title = "Diamond Sales") + theme(legend.position = "bottom")
+
+4+7
+```
+
+
+## Question 2
+
+## Question 3

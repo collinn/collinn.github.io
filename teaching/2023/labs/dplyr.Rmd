@@ -1,0 +1,362 @@
+---
+title: "Data Manipulation with `dplyr`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, 
+                      message = FALSE, fig.height = 4, 
+                      fig.align = 'center')
+```
+
+This lab focuses on manipulating, cleaning, and preparing data for visualization (and other analyses) using packages from the [tidyverse suite](https://www.tidyverse.org/packages/).
+
+**Directions** (Please read before starting)
+
+1) Please *work together* with your assigned partner. Make sure you both fully understand each concept before you move on.
+2) Please record your answers and any related code for all embedded lab questions. I encourage you to try out the embedded examples, but you shouldn't turn them in.
+3) Please ask for help, clarification, or even just a check-in if anything seems unclear.
+
+$~$
+
+## Preamble
+
+### Packages and Datasets
+
+This lab will primarily use the ``dplyr` package, which is used for "data wrangling", or the process of cleaning, restructuring, and enriching a data set to make it more usable. 
+
+```{r message = FALSE, warning = FALSE}
+# Please install and load the following packages
+# install.packages("dplyr")
+library(dplyr)
+library(ggplot2)
+```
+
+The lab will use several data sets:
+
+```{r}
+colleges <- read.csv("https://remiller1450.github.io/data/Colleges2019.csv")
+```
+
+- **Description**: The `colleges` data set records attributes and outcomes for all primarily undergraduate institutions in the United States with at least 400 full-time students for the year 2019.
+
+
+```{r}
+bluechips <- read.csv("https://remiller1450.github.io/data/bluechips.csv")
+```
+
+- **Description**: Closing prices on the first trading day of the year from 2010 to 2021 for four stocks that [The Motley Fool](https://www.fool.com/investing/stock-market/types-of-stocks/blue-chip-stocks/) calls "blue chip" investments.
+
+
+### Workflow and Piping
+
+As a data scientist, you should strive to write code that is:
+
+1) *Legible* - a peer could easily determine what each line is doing
+2) *Efficient* - it avoids redundant, unnecessary, or computationally burdensome steps
+3) *Documented* - comments and formatting are used to clearly explain every important step
+
+Below is an example that is written in "base R" (that is, without any external packages), that begins by taking the `bluechips` data and creating a new data frame containing the average of each of the four stock prices for each year for the years 2013, 2017, and 2021.
+
+```{r}
+## Base R example
+tmp1 <- subset(bluechips, Year %in% c(2013, 2017, 2021))
+tmp2 <- data.frame(Year = tmp1$Year, Avg = (tmp1$AAPL + tmp1$KO + tmp1$JNJ + tmp1$AXP)/4)
+tmp2
+```
+
+- Line 1 creates a new data frame that is only used in the next step (efficiency issue)
+- Line 2 is doing multiple things at once without documentation (legibility and documentation issues)
+
+We can greatly streamline our workflow in this example using a method known as **piping** (`%>%`), which we can think of as a programming statement that is saying, "and then", along with a number of action/verb oriented functions that self-describe what they are doing
+
+```{r}
+## Good example
+bluechips %>% 
+  filter(Year %in% c(2013, 2017, 2021)) %>%    # Subset to include the target years
+  mutate(Avg = (AAPL + KO + JNJ + AXP)/4) %>%  # Calculate average
+  select(Year, Avg)                            # Drop everything but year and average
+```
+
+The `%>%` symbol will "pipe" the output of a preceding function into the first argument of the subsequent function (usually as the "data" argument).
+
+Below is a description of each line within the piping example given above:
+
+1) The data frame `bluechips` is piped forward (into the `filter()` function on the next line)
+2) `filter()` subsets the data it receives to include only the target years and the resulting subset is piped forward (into the `mutate()` function on the next line)
+3) `mutate()` adds a new column called "Avg" to the data frame it received, and the resulting data frame is piped forward (into the `select()` function on the next line)
+4) `select()` function drops all variables other than "Year" and "Avg"
+
+Because the output of this pipeline is not stored as an object, the final data frame is simply printed. If we planned on using data frame prepared by this pipeline in a future data visualization or model, we'd want to store it as its own object:
+
+```{r}
+## Storing the manipulated data set
+new_bluechips <- bluechips %>% 
+                   filter(Year %in% c(2013, 2017, 2021)) %>%    # Include only target years
+                   mutate(Avg = (AAPL + KO + JNJ + AXP)/4) %>%  # Calculate average
+                   select(Year, Avg)                            # Drop extra vars
+```
+
+*Note*: all functions in the `tidyverse` suite of packages are compatible with the `%>%` operator, so we can including pivoting steps in a pipeline.
+
+$~$
+
+## Lab
+
+At this point you will begin working with your partner. Please read through the text/examples and make sure you both understand before attempting to answer the embedded questions.
+
+$~$
+
+### Overview of Data Manipulation
+
+The `dplyr` package contains a suite of functions designed to make data manipulation easier. The package's core functions can be viewed as verbs:
+
+
+Verb/Function         | Meaning
+--------------------- | -----------------------------------------------------
+`filter`              | pick specific observations (i.e. specific rows)
+`arrange`             | reorder the rows
+`select`              | pick variables by their names (i.e. specific columns)
+`mutate`              | add new derived columns to a data frame
+`summarize`           | aggregate many rows into a summary measure
+
+Importantly, these functions can be strung together using *piping*. But first, let's see a few examples of how they work individually.
+
+$~$
+
+#### Filter
+
+The `filter()` function is nearly identical to the `subset()` function from base R. The only difference is that you can provide multiple logical conditions as separate arguments with commas (rather than building a single condition using `&`).  You should also be aware of it because of its compatibility with piping.
+
+Example:
+
+```{r}
+colleges %>% filter(State == "IA", ACT_median > 25)
+```
+$~$
+
+#### Arrange
+
+The `arange()` function sorts the rows of your data by one or more numeric variables:
+
+```{r}
+colleges %>% 
+  filter(State == "IA" & ACT_median > 25) %>%
+  arrange(ACT_median)
+```
+
+When sorting by multiple variables, the one listed first will be given priority. Additionally, values can be arranged in descending order via the `desc()` function:
+
+```{r}
+IA_selective <- colleges %>% 
+  filter(State == "IA" & ACT_median > 25) %>%
+  arrange(ACT_median, desc(Adm_Rate))
+IA_selective
+
+## Illustration of ordering priority, uncomment to run
+# df <- data.frame(x = c(1,2,1,2,1,2), 
+#                  y = rep(c("b", "a"), each = 3), 
+#                  z = 1:6)
+# df %>% arrange(x)
+# df %>% arrange(x, y)
+# df %>% arrange(x, y, desc(z))
+```
+
+**Question #1**: Filter the `colleges` data to include only private colleges in the Mid East and New England regions. Then sort these schools according to the variable "PercentFemale" such that the school with the largest share of female students appears at the top of the list.
+
+```{r, echo = FALSE, eval = FALSE}
+colleges %>% 
+  filter(Private == "Private", Region == "Mid East" | Region == "New England") %>%
+  arrange(desc(PercentFemale))
+```
+
+$~$
+
+#### Select
+
+The `select()` function is used to reduce the number of variables in a data set:
+
+```{r}
+IA_selective <- colleges %>% 
+  filter(State == "IA" & ACT_median > 25) %>%
+  select(Name, ACT_median, Cost, Net_Tuition)
+IA_selective
+```
+
+Sometimes you'll want to keep most of your variables, dropping only a few that are no longer necessary. To drop a variable using `select()`, you can place a `-` character in front of its name:
+
+```{r}
+IA_selective <- colleges %>% 
+  filter(State == "IA" & ACT_median > 25) %>%
+  select(-State, -City) # Remove State and City
+IA_selective
+```
+
+$~$
+
+#### Mutate
+
+The `mutate()` function is used to add a new column to your data that is a function of one or more existing variables:
+
+```{r}
+IA_selective <- colleges %>% 
+  filter(State == "IA" & ACT_median > 25) %>%
+  mutate(Expected_Discount = (Cost - Net_Tuition)/Cost) %>%
+  select(Name, Cost, Net_Tuition, Expected_Discount)
+IA_selective
+```
+
+In the example shown above we add a new variable, "Expected_Discount", that is a function of "Cost" and "New_Tuition".
+
+**Question #2**: Using the entire `colleges` data set, create a new data frame containing *only* "Name", "State", and a new variable named "Debt_Cost_Ratio" that describes each college's "Debt_median" relative to its expected cumulative cost of attendance (as a ratio) under the assumption that a student enrolls for 4 years and "Cost" increases by 3% each year. Print this new data frame as part of your answer. *Hint*: In year 1 the cumulative cost for a student is `Cost`, in year 2 the cumulative cost is `Cost + 1.03*Cost`, etc.,.
+
+```{r, echo = FALSE, eval = FALSE}
+Q3 <- colleges %>% 
+  mutate(Debt_Cost_Ratio = Debt_median/(Cost + 1.03*Cost + 1.03^2*Cost + 1.03^3*Cost)) %>%
+  select(Name, State, Debt_Cost_Ratio)
+Q3
+```
+
+$~$
+
+#### Summarize
+
+The `summarize()` (or `summarise()`) function will calculate summary statistics that require an aggregation of rows. For example:
+
+```{r}
+colleges %>% 
+  filter(State == "IA") %>%
+  summarize(Median_Cost = median(Cost))
+```
+
+Without group-wise manipulation (explained in the next section), `summarize()` is most useful for generating a customized set of summary measures:
+
+```{r}
+colleges %>% 
+  filter(State == "IA") %>%
+  summarize(Min_Cost = min(Cost),
+            TenPer_Cost = quantile(Cost, 0.1),     ## 10th percentile
+            Median_Cost = median(Cost),
+            NinetyPer_Cost = quantile(Cost, 0.9),  ## 90th percentile
+            Max_Cost = max(Cost))
+```
+
+**Question #3**: Using the `summarize()` function, report the interquartile range (IQR) and standard deviation of the variable "Debt_Cost_Ratio" that you created in Question #2. *Hint*: recall that the IQR is calculated as the 75th percentile minus the 25th percentile.
+
+$~$
+
+### Groupwise Manipulation
+
+Frequently, we'd like to manipulate data separately within certain groups. For example, you might want separate numeric summaries describing the colleges in different states, or maybe even for the private and public schools within each of those different states.
+
+*Groupwise manipulations* require two steps:
+
+1. First, the `group_by()` function is used to create an internal tag defining the desired groupings.
+2. Next, the tagged data are passed into any of the aforementioned `dplyr` functions (usually `summarize()` or `mutate()`), and those functions are executed separately on each group.
+
+Shown below are a few examples. 
+
+In Example #1, we find the median cost for colleges within each state located in the "Plains" region:
+
+```{r}
+## Example #1
+colleges %>% 
+  filter(Region == "Plains") %>%
+  group_by(State) %>%
+  summarize(Median_Cost = median(Cost, na.rm = TRUE))
+```
+
+In Example #2, we find each state's median cost separately for private and public colleges located in Iowa, Minnesota, or Missouri. We also introduce the `n()` function that, when used with grouped data, will report the total number of observations in each group. Here, we use it to record "N", the number of colleges belonging to each group reported in the summary.,
+
+We also use `n()` to count the number of colleges, recorded as "N", belonging to each group reported in the summary.
+
+```{r}
+## Example #2
+colleges %>% 
+  filter(State == "IA" | State == "MN" | State == "MO") %>%
+  group_by(State, Private) %>% 
+  summarize(Median_Cost = median(Cost, na.rm = TRUE),
+            N = n())
+```
+
+In Example #3, we find how much each state (either IA or MN) deviates from the average cost of all colleges within the same state.
+
+```{r}
+## Example #3
+colleges %>% 
+  filter(State == "IA" | State == "MN" ) %>%
+  group_by(State) %>%
+  mutate(Cost_Avg = mean(Cost, na.rm = TRUE),
+         Cost_vs_Avg = Cost - mean(Cost, na.rm = TRUE)) %>%
+  select(Name, State, Cost, Cost_Avg, Cost_vs_Avg)
+
+# colleges %>% 
+#   filter(State == "IA" | State == "MN" ) %>%
+#   group_by(State) %>%
+#   mutate(Cost_Avg = mean(Cost, na.rm = TRUE),
+#          Cost_vs_Avg = Cost - Cost_Avg) %>% # We can also use other variables defined in mutate
+#   select(Name, State, Cost, Cost_Avg, Cost_vs_Avg)
+```
+
+Notice how `summarize()` returns an object with 1 row per group, while `mutate()` returns an object with 1 row per observation.
+
+$~$
+
+### Practice
+
+Intensive care units, or ICUs, are primary spaces in hospitals that are reserved for patients in critical condition. The data below is a random sample of n = 200 ICU patients from a research hospital affiliated with Carnegie Mellon University (CMU).
+
+```{r}
+icu <- read.csv("https://remiller1450.github.io/data/ICUAdmissions.csv")
+```
+
+The data dictionary below documents each variable that was recorded:
+
+- **ID** - Patient ID number
+- **Status** - Patient status: 0=lived or 1=died
+- **Age** - Patient’s age (in years)
+- **Sex** - 0=male or 1=female
+- **Race** - Patient’s race: 1=white, 2=black, or 3=other
+- **Service** - Type of service: 0=medical or 1=surgical
+- **Cancer** - Is cancer involved? 0=no or 1=yes
+- **Renal** - Is chronic renal failure involved? 0=no or 1=yes
+- **Infection** - Is infection involved? 0=no or 1=yes
+- **CPR** - Patient received CPR prior to admission? 0=no or 1=yes
+- **Systolic** - Systolic blood pressure (in mm of Hg)
+- **HeartRate** - Pulse rate (beats per minute)
+- **Previous** - Previous admission to ICU within 6 months? 0=no or 1=yes
+- **Type** - Admission type: 0=elective or 1=emergency
+- **Fracture** - Fractured bone involved? 0=no or 1=yes
+- **PO2** - Partial oxygen level from blood gases under 60? 0=no or 1=yes
+- **PH** - pH from blood gas under 7.25? 0=no or 1=yes
+- **PCO2** - Partial carbon dioxide level from blood gas over 45? 0=no or 1=yes
+- **Bicarbonate** - Bicarbonate from blood gas under 18? 0=no or 1=yes
+- **Creatinine** - Creatinine from blood gas over 2.0? 0=no or 1=yes
+- **Consciousness** - Level upon arrival: 0=conscious, 1=deep stupor, or 2=coma
+
+**Question #4**: Filter the ICU data to include only patients whose visit involves an infection. Then, for the "Age" variable, find the mean, standard deviation, and group size (found using the function `n()`) of patients with and without a previous admission in the prior 6 months. That is, your solution should indicate the total number of patients with and without previous admission, along with each group's mean age and standard deviation.
+
+```{r, include = FALSE, eval = FALSE, echo = FALSE}
+icu %>% filter(Infection == 1) %>%
+  group_by(Previous)  %>% 
+  summarize(Mean = mean(Age),
+            SD = sd(Age),
+            N = n())
+```
+
+**Question #5**: Considering all ICU patients in these data, use the `group_by()` and `mutate()` functions to a sex-specific Z-score for the variable "HeartRate" of each patient. *Note*: you should be using different means and standard deviations within each sex to calculate this Z-score.  If you are unfamiliar with Z-scores, they take the form: $Z = \tfrac{\text{Value} - \text{Mean}}{\text{Std. Dev}}$
+
+```{r, include = FALSE, eval = FALSE, echo = FALSE}
+icu %>% group_by(Sex) %>%
+    mutate(HR_sex_avg = mean(HeartRate, na.rm = TRUE),
+          HR_sex_sd = sd(HeartRate, na.rm = TRUE),
+          Z = (HeartRate - mean(HeartRate, na.rm = TRUE))/sd(HeartRate, na.rm = TRUE)) %>%
+          select(ID, Sex, HR_sex_avg, HR_sex_sd, Z)
+```
