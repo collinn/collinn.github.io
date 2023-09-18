@@ -1,7 +1,7 @@
 ---
 title: "Homework 3"
 author: "your-name-here"
-date: "2023-09-15"
+date: "2023-09-18"
 output: html_document
 editor_options: 
   chunk_output_type: console
@@ -70,9 +70,7 @@ data(economics)
 
 ### Part A
 
-First, only retain the variables in the economics data associated with date, personal consumption
-
-Write code that transforms the economics data from wide to long format, so that each row contains one economic outcome (`pce`, `psavert`, `unemped`, and `unemploy`). 
+Write code that transforms the economics data from wide to long format, so that each row contains one economic outcome (`pce`, `psavert`, `unemped`, and `unemploy`) and its associated value for that year. 
 
 ```{r, echo = solutions, class.source="bg-success", class.output = "bg-success", eval = solutions}
 eco_long <- economics %>% 
@@ -96,6 +94,8 @@ ggplot(eco_long, aes(date, Value, color = Metric)) +
 
 ## Question 3
 
+For Question 3, we need to install that `Lahman` package which is a database of Major League Baseball statistics collected by Sean Lahman from the 1871-2016 seasons. The database contains several tables (data frames) which can be loaded into our environment using the `data()` function.
+
 ```{r}
 # install.packages("Lahman")
 library(Lahman)
@@ -114,14 +114,11 @@ dat <- Batting %>%
   group_by(playerID) %>% 
   summarize(totalHR = sum(HR)) %>% 
   arrange(desc(totalHR)) %>% slice_head(n = 30)
-
 ```
 
 ### Part B
 
-It has been hypothesized in several sports that an [athlete's birth month](https://fivethirtyeight.com/features/why-athletes-birthdays-affect-who-goes-pro-and-who-becomes-a-star/) is related to future success in sports.
-
-For this final part, include birth month information from the `People` data frame into the data frame you created in Part A (containing the top 30 home run hitters). Then, create a data visualization exploring whether birth months appear to be uniformly distributed among the players.
+It has been hypothesized in several sports that an [athlete's birth month](https://fivethirtyeight.com/features/why-athletes-birthdays-affect-who-goes-pro-and-who-becomes-a-star/) is related to future success in sports. For this final part, include birth month information from the `People` data frame into the data frame you created in Part A (containing the top 30 home run hitters). Then, create a data visualization exploring whether birth months appear to be uniformly distributed among the players.
 
 ```{r, echo = solutions, class.source="bg-success", class.output = "bg-success", eval = solutions}
 dat2 <- left_join(dat, People, by = "playerID")

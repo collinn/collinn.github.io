@@ -11,7 +11,7 @@
 
 <meta name="author" content="your-name-here" />
 
-<meta name="date" content="2023-09-15" />
+<meta name="date" content="2023-09-18" />
 
 <title>Homework 3</title>
 
@@ -352,7 +352,7 @@ display: none;
 
 <h1 class="title toc-ignore">Homework 3</h1>
 <h4 class="author">your-name-here</h4>
-<h4 class="date">2023-09-15</h4>
+<h4 class="date">2023-09-18</h4>
 
 </div>
 
@@ -394,12 +394,10 @@ the <a href="https://fred.stlouisfed.org/">US Federal Reserve</a></p>
 data(economics)</code></pre>
 <div id="part-a-1" class="section level3">
 <h3>Part A</h3>
-<p>First, only retain the variables in the economics data associated
-with date, personal consumption</p>
 <p>Write code that transforms the economics data from wide to long
 format, so that each row contains one economic outcome
 (<code>pce</code>, <code>psavert</code>, <code>unemped</code>, and
-<code>unemploy</code>).</p>
+<code>unemploy</code>) and its associated value for that year.</p>
 </div>
 <div id="part-b-1" class="section level3">
 <h3>Part B</h3>
@@ -415,6 +413,11 @@ variables)</p>
 </div>
 <div id="question-3" class="section level2">
 <h2>Question 3</h2>
+<p>For Question 3, we need to install that <code>Lahman</code> package
+which is a database of Major League Baseball statistics collected by
+Sean Lahman from the 1871-2016 seasons. The database contains several
+tables (data frames) which can be loaded into our environment using the
+<code>data()</code> function.</p>
 <pre class="r"><code># install.packages(&quot;Lahman&quot;)
 library(Lahman)
 data(&quot;Teams&quot;)
@@ -433,12 +436,11 @@ might be useful (<code>?slice_head</code>)</p>
 <div id="part-b-2" class="section level3">
 <h3>Part B</h3>
 <p>It has been hypothesized in several sports that an <a href="https://fivethirtyeight.com/features/why-athletes-birthdays-affect-who-goes-pro-and-who-becomes-a-star/">athlete’s
-birth month</a> is related to future success in sports.</p>
-<p>For this final part, include birth month information from the
-<code>People</code> data frame into the data frame you created in Part A
-(containing the top 30 home run hitters). Then, create a data
-visualization exploring whether birth months appear to be uniformly
-distributed among the players.</p>
+birth month</a> is related to future success in sports. For this final
+part, include birth month information from the <code>People</code> data
+frame into the data frame you created in Part A (containing the top 30
+home run hitters). Then, create a data visualization exploring whether
+birth months appear to be uniformly distributed among the players.</p>
 </div>
 </div>
 <div id="question-4" class="section level2">

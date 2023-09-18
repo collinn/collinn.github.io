@@ -126,8 +126,9 @@ Using the plot that you made, answer the following questions:
 
   1. Within each hair color, does the distribution of eye color appear to be similar or different between sexes?
   2. Are there any trends that you notice in the relationship between hair and eye color? Specifically:
-    + Are there any hair colors with a strong association with eye color? What about hair color with little differentiation between eye colors?
-    + How does the distribution of eye color in individuals with black hair compare with the distribution of eye color for those with brown hair?
+  
+      - Are there any hair colors with a strong association with eye color? What about hair color with little differentiation between eye colors?
+      - How does the distribution of eye color in individuals with black hair compare with the distribution of eye color for those with brown hair?
     
 #### Part 2
 
