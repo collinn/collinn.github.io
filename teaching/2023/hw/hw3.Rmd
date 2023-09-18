@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE,
 library(dplyr)
 library(ggplot2)
 library(tidyr)
-solutions <-  T
+solutions <-  FALSE
 ```
 
 ## Question 1
@@ -94,16 +94,72 @@ ggplot(eco_long, aes(date, Value, color = Metric)) +
 ```
 
 
-
 ## Question 3
 
+```{r}
+# install.packages("Lahman")
+library(Lahman)
+data("Teams")
+data("People")
+data("Batting")
+```
+
+
+### Part A
+
+For Part A, use the `group_by()` and `summarize()` functions to find the total number of home runs for each player in the `Batting` data fame. Then, store the top 30 players (with the most career home runs) in a separate data frame. *Hint:* While there are a number of ways to select the top 30 players, the `dplyr` function `slice_head()` might be useful (`?slice_head`)
+
+```{r, echo = solutions, class.source="bg-success", class.output = "bg-success", eval = solutions}
+dat <- Batting %>% 
+  group_by(playerID) %>% 
+  summarize(totalHR = sum(HR)) %>% 
+  arrange(desc(totalHR)) %>% slice_head(n = 30)
+
+```
+
+### Part B
+
+It has been hypothesized in several sports that an [athlete's birth month](https://fivethirtyeight.com/features/why-athletes-birthdays-affect-who-goes-pro-and-who-becomes-a-star/) is related to future success in sports.
+
+For this final part, include birth month information from the `People` data frame into the data frame you created in Part A (containing the top 30 home run hitters). Then, create a data visualization exploring whether birth months appear to be uniformly distributed among the players.
+
+```{r, echo = solutions, class.source="bg-success", class.output = "bg-success", eval = solutions}
+dat2 <- left_join(dat, People, by = "playerID")
+ggplot(dat2, aes(x = birthMonth)) + geom_bar()
+```
+
+
+## Question 4
+
+Using the `Teams` data frame in the `Lahman` package, display the top ten teams in terms of "slugging percentage" (SLG) since 1969.
+
+SLG is computed as the team's total bases divided by the total "at bats" (`AB` in the data set). To find the total number of bases, you should assign a value of 1 for singles, 2 for doubles, 3 for triples, and 4 for home runs (that is, the sum of all of these will give you the total number of bases).
+
+*Hint:* The variables `X2B`, `X3B`, and `HR` represent doubles, triples, and home runs, respectively. There is no variable for singles, but one can be computed using the variable `H` which represents the total number of hits. If we subtract the total number of doubles, triples, and home runs from the hits, we will be left with the total number of singles.
+
+Sample output of *only the first three teams* is printed below to help validate your own solutions:
+
+```{r, echo = FALSE}
+tt <- Teams %>% select(teamID, yearID, H, X2B, X3B, HR, AB)
+tt %>% 
+  filter(yearID > 1969) %>%
+  mutate(X1B = H - X2B - X3B - HR, 
+         totalBase = X1B + 2*X2B + 3*X3B + 4*HR, 
+         SLG = totalBase / AB) %>% 
+  select(yearID, teamID, SLG) %>% arrange(desc(SLG)) %>% head(n = 3)
+```
 
 
 
-
-
-
-
+```{r, echo = solutions, class.source="bg-success", class.output = "bg-success", eval = solutions}
+tt <- Teams %>% select(teamID, yearID, H, X2B, X3B, HR, AB)
+tt %>% 
+  filter(yearID > 1969) %>%
+  mutate(X1B = H - X2B - X3B - HR, 
+         totalBase = X1B + 2*X2B + 3*X3B + 4*HR, 
+         SLG = totalBase / AB) %>% 
+  select(yearID, teamID, SLG) %>% arrange(desc(SLG)) %>% head(n = 10)
+```
 
 
 

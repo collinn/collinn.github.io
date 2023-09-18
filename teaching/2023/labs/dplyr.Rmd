@@ -341,7 +341,7 @@ The data dictionary below documents each variable that was recorded:
 - **Creatinine** - Creatinine from blood gas over 2.0? 0=no or 1=yes
 - **Consciousness** - Level upon arrival: 0=conscious, 1=deep stupor, or 2=coma
 
-**Question #4**: Filter the ICU data to include only patients whose visit involves an infection. Then, for the "Age" variable, find the mean, standard deviation, and group size (found using the function `n()`) of patients with and without a previous admission in the prior 6 months. That is, your solution should indicate the total number of patients with and without previous admission, along with each group's mean age and standard deviation.
+**Question #4**: Filter the ICU data to include only patients whose visit involves an infection. Then, for the "Age" variable, find the mean, standard deviation, and group size (found using the function `n()`) of patients with and without a previous admission in the prior 6 months. That is, your solution should indicate the total number of patients with and without previous admission, along with each group's mean age and standard deviation. It will contain two rows and four columns.
 
 ```{r, include = FALSE, eval = FALSE, echo = FALSE}
 icu %>% filter(Infection == 1) %>%
@@ -351,12 +351,21 @@ icu %>% filter(Infection == 1) %>%
             N = n())
 ```
 
-**Question #5**: Considering all ICU patients in these data, use the `group_by()` and `mutate()` functions to a sex-specific Z-score for the variable "HeartRate" of each patient. *Note*: you should be using different means and standard deviations within each sex to calculate this Z-score.  If you are unfamiliar with Z-scores, they take the form: $Z = \tfrac{\text{Value} - \text{Mean}}{\text{Std. Dev}}$
+**Question #5**: Considering all ICU patients in these data, use the `group_by()` and `mutate()` functions to a sex-specific Z-score for the variable "HeartRate" of each patient. *Note*: you should be using different means and standard deviations within each sex to calculate this Z-score.  If you are unfamiliar with Z-scores, they take the form: $Z = \tfrac{\text{Value} - \text{Mean}}{\text{Std. Dev}}$. Within R you can use the `mean` and `sd` functions
 
 ```{r, include = FALSE, eval = FALSE, echo = FALSE}
-icu %>% group_by(Sex) %>%
-    mutate(HR_sex_avg = mean(HeartRate, na.rm = TRUE),
-          HR_sex_sd = sd(HeartRate, na.rm = TRUE),
-          Z = (HeartRate - mean(HeartRate, na.rm = TRUE))/sd(HeartRate, na.rm = TRUE)) %>%
-          select(ID, Sex, HR_sex_avg, HR_sex_sd, Z)
+tt <- icu %>% group_by(Sex) %>%
+  mutate(HR_sex_avg = mean(HeartRate, na.rm = TRUE),
+         HR_sex_sd = sd(HeartRate, na.rm = TRUE),
+         Z = (HeartRate - mean(HeartRate, na.rm = TRUE))/sd(HeartRate, na.rm = TRUE)) %>%
+  select(ID, Sex, HR_sex_avg, HR_sex_sd, Z)
+tt
 ```
+
+
+
+
+
+
+
+
