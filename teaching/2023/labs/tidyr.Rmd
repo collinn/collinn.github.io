@@ -274,28 +274,28 @@ Recall that a "tidy" version of these data should satisfy the following:
 
 **Question 4 (Part A)**: Use `pivot_longer()` to gather the last six columns of the `airlines` data into a column named `accidents` and a column named `count`.
 
-```{r, echo = FALSE, eval = FALSE}
+```{r, echo = FALSE, eval = TRUE}
 tt <- pivot_longer(airlines, 
              cols = setdiff(colnames(airlines), c("airline", "avail_seat_km_per_week")), 
              names_to = "accidents", values_to = "count")
-head(tt, n = 5)
+# head(tt, n = 5)
 ```
 
 
 **Question 4 (Part B)**: Use `separate()` to split the `accidents` column into two variables named `type` and `years`. *Hint*: remember that the period is a special character in `R`.
 
-```{r, echo = FALSE, eval = FALSE}
+```{r, echo = FALSE, eval = TRUE}
 tt2 <- separate(tt, 
                col = "accidents", 
                into = c("type", "years"), 
                sep = "\\.")
-head(tt2, n = 5)
+# head(tt2, n = 5)
 ```
 
 
-**Question 4 (Part C)**: Use `pivot_wider()` to spread out the `type` column into three new columns containing the type of accident (use the `table()` function to see the types of accidents). Your data should now contain two rows per airline (one for each time period), you can check if the first few rows match those printed below.
+**Question 4 (Part C)**: Use `pivot_wider()` to spread out the `type` column into three new columns containing the type of accident. Your data should now contain two rows per airline (one for each time period), you can check if the first few rows match those printed below.
 
-```{r, echo = FALSE, eval = FALSE}
+```{r, echo = FALSE, eval = TRUE}
 tt3 <- pivot_wider(tt2, 
                    id_cols = setdiff(names(tt2), c("type", "count")), 
                    names_from = type, values_from = count)

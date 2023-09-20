@@ -1,0 +1,356 @@
+---
+title: "Merging and Joining with `dplyr`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, 
+                      fig.align = 'center')
+```
+
+# Preamble
+
+## Packages and datasets
+
+For this lab we will continue to use the `dplyr` and `ggplot2` packages, as well as another data set package, `nycflights13`
+
+```{r}
+# install.packages("nycflights13")
+library(ggplot2)
+library(dplyr)
+library(nycflights13)
+```
+
+The `nycflights13` package contains a number of datasets which, together, make up a *database*. This data originates  from the US Bureau of Transportation pertaining to all flights that departed from New York City in 2013. As before, we can load them explicitly with the `data` function
+
+```{r}
+data("airlines")
+data("flights")
+data("planes")
+data("weather")
+data("airports")
+```
+
+## Databases
+
+The present lab is oriented around the topic of *joins* and *merges* which, simply enough, involve joining or merging several related datasets into a single dataset. Any structured collection of related datasets we might encounter could reasonably be called a *database*.
+
+Databases represent a very natural and often intuitive way of organizing large collections of data. For example, we might consider all of the data that Grinnell College has on you -- social security numbers, addresses, grades and enrollment status. While it is certainly *possible* to keep all of this information in one large data frame, it often makes more sense to keep related data together with a way to join separate data frames if needed. This encapsulates pretty well the idea of databases: a collection of these independent but related data frames that can be linked together on demand.
+
+To understand how datasets within a database can be joined to one another, we need to have an understanding of the concept of *keys*. There are two distinct types of keys that we consider:
+
+  + A **primary key** uniquely identifies an observation within its own table or data frame
+  + A **foreign key** is either a column or a group of columns in *another table* that can be linked to a primary key
+
+Part of our task will involve finding the primary keys in the dataset we are beginning with and then identifying their corresponding foreign key in the tables we wish to join.
+
+We can investigate the concept of primary and foreign keys by considering the collection of data frames included in our airlines database. Let's look first at our `planes` dataset, containing metadata for all of the planes in the FAA aircraft registry:
+
+```{r}
+head(planes)
+```
+
+As we can see, each row constitutes an individual plane, each of which can be uniquely identified by it's tail number, making `tailnum` the primary key in this dataset. Next, we consider the data frame of airlines:
+
+```{r}
+head(airlines)
+```
+
+In this case, the data frame contains both the full name of the airline as well as a two letter abbreviation. While both of these columns do uniquely identify each row, we will find that other datasets in our database are more likely to contain the abbreviation, making `carrier` the more obvious candidate for a primary key here.
+
+There are sometimes situations in which there is no single column that uniquely identifies observations in a dataset. Consider for example the `weather` data, which includes hourly snapshots of the weather at each of the three NYC airports:
+
+```{r, eval = FALSE}
+head(weather)
+```
+
+
+```{r, echo = FALSE}
+## Thanks 'tibble' for cutting this off
+head(weather[, c(1:3, 12:15)])
+```
+
+Here, each `origin` contains almost 9,000 observations, while each `time_hour` has an entry for each of the three airports. When combined, however, each provides a unique identifier for each row -- the weather at a particular airport at a specific time. When combined, these variables together make up what is called a *compound primary key*.
+
+Given a *primary key* in any particular table, we are then looking for a corresponding *foreign key* in a table that we are hoping to relate it to. Given each of the primary keys we have identified so far, consider the `flights` dataset which includes detailed information on each of the individual flights that departed from an airport in NYC:
+
+```{r, eval = FALSE}
+## Some columns hidden for space
+head(flights)
+```
+
+
+```{r, echo = FALSE}
+## Thanks 'tibble' for cutting this off
+head(flights[, c(1,10,11,12,13,14,19)])
+```
+
+
+Here, we see a number of columns that directly relate to the other datasets we have considered so far. For example, `planes$tailnum` corresponds to `flights$tailnum`, allowing us to relate information about individual planes (model type, number of seat, manufacturer, etc.,) to each of the individual flights. As each plane is associated with more than one flight, keeping all of this information in a table would result in a tremendous amount of repeated data. 
+
+The web of related variables between datasets within a database is known as a *relational structure*, a visual representation of which is given below:
+
+
+```{r, fig.align='center', out.width = "600px", out.height = "400px", echo = FALSE}
+knitr::include_graphics("relational-nycflights.png")
+```
+
+### Odds and Ends
+
+We generally operate under the expectation that a primary or foreign key is *unique* (though this is not always true), and we can check this with a quick set of operations from the `dplyr` package. We will first `count()` how many instances of each unique value in a column appear and then `filter()` the resulting data to if any of them have a count greater than 1. If this final table is empty, we know our key is unique
+
+```{r}
+# Unique primary key in planes
+planes %>% 
+  count(tailnum) %>% 
+  filter(n > 1)
+
+# time_hour is not unique for weather data
+weather %>% 
+  count(time_hour) %>% 
+  filter(n > 1)
+
+# But it is once we combine it with origin
+weather %>% 
+  count(time_hour, origin) %>% 
+  filter(n > 1)
+```
+
+It is the combination of the primary and foreign keys that form a **relation**. Relations might be *one-to-one*, where each instance of the primary key appears at most once among the foreign key, or *one-to-many*, where the each primary key matches one or more foreign keys.
+
+# Lab
+
+This lab will cover the topics of *merging joins* and *filtering joins* which will be described more in their respective sections. For most of these exercises we will be using a contrived database of customer and order data that is small enough for us to visually inspect the results
+
+```{r}
+orders <- read.csv("https://raw.githubusercontent.com/ds4stats/r-tutorials/master/merging/data/orders.csv")
+customers <- read.csv("https://raw.githubusercontent.com/ds4stats/r-tutorials/master/merging/data/customers.csv")
+```
+
+
+## Mutating Joins
+
+The goal of *mutating joins* is to combine variables from two different data frames X and Y.
+
+There are three primary types of mutating joins:
+
+  + **Left Join:** Keep *all* of the observations in X and add matching records in Y, if present. Fill with `NA` records in X that do not have a match in Y
+  + **Full Join:** Keep *all* observations in *both* X and Y, filling `NA` for records in X without a match in Y *and* for records in Y without a match in X
+  + **Inner Join:** Keep *only* observations with records in *both* X and Y, dropping any records that are not present in both data frames
+
+There is also a **right join** which is identical to a left join, but with the arguments reversed. This is sometimes useful in conjunction with the pipe operator `%>%`, but it is not very common.
+
+A visual illustration of these joins is given below:
+
+```{r, fig.align='center', out.width = "500px", out.height = "200px", echo = FALSE}
+knitr::include_graphics("join_venn.png")
+```
+
+
+### Left Join
+
+Consider our customer data frames `orders` and `customers`
+
+```{r}
+print(orders)
+print(customers)
+```
+
+We see quickly that each of these data frames shares an identifier column `id`, making it a natural candidate for a primary key in both data frames. We will also note that not all of the ids in the orders dataset has a corresponding entry in the customer list, and similarly, not every customer has an outstanding order.
+
+The `left_join()` function is used to perform a left join, in this case adding customer information to the data frame of orders
+
+```{r}
+# the first argument is always "x", the second is "y", and "by" is third
+left_join(x = orders, y = customers, by = "id")
+```
+
+Because this is a left join, we know that we will be keeping all of the observations in `x`, regardless of whether or not they have a match in `y`. In this case, we see that there is an id value of 50 in our `orders` data frame that is not present in `customers`, resulting in an `NA` value being added to the resulting dataset.
+
+If we flip the arrangements of the arguments so that `x = customers` and `y = orders`, we will find the situation is changed. In other words, left joins *are not symmetric*; the order of the `x` and `y` values will often result in different results
+
+```{r}
+left_join(x = customers, y = orders, by = "id")
+```
+
+Here, the situation is a bit different -- we see that customers with id values of 15, 16, and 23 do not have any orders listed, so these values have been filled in with `NA` values. Further, note that as we saw in the last example that no customer had an id value of 50 in the order dataset, this order has been dropped entirely here and does not appear after the merge.
+
+
+**Question 1** In this question we are going to consider the output of an example left join between two data sets, `tab1` and `tab2`
+
+```{r}
+tab1 <- data.frame(key = c("a", "a", "b", "b", "b", "c"), A = 1:6)
+tab1
+tab2 <- data.frame(key = c("a", "b", "c"), B = c("X", "Y", "C"))
+tab2
+```
+
+Given our initial description of the left join, which retains all of the elements in the `x` argument, one might expect that using `x = tab2` would return a data frame that contains three rows, one for each observation. Instead, we see that it produces a data frame with six rows. Why do you think this happens?
+
+```{r}
+left_join(tab2, tab1, by = "key")
+```
+
+
+### Full Join
+
+Full joins, also known as *outer joins*, performs a joins such that all observations from both the `x` and `y` arguments are included
+
+```{r}
+full_join(x = orders, y = customers, by = "id")
+```
+
+Note how now there is a row for each unique id value from both the `customer` and `order` datasets. When a full join is used, none of the observations are dropped, and everything is filled with `NA`. Because of this, outer joins *are* symmetric, meaning the changing the order of the arguments will only impact the ordering of the columns in the resulting data frame.
+
+```{r}
+# Now it goes id, name, order, date
+full_join(x = customers, y = orders, by = "id")
+```
+
+
+### Inner Join
+
+The `inner_join()` function is used to perform an inner join on two data frames, retaining only those observations that are present in *both* data sets
+
+```{r}
+inner_join(x = orders, y = customers, by = "id")
+```
+
+Because of this, like the outer joins, inner joins are also symmetric, meaning again that changing the `x` and `y` arguments only results in a change in the order of the columns:
+
+```{r}
+inner_join(x = customers, y = orders, by = "id")
+```
+
+
+**Question 2** Consider two data frames named `A` and `B`, each containing the primary key variable `id`. Each data frame has four rows, with the id values in A being $\{1, 2, 3, 4\}$ and the id values in `B` being $\{3, 4, 5, 6\}$.  Given this information, state how many rows will be present in the results produced by the following joins:
+
+  1. `left_join(x = A, y = B, by = "id")`
+  2. `left_join(x = B, y = A, by = "id")`
+  3. `full_join(x = A, y = B, by = "id")`
+  4. `inner_join(x = A, y = B, by = "id")`
+  
+#### More on the `by` argument
+
+In the ideal case, two data frames are joined by a single variable sharing the same name in both `x` and `y`. However, there are several other ways to use the `by` argument when this is not the case
+
+  + By default, the argument is set to `by = NULL` which will automatically identify *all variables* that are shared between datasets. This can be useful when there are several variables needed to uniquely identify an observation, but it is *absolutely* critical that you be sure that each of the variables refer to the same thing. For example, considering the `nycflights` data, `planes$year` refers to the year the plan was manufactured while `flight$year` refers to the year of departure.
+  + Alternatively, you can use named vector syntax, for example, `by = c("a" = "b")` when you want to use the primary key `a` in the `x` dataset and the foreign key `b` in the `y` dataset.
+
+Here are a few examples illustrating each
+
+```{r}
+## Since they both have "id" we can leave the `by` argument empty
+inner_join(x = customers, y = orders)
+
+## We can specify we want to match with the orders$order
+# Since there is an "id" column in each dataset we are not matching on, it
+# creates a new column for customers$id with "id.y"
+inner_join(x = customers, y = orders, by = c("id" = "order"))
+```
+
+
+**Question 3** In the `flightsnyc13` database, the location of each airport (`lat` and `lon` for latitude and longitude) are stored in the `airports` data file. Use the appropriate join to add `lat` and `lon` of the destination airport to each flight recorded in flights. Do not add any other variables! This might mean that you first have to process `airports` with `dplyr` functions.
+
+
+## Filtering Joins
+
+Filtering joins will match observations in the same way as mutating joins, but they *will not add any variables* from `y` to the `x` data frame.
+
+- `semi_join()` will **keep** the observations in `x` that have a match in `y`
+- `anti_join()` will **drop** the observations in `x` that have a match in `y`
+
+An important thing to keep in mind with filtering joins: *no new columns are added*. In other words, none of the columns from `y` will be merged into the columns of `x`.
+
+Here a few examples:
+
+```{r}
+semi_join(x = orders, y = customers, by = "id")
+```
+
+Here, `semi_join()` filters out order 4 because there are no customers with an id of 50 in the `customers` data frame.
+
+```{r}
+anti_join(x = orders, y = customers, by = "id")
+```
+
+In the above example, `anti_join()` will filter out everything except for order 4 because it was the only observation in the `x` data file without a match in `y`
+
+Filtering joins are most useful in finding *implicit missing values*. Whereas `NA` values indicate the "presence of an absence", implicit missing values are an "absence of a presence." For example, we can find out if any entires are missing in the `airports` dataset by looking for flights in `flights` whose destination doesn't have a match
+
+```{r}
+anti_join(x = flights, y = airports, by = c("dest" = "faa")) %>% 
+  distinct(dest) # return only unique values of `dest`
+```
+
+We see that we have four implicitly missing values in our `airports` data frame.
+
+**Question #4**: The code below creates a data frame, `top_dest`, containing the ten most common flight destinations and how many flights arrived at them. 
+
+```{r}
+top_dest <- flights %>%
+  count(dest, sort = TRUE) %>% 
+  slice_head(n = 10)
+```
+
+
+  + **Part A** Use this data frame, along with an appropriate join, to filter the `flights` data file to include only flights whose destination is one of the top ten airports. Then, use `dim()` to print the dimensions of the resulting data frame.
+  + **Part B** Using the results from Part A and an appropriate join, find the number of planes whose destination was a top ten airport that do not have a record in the `planes` data frame
+  
+```{r, eval = FALSE, echo = FALSE}
+tt <- semi_join(flights, top_dest) 
+dim(tt)
+
+# I don't think i need unique since tailnum is primary key of planes
+anti_join(planes, tt, by = "tailnum") %>% 
+  distinct(tailnum) %>% dim()
+```
+
+
+
+$~$
+
+
+
+## Practice 
+
+**Question 5**:
+
+- **Part A**: Using the appropriate joins as necessary, investigate whether the variable `visib` (visibility rating) in the weather data frame is associated with a flight being delayed more than 10 hours (a `dep_delay` over 600). To achieve this, you should calculate the average and standard deviation of the `visib` variable for each grouping of delay (more than/less than 10 hours) (using `mean` and `sd`). You may use the argument `na.rm = TRUE` to remove missing values when performing these calculations.
+- **Part B**: Using `count()` and `is.na()`, find the number of flights that are missing data on the variable `visib` for each grouping of delay. You may also report the number of flights that were missing the variable `dep_delay`, which was also involved in Part A.
+
+
+*Note*: At some point you should use the `ifelse()` function to create a binary variable representing whether a flight's delay was larger than 10 hours.  An example of this function is shown below:
+
+```{r}
+## ifelse() example
+values <- c(1,1,3,4,5,10)
+binary_values <- ifelse(values < 4, "less than 4", "greater than or equal to 4")
+binary_values
+```
+
+As you can see, `ifelse()` takes a logical condition as its first argument, returning the second argument where that condition is `TRUE` and the third argument where that condition is `FALSE`.
+
+```{r, echo = FALSE, eval = FALSE}
+left_join(x = flights, y = weather) %>% 
+     mutate(delay_10 = ifelse(dep_delay > 600, "More", "Less")) %>%
+     group_by(delay_10) %>%
+     summarize(mean_vis = mean(visib, na.rm = TRUE),
+               sd_vis = sd(visib, na.rm =TRUE))
+
+left_join(x = flights, y = weather) %>% 
+     mutate(delay_10 = ifelse(dep_delay > 600, "More", "Less")) %>%
+     group_by(delay_10) %>% 
+     count(is.na(visib))
+```
+
+
+
+

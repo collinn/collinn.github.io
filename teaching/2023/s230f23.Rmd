@@ -42,7 +42,7 @@ Sta-230 uses a *workshop style* class format. This means that the majority of ou
     - [Lab 5 (reshaping data with `tidyr`)](labs/tidyr.html)
       + [Visual aid](scratch/pivot_summary.pdf)
     - [Lab 6 (manipulation with `dplyr`)](labs/dplyr.html)
-    - Lab 7 (merging and joining)
+    - [Lab 7 (merging and joining)](labs/joins.html)
     - Labs due (excluding bonus) as a single document 9/22 at 11:59pm
     - Optional lab (functions, iteration, and files)
 - Working with strings
@@ -62,7 +62,7 @@ Sta-230 uses a *workshop style* class format. This means that the majority of ou
     
 ### Course Summary
 
-[TBD]()
+[TBD](courseSummary.html)
 
 
 <!-- - Introduction to `R` -->
