@@ -2,7 +2,12 @@
 title: "Lab 4 - `ggplot2` continued"
 author: "STA 230"
 date: "2023-09-04"
-output: html_document
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: false
 editor_options: 
   chunk_output_type: console
 ---

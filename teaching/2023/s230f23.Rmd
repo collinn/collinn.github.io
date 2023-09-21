@@ -62,7 +62,7 @@ Sta-230 uses a *workshop style* class format. This means that the majority of ou
     
 ### Course Summary
 
-[TBD](courseSummary.html)
+[Summary](courseSummary.html)
 
 
 <!-- - Introduction to `R` -->
