@@ -1,0 +1,87 @@
+---
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+
+
+# Mutate and Summarize
+
+"Summarize summarizes mutate mutates at the group level"
+
+While in a sense these are each doing very similar tasks, they differ in critical ways:
+
+  1. Mutate will retain all of the columns of the original dataset, adding a single column to represent the summary
+  2. Summarize will drop all columns in the dataset *except* those that are used to signify groups. It will add a column for the summary
+  
+For this example, we will look at a simple toy dataset consisting of four subjects, each with values in two groups.
+
+```{r}
+library(dplyr)
+
+dat <- data.frame(subject = rep(LETTERS[1:4], each = 2), 
+                  class = rep(c("X", "Y"), times = 4), 
+                  val = c(1,3,3,5,5,7,7,9))
+
+dat
+```
+
+## Without groups
+
+Without groups, both `mutate` and `summarize` will find the mean of the entire `val` column. Mutate adds this as an additional column, while summarize returns a single value (both are data frames, however)
+
+```{r}
+## Mean of all added as column
+dat %>% mutate(totalMean = mean(val))
+
+## Mean of all added as column
+dat %>% summarize(totalMean = mean(val))
+```
+
+## Grouping by subject
+
+Here, mutate computes the mean based on the grouping, in this case the subject. Looking at the resulting data frame, we see for example that A has a mean value of 2 in both of its rows, B a mean value of 4, etc. In some sense, this is redundant, as there is only one subject A and one mean value from `val`. We remove this redundancy with summarize, which simply returns a column indicating which subject we have summarized, along with their mean value.
+
+
+```{r}
+## By subject
+dat %>% group_by(subject) %>% 
+  mutate(subjectMean = mean(val))
+
+## This keeps subject and mean val
+dat %>% group_by(subject) %>% 
+  summarize(subjectMean = mean(val))
+```
+
+## Grouping by class
+
+Here, we see the same thing as above, except now we have grouped by class. As there are only two different classes in this data frame, there are only going to be two unique values for the mean. As before, mutate adds a new entry for each row, while summarize returns a data frame with only  two rows, one for each class.
+
+```{r}
+## By class
+dat %>% group_by(class) %>% 
+  mutate(classMean = mean(val))
+
+## By class
+dat %>% group_by(class) %>% 
+  summarize(classMean = mean(val))
+```
+
+## Grouping by class and subject
+
+Here, the group of class/subject uniquely defines each of the rows -- that is, each row will have it's own associated mean. Though mutate and summarize now include the same number of rows, note that summarize has dropped the `val` column, retaining only information on the groups and their associated means
+.
+
+```{r}
+## By both (in this case, uniquely identifies row)
+dat %>% group_by(subject, class) %>% 
+  mutate(subClassMean = mean(val))
+
+## By both (in this case, uniquely identifies row)
+dat %>% group_by(subject, class) %>% 
+  summarize(subClassMean = mean(val))
+```
+
