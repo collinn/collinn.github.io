@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE,
 library(dplyr)
 library(ggplot2)
 library(tidyr)
-solutions <-  FALSE
+solutions <-  TRUE
 ```
 
 ## Question 1
@@ -56,6 +56,12 @@ Create a new graph that fixes the problem you identified in part A and appropria
 dat2 <- dat %>% 
   filter((name %in% c("Anna", "Shonda") & sex == "F") | name %in% c("Ryan", "Jeff", "Jonathan", "Collin") & sex == "M")
 ggplot(dat2, aes(year, n, color = name)) + geom_line(linetype = "dashed")
+
+dat2 <- dat %>% 
+  group_by(year, name) %>% 
+  summarize(total = sum(n))
+
+ggplot(dat2, aes(year, total, color = name)) + geom_line()
 ```
 
 
@@ -122,7 +128,13 @@ It has been hypothesized in several sports that an [athlete's birth month](https
 
 ```{r, echo = solutions, class.source="bg-success", class.output = "bg-success", eval = solutions}
 dat2 <- left_join(dat, People, by = "playerID")
-ggplot(dat2, aes(x = birthMonth)) + geom_bar()
+ggplot(dat2, aes(x = birthMonth)) + geom_bar() +
+  scale_x_discrete(drop = FALSE)
+
+dat3 <- subset(dat2, birthMonth != 3)
+
+ggplot(dat3, aes(x = factor(birthMonth, levels = 1:12))) + geom_bar() +
+  scale_x_discrete(drop = FALSE)
 ```
 
 
