@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE,
 library(dplyr)
 library(ggplot2)
 library(tidyr)
-solutions <-  TRUE
+solutions <-  FALSE
 ```
 
 ## Question 1
