@@ -155,12 +155,14 @@ To that end, here are some of the more common functions we will be using, though
 Function | Description
 --------|---------------------------------------------------------
 `str_sub()` | Extract substring from a given start to end position
-`str_replace()` |
-`str_detect()` |Detect presence/absence of first occurrence of substring 
-`str_locate()` | Give position (start, end) of first occurrence of substring
-`str_locate_all()`|Give positions of all occurrences of a substring 
 `str_replace()` | Replace the first instance of a substring with another
 `str_replace_all()` | Replace all instances of a substring with another
+`str_c()` | Concatenate or combine strings
+`str_subset()` | Subset character vector with strings matching a pattern
+`str_detect()`| Similar to `str_subset`, returning a logical vector
+`str_extract()` | Extract matching pattern from a string
+`str_count()` | Count instances of pattern in a string
+
 
 Most of the functions in the `stringr` package take *at least* two arguments: string and pattern. The string indicates the character string that we are manipulating, while pattern indicates the sequence of characters that modulate our function. This will make more sense once we consider some examples.
 
@@ -424,6 +426,8 @@ str_subset(s, "\\^")
 ```{r}
 s <- c("howdy", "otter", "tragedy", "danger", "octopus", "grapes")
 ```
+
+Not such a silly function now, is it?
 
 ```{r, eval = FALSE, echo = FALSE}
 s <- c("howdy", "otter", "tragedy", "danger", "octopus", "grapes")

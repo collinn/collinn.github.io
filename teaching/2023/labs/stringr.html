@@ -1676,27 +1676,31 @@ using, though it is by no means comprehensive</p>
 </tr>
 <tr class="even">
 <td><code>str_replace()</code></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><code>str_detect()</code></td>
-<td>Detect presence/absence of first occurrence of substring</td>
-</tr>
-<tr class="even">
-<td><code>str_locate()</code></td>
-<td>Give position (start, end) of first occurrence of substring</td>
-</tr>
-<tr class="odd">
-<td><code>str_locate_all()</code></td>
-<td>Give positions of all occurrences of a substring</td>
-</tr>
-<tr class="even">
-<td><code>str_replace()</code></td>
 <td>Replace the first instance of a substring with another</td>
 </tr>
 <tr class="odd">
 <td><code>str_replace_all()</code></td>
 <td>Replace all instances of a substring with another</td>
+</tr>
+<tr class="even">
+<td><code>str_c()</code></td>
+<td>Concatenate or combine strings</td>
+</tr>
+<tr class="odd">
+<td><code>str_subset()</code></td>
+<td>Subset character vector with strings matching a pattern</td>
+</tr>
+<tr class="even">
+<td><code>str_detect()</code></td>
+<td>Similar to <code>str_subset</code>, returning a logical vector</td>
+</tr>
+<tr class="odd">
+<td><code>str_extract()</code></td>
+<td>Extract matching pattern from a string</td>
+</tr>
+<tr class="even">
+<td><code>str_count()</code></td>
+<td>Count instances of pattern in a string</td>
 </tr>
 </tbody>
 </table>
@@ -1981,6 +1985,7 @@ str_subset(s, &quot;\\^&quot;)</code></pre>
 the first letter of each string in this vector. Then combine those
 letters with <code>str_c</code> to create a single character string</p>
 <pre class="r"><code>s &lt;- c(&quot;howdy&quot;, &quot;otter&quot;, &quot;tragedy&quot;, &quot;danger&quot;, &quot;octopus&quot;, &quot;grapes&quot;)</code></pre>
+<p>Not such a silly function now, is it?</p>
 </div>
 <div id="regular-expressions-1" class="section level3">
 <h3>Regular Expressions</h3>
