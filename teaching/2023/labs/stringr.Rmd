@@ -1,0 +1,448 @@
+---
+title: "String Manipulation and Regular Expressions"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Preamble
+
+The focus of this lab is going to be on strings and string manipulation. We will be fascilitating this with the `stringr` package
+
+```{r}
+# install.packages("stringr")
+library(stringr)
+library(dplyr)
+```
+
+## Strings
+
+What is a string? Mostly simply, it's a sequence of characters in `R` enclosed between single or double quotes. It's analogous to a number (or numeric) in that a string, however long, is a single element in `R`. Also like numbers, multiple strings can be collected together to make a vector
+
+```{r}
+# This is a string
+a <- "abc"
+
+# This is also a string
+b <- "I think statistics is really super duper neat!"
+
+# Strings can be combined into a character vector with `c`
+vec <- c(a, b)
+vec
+```
+
+Note: As a general comment on naming variables and best practices, we should avoid things like `c <- "blah blah"` because `c` is a function commonly used in R. This also applies to naming things with other common function names such as `mean`, `sd`, and `summary`.
+
+Strings have a number of unique properties that will be helpful to keep in mind; one of these is the concept of length. When we refer to the length of a string, we are referring to the number of characters that the string contains:
+
+```{r}
+# This is both a string and a vector of length 1
+y <- "four"
+
+# The length of the string is four
+str_length(y)
+
+# The length of the vector is still one
+length(y)
+```
+
+When we have a vector of strings, `str_length` will give us length information for each string. This will be a common phenomenon in this lab -- funtions that apply to strings will also apply to each element of a character vector
+
+```{r}
+y <- c("apple", "banana", "pears")
+str_length(y)
+```
+
+As a corollary of the fact that strings have length, they also have associated indices meaning that it is possible for me to specify that I want, say, the second letter of a string
+
+```{r}
+y <- "rstudio"
+str_sub(y, start = 2, end = 2)
+```
+
+`str_sub` stands for "substring" rather than "subset", which exists in the more useful function `str_subset` (observe that all stringr functions begin with `str_`). While this is one of the less useful functions, it is helpful in illustrating a few concepts. Using `str_sub`, we can also specify that we want all of the characters *up to a certain point*, all of the characters *past a certain point*, or all of the characters *between two points*
+
+```{r}
+y <- "firefighter"
+
+# Give me everything starting at position 5
+str_sub(y, start = 5)
+
+# Give me everything up to position 4
+str_sub(y, end = 4)
+
+# Give me everything between 3 and 9
+str_sub(y, start = 3, end = 9)
+```
+
+`str_sub` also (conveniently) works with negative numbers. In this case, they work backwards from the end of a string
+
+```{r}
+str_sub(y, start = -7, end = -3)
+```
+
+
+## Coercion
+
+We discussed [coercian](https://collinn.github.io/teaching/2023/labs/intro2.html#Miscellaneous) briefly in the second lab, but it is worth reviewing briefly here as this is a very common problem in data analysis.
+
+Vectors in `R` are all expected to be of the same type: logicals, numerics, characters, etc.,. In the case of a mixed type, `R` *coerces* all of the elements to be the same. There is a hierarchy in coercion in that all logicals can be represented by numerics, and all numerics can be represented as characters.
+
+```{r}
+x <- c(1, 2, 3)
+x
+class(x)
+
+x <- c(1, 2, 3, "A")
+x
+class(x)
+```
+
+We can force coercion in the other direction, but mismatches will result in missing (`NA`) values.
+
+```{r, warning = FALSE}
+as.numeric(x)
+```
+
+
+Often, it's the presence of a single character that can cause issues, contaminating a dataset. Consider this data.frame, for example, in which both of our intended numeric columns are corrupted:
+
+```{r}
+dat <- read.csv("https://remiller1450.github.io/data/char_dom.csv")
+dat
+str(dat)
+```
+
+In the first case in `messy_x`, we see that the cause of the issue is that missing data was entered as `"Missing"` rather than `NA`. Issues like this can generally be resolved pretty quickly by simply coercing it back to the correct type.
+
+```{r}
+dat$messy_x <- as.numeric(dat$messy_x)
+dat
+```
+
+In the second case, see see that one of the entries in annotated as `55*`. As we want to remove the annotation without losing the entry, we will need some more tools. Problems such as this are the primary motivation for this lab.
+
+
+# Lab
+
+This lab will cover some of the most commonly used elements of the `stringr` package, as well as introduce [regular expressions](https://en.wikipedia.org/wiki/Regular_expression)
+
+A cheat sheet for both of these together is provided here: [CHEATSHEET](https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_strings.pdf)
+
+## stringr
+
+The `stringr` package, as the name implies, was created to assist with the manipulation of strings in `R`. The motivation for string manipulation arises from a number of avenues. Often, there are issues with data entry, making it difficult to use and manipulate data as intended; this is what we saw in the `messy_x` column above. More commonly, however, string manipulation can be used to assist us directly in data processing tasks.
+
+The most common tasks we will have include
+
+  1. Mutating strings
+  2. Joining and splitting strings
+  3. Subsetting and extracting strings
+  4. Detecting patterns in strings
+
+
+To that end, here are some of the more common functions we will be using, though it is by no means comprehensive
+
+Function | Description
+--------|---------------------------------------------------------
+`str_sub()` | Extract substring from a given start to end position
+`str_replace()`
+`str_detect()` |Detect presence/absence of first occurrence of substring 
+`str_locate()` | Give position (start, end) of first occurrence of substring
+`str_locate_all()`|Give positions of all occurrences of a substring 
+`str_replace()` | Replace the first instance of a substring with another
+`str_replace_all()` | Replace all instances of a substring with another
+
+Most of the functions in the `stringr` package take *at least* two arguments: string and pattern. The string indicates the character string that we are manipulating, while pattern indicates the sequence of characters that modulate our function. This will make more sense once we consider some examples.
+
+### Mutating Strings
+
+#### Replace strings
+
+The first set of functions we will consider will be those that modify strings directly. We already saw above that `str_sub` can extract a subset of a string; it can also be used to modify specific portions of a string
+
+```{r}
+# position 1 to 3 is "sta"
+x <- "sta230"
+str_sub(x, 1, 3)
+
+# replace "sta" with "statistics"
+str_sub(x, 1, 3) <- "statistics"
+x
+```
+
+Using `str_sub` is a bit awkward, however, as it requires positional indices. More commonly, there is the `str_replace` function, which takes the two arguments we mentioned above, string and pattern. In this case, `string` is the string we are manipulating and `pattern` indicates what we wish to replace. Finally, there is a `replacement` argument which we use to replace `pattern`
+
+```{r}
+x <- "sta320"
+str_replace(string = x, pattern = "sta", replacement = "statistics")
+```
+
+Like all `stringr` functions, this is vectorized, meaning that we can do this on a vector of character strings.
+
+```{r}
+# A vector of hypothetical ids
+ids <- c("M289", "M432", "F201", "M365")
+
+ids <- str_replace(string = ids, pattern = "M", replacement = "MALE")
+ids
+ids <- str_replace(ids, "F", "FEMALE")
+ids
+```
+
+Oddly (and this also applies to most `stringr` functions), these operations typically only happen *on the first instance* of a pattern match. So, for example, if a particular pattern shows up multiple times in a string, the replacement will only occur on the first
+
+```{r}
+dog <- "dog_dog_dog_dog_dog"
+str_replace(dog, "dog", "GOD")
+```
+
+We can specify that we want this to apply to all instances of the pattern with `str_replace_all`
+
+```{r}
+str_replace_all(dog, "dog", "GOD")
+```
+
+Personally, I really like using this function to remove characters I don't want by replacing a pattern with `""` or `"_"`
+
+```{r}
+x <- "123-456-789"
+str_replace_all(x, "-", "")
+```
+
+
+#### Misc mutations
+
+There are also a collection of mutating functions that operate as housekeeping functions, allowing us to standardize or clean up sloppy data entry. For example, consider the following:
+
+```{r}
+s <- "tHe quIcK brOWn fOX juMPeD oVeR tHe LAzY dOG"
+
+# Make all lower
+str_to_lower(s)
+
+# Make all upper
+str_to_upper(s)
+
+# Make a title
+str_to_title(s)
+
+# Make a sentence
+str_to_sentence(s)
+```
+
+Clearly, some of these are more useful than others.
+
+It's worth mentioning also a number of functions that handle extra spaces which can sometimes occur with manual data entries. `str_trim` will trim off all leading and trailing white space, while `str_squish` will do that *and* remove repeated spaces in the string
+
+```{r}
+x <- "   oops   too much    space "  
+str_trim(x)
+str_squish(x)
+```
+
+
+### Joining and splitting
+
+Next we have joining and splitting which, as the heading suggests, involves joining or splitting strings together. Joining strings is especially useful when we want to present summary information based on statistics that have yet to be computed. `str_c` takes a comma separated collection of values which it will then paste together to form a single string
+
+```{r}
+val <- 1:10
+str_c("The mean value of val is: ", mean(val))
+```
+
+`str_c` can also be used to turn a character vector into a single string by using the `collapse` argument
+
+```{r}
+s <- c("a", "b", "c")
+s
+str_c(s, collapse = "")
+str_c(s, collapse = ", ")
+```
+
+We have already seen a form of string splitting with the `separate` function in `dplyr`. With simple strings, it is `str_split`. Also as before, `.` is a special character that needs to be escaped with `\\`
+
+```{r}
+s <- "cat.dog"
+str_split(s, "\\.")
+```
+
+This one is a bit strange in that it returns a `list` object instead of a character vector. This is because unlike the other functions we have seen so far, `str_split` will split every instance of the pattern. Returning a list allows each element of the character vector to be a different length
+
+```{r}
+s <- c("oneword", "two.words", "this.has.three")
+str_split(s, "\\.")
+```
+
+
+
+
+### Subsetting and Extracting
+
+The next collection of functions deals with subsetting and extraction. We already saw `str_sub` in a few contexts, so we will not repeat that here. The two primary functions here are `str_extract` and `str_subset`. The first of these, `str_extract`, simply extracts from the string any pattern that matches `pattern` or otherwise returns `NA`
+
+```{r}
+x <- c("apple", "banana", "melon")
+str_extract(x, "a")
+```
+
+There is also `str_subset` which will instead retain each element of a character vector matching a pattern, discarding everything else
+
+```{r}
+x <- c("apple", "banana", "melon")
+str_subset(x, "a")
+```
+
+These two functions seem a bit silly here, but we will return to them after we introduce regular expressions.
+
+
+### Detecting patterns
+
+Finally, we have pattern detection. This again is much more useful with regular expressions, but we will briefly introduce the primary functions here.
+
+First we have `str_detect`, which returns a logical vector indicating if a pattern was found in a string
+
+```{r}
+s <- c("dog", "cat", "parrot", "hamster")
+str_detect(s, pattern = "o")
+```
+
+This can be used similarly to `str_subset` above wher the logical vector indicates which we would keep
+
+```{r}
+s <- c("dog", "cat", "parrot", "hamster")
+idx <- str_detect(s, pattern = "o")
+s[idx] # true and false values
+
+str_subset(s, "o")
+```
+
+Also useful is `str_count` which counts the number of times a pattern appears in a string
+
+```{r}
+x <- "mississippi"
+str_count(x, "s")
+```
+
+
+## Regular Expressions
+
+Regular expressions (regex) are an incredibly powerful tool for specifying patterns in a text; a short collection of examples is provided on the second page of the [cheatsheet](https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_strings.pdf), which you will want to reference frequently for the remaining portion of this lab.
+
+We will focus here on XX topics, meta-characters, expressions, and quantifiers.
+
+### View
+
+While we will not include it here in the lab for brevity's sake, there is a very useful function called `str_view` which allows you to see visually the pattern in a string by enclosing the pattern in brackets. As our regular expressions get more sophisticated, this will help visualize what exactly your pattern is finding, especially useful when you are not getting the results you want:
+
+```{r}
+## Find all the vowels
+str_view("apple", "[aeiou]")
+```
+
+
+
+
+### Meta-characters
+
+Meta-characters are characters that have a particular meaning in regex language, meaning that they cannot be used to literally express a string value. We have seen one of these already in `R`, with the period `.` which has to be *escaped*. In regex, the period is used to indicate a "wildcard" character, meaning it will match with anything. By escaping a meta-character with `\\`, we are able to tell `R` to interpret the string literally. Here, we count the number of periods in a string
+
+```{r}
+x <- "hello.world"
+
+# As a wildcard, this counts every single character
+str_count(x, ".")
+
+# We must "escape" the period if we want to count periods
+str_count(x, "\\.")
+```
+
+We won't list out all of the  meta-characters here. Instead, understand that in the next sections we will introduce a number of expressions that use special characters. To use those characters literally, we will need to escape them in strings.
+
+### Anchoring
+
+Anchoring simply means that we wish to indicate the start or the end of the string. For example, if instead of finding *all* instances in which a string contains the letter "a" we want to find those that *start* with the letter "a", we can "anchor" our expression with `"^"` which indicates the beginning of a string
+
+```{r}
+s <- c("apple", "pineapple", "banana")
+str_subset(s, "a")
+str_subset(s, "^a")
+```
+
+Likewise, we use `"$"` to indicate the end of a string
+
+```{r}
+s <- c("apple", "pineapple", "banana")
+str_subset(s, "a")
+str_subset(s, "a$")
+```
+
+Of course, if we actually wanted to find "^" or "$", we would need to escape them
+
+```{r}
+s <- c("h^t", "hat", "hut", "hit")
+str_subset(s, "\\^")
+```
+
+
+**Question XX** Use `str_extract` to extract the first letter of each string in this vector. Then combine those letters with `str_c` to create a single character string
+
+```{r}
+s <- c("howdy", "otter", "tragedy", "danger", "octopus", "grapes")
+```
+
+```{r, eval = FALSE, echo = FALSE}
+s <- c("howdy", "otter", "tragedy", "danger", "octopus", "grapes")
+str_extract(s, "^.") %>% str_c(collapse = "")
+```
+
+
+### Regular Expressions
+
+While regular expressions does refer to this entire process itself, there are also sets of patterns that we refer to as regular expressions. A pretty decent list is included on the cheat sheet. Some immediately useful ones are `"\d"` and `"\b"` which refer to digits and word boundaries, respectively. Regular expressions can be combined in powerful ways:
+
+```{r}
+s <- c("some words no numbers", "see you 2nite", "you are l8")
+
+# Find strings that have digits that start of a word
+str_subset(s, "\\b\\d")
+
+# Find strings that have digits at end of word
+str_subset(s, "\\d\\b")
+```
+
+Other common ones includes `"[:alpha:]"`, `"[:punct:]"`, `"[:lower:]"`, etc., . This is useful, for 
+
+```{r}
+s <- c("$(@!")
+```
+
+
+### Anchoring
+
+### Regex
+
+```{r}
+# Which state has most vowels? which has highest ratio of vowels? lowest?
+states <- data.frame(states = rownames(USArrests))
+head(states)
+
+states %>% mutate(nvowel = str_count(str_to_lower(states), "[aeiou]"), 
+                  nlen = str_length(states), 
+                  ratio = nvowel/nlen) %>% 
+  arrange(desc(ratio))
+
+
+
+(str_count(str_to_lower(states), "[aeiou]") / str_length(states))
+```
+

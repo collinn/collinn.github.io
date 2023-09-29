@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE,
 library(dplyr)
 library(ggplot2)
 library(tidyr)
-solutions <-  TRUE
+solutions <-  FALSE
 ```
 
 ## Question 1
@@ -48,21 +48,29 @@ ggplot(dat, aes(year, n, color = name)) + geom_line()
 
 Create a new graph that fixes the problem you identified in part A and appropriately displays the frequency of each name over time. Don't forget the [logical operators](https://collinn.github.io/teaching/2023/labs/intro1.html#Logical_Conditions_and_Subsetting) covered in Lab 1.
 
+
 ```{r, echo = solutions, class.source="bg-success", class.output = "bg-success", eval = solutions}
 ## They probably won't use `xor`
 # dat %>% 
 #   filter(xor((name %in% c("Anna", "Shonda")), sex == "M"))
 
+
+## Filter out "incorrect" names
 dat2 <- dat %>% 
   filter((name %in% c("Anna", "Shonda") & sex == "F") | name %in% c("Ryan", "Jeff", "Jonathan", "Collin") & sex == "M")
-ggplot(dat2, aes(year, n, color = name)) + geom_line(linetype = "dashed")
 
+
+## Summarize by name and year
 dat2 <- dat %>% 
   group_by(year, name) %>% 
   summarize(total = sum(n))
 
+## Either is fine, the plots will look roughly the same
 ggplot(dat2, aes(year, total, color = name)) + geom_line()
 ```
+
+
+
 
 
 ## Question 2
