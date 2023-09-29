@@ -1491,21 +1491,13 @@ manipulation. We will be fascilitating this with the
 <pre class="r"><code># install.packages(&quot;stringr&quot;)
 library(stringr)
 library(dplyr)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;dplyr&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:stats&#39;:
-## 
-##     filter, lag</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     intersect, setdiff, setequal, union</code></pre>
 <div id="strings" class="section level2">
 <h2>Strings</h2>
-<p>What is a string? Mostly simply, it’s a sequence of characters in
-<code>R</code> enclosed between single or double quotes. It’s analogous
-to a number (or numeric) in that a string, however long, is a single
-element in <code>R</code>. Also like numbers, multiple strings can be
-collected together to make a vector</p>
+<p>What is a string? Mostly simply, a string is a sequence of characters
+in <code>R</code> enclosed between single or double quotes. It’s
+analogous to a number (or numeric) in that a string, however long, is a
+single element in <code>R</code>. Also like numbers, multiple strings
+can be collected together to make a vector</p>
 <pre class="r"><code># This is a string
 a &lt;- &quot;abc&quot;
 
@@ -1581,7 +1573,8 @@ this is a very common problem in data analysis.</p>
 logicals, numerics, characters, etc.,. In the case of a mixed type,
 <code>R</code> <em>coerces</em> all of the elements to be the same.
 There is a hierarchy in coercion in that all logicals can be represented
-by numerics, and all numerics can be represented as characters.</p>
+by numerics, and all numerics can be represented as characters,
+etc.,.</p>
 <pre class="r"><code>x &lt;- c(1, 2, 3)
 x</code></pre>
 <pre><code>## [1] 1 2 3</code></pre>
@@ -1621,9 +1614,8 @@ dat</code></pre>
 the issue is that missing data was entered as <code>&quot;Missing&quot;</code>
 rather than <code>NA</code>. Issues like this can generally be resolved
 pretty quickly by simply coercing it back to the correct type.</p>
-<pre class="r"><code>dat$messy_x &lt;- as.numeric(dat$messy_x)</code></pre>
-<pre><code>## Warning: NAs introduced by coercion</code></pre>
-<pre class="r"><code>dat</code></pre>
+<pre class="r"><code>dat$messy_x &lt;- as.numeric(dat$messy_x)
+dat</code></pre>
 <pre><code>##    ID messy_x messy_y
 ## 1   1     100      50
 ## 2   2      90      40
@@ -1667,6 +1659,10 @@ tasks.</p>
 <p>To that end, here are some of the more common functions we will be
 using, though it is by no means comprehensive</p>
 <table>
+<colgroup>
+<col width="12%" />
+<col width="87%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th>Function</th>
@@ -1678,16 +1674,32 @@ using, though it is by no means comprehensive</p>
 <td><code>str_sub()</code></td>
 <td>Extract substring from a given start to end position</td>
 </tr>
+<tr class="even">
+<td><code>str_replace()</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>str_detect()</code></td>
+<td>Detect presence/absence of first occurrence of substring</td>
+</tr>
+<tr class="even">
+<td><code>str_locate()</code></td>
+<td>Give position (start, end) of first occurrence of substring</td>
+</tr>
+<tr class="odd">
+<td><code>str_locate_all()</code></td>
+<td>Give positions of all occurrences of a substring</td>
+</tr>
+<tr class="even">
+<td><code>str_replace()</code></td>
+<td>Replace the first instance of a substring with another</td>
+</tr>
+<tr class="odd">
+<td><code>str_replace_all()</code></td>
+<td>Replace all instances of a substring with another</td>
+</tr>
 </tbody>
 </table>
-<p><code>str_replace()</code> <code>str_detect()</code> |Detect
-presence/absence of first occurrence of substring
-<code>str_locate()</code> | Give position (start, end) of first
-occurrence of substring <code>str_locate_all()</code>|Give positions of
-all occurrences of a substring <code>str_replace()</code> | Replace the
-first instance of a substring with another
-<code>str_replace_all()</code> | Replace all instances of a substring
-with another</p>
 <p>Most of the functions in the <code>stringr</code> package take <em>at
 least</em> two arguments: string and pattern. The string indicates the
 character string that we are manipulating, while pattern indicates the
@@ -1711,7 +1723,7 @@ x</code></pre>
 <pre><code>## [1] &quot;statistics230&quot;</code></pre>
 <p>Using <code>str_sub</code> is a bit awkward, however, as it requires
 positional indices. More commonly, there is the <code>str_replace</code>
-function, which takes the two arguments we mentioned above, string and
+function which takes the two arguments we mentioned above, string and
 pattern. In this case, <code>string</code> is the string we are
 manipulating and <code>pattern</code> indicates what we wish to replace.
 Finally, there is a <code>replacement</code> argument which we use to
@@ -1779,6 +1791,10 @@ str_trim(x)</code></pre>
 <pre><code>## [1] &quot;oops   too much    space&quot;</code></pre>
 <pre class="r"><code>str_squish(x)</code></pre>
 <pre><code>## [1] &quot;oops too much space&quot;</code></pre>
+<p><strong>Question 1</strong> Using the functions we have learned so
+far, modify the string below to produce the string
+<code>&quot;United_States&quot;</code></p>
+<pre class="r"><code>s &lt;- c(&quot;  UNITED  STATES  &quot;)</code></pre>
 </div>
 </div>
 <div id="joining-and-splitting" class="section level3">
@@ -1873,21 +1889,25 @@ str_count(x, &quot;s&quot;)</code></pre>
 </div>
 <div id="regular-expressions" class="section level2">
 <h2>Regular Expressions</h2>
+<p>Up until this point, the <code>stringr</code> functions we have
+introduced may seem a bit limited in their usefulness. However, each of
+the above examples is intended to provide an unambiguous illustration of
+how each of these functions work. In this current section, we combine
+our <code>stringr</code> functions with patterns produced by <em>regular
+expressions</em>, infinitely expanding their utility.</p>
 <p>Regular expressions (regex) are an incredibly powerful tool for
 specifying patterns in a text; a short collection of examples is
 provided on the second page of the <a href="https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_strings.pdf">cheatsheet</a>,
 which you will want to reference frequently for the remaining portion of
 this lab.</p>
-<p>We will focus here on XX topics, meta-characters, expressions, and
-quantifiers.</p>
 <div id="view" class="section level3">
 <h3>View</h3>
 <p>While we will not include it here in the lab for brevity’s sake,
 there is a very useful function called <code>str_view</code> which
-allows you to see visually the pattern in a string. As our regular
-expressions get more sophisticated, this will help visualize what
-exactly your pattern is finding, especially useful when you are not
-getting the results you want:</p>
+allows you to see visually the pattern in a string by enclosing the
+pattern in brackets. As our regular expressions get more sophisticated,
+this will help visualize what exactly your pattern is finding,
+especially useful when you are not getting the results you want:</p>
 <pre class="r"><code>## Find all the vowels
 str_view(&quot;apple&quot;, &quot;[aeiou]&quot;)</code></pre>
 <pre><code>## [1] │ &lt;a&gt;ppl&lt;e&gt;</code></pre>
@@ -1914,6 +1934,25 @@ str_count(x, &quot;\\.&quot;)</code></pre>
 understand that in the next sections we will introduce a number of
 expressions that use special characters. To use those characters
 literally, we will need to escape them in strings.</p>
+<p><strong>Question 2</strong> Return to the dataset we introduced at
+the beginning of the lab</p>
+<pre class="r"><code>dat &lt;- read.csv(&quot;https://remiller1450.github.io/data/char_dom.csv&quot;)
+dat</code></pre>
+<pre><code>##    ID messy_x messy_y
+## 1   1     100      50
+## 2   2      90      40
+## 3   3      85      55
+## 4   4      90      45
+## 5   5     110     55*
+## 6   6 Missing      60
+## 7   7     115      40
+## 8   8    &lt;NA&gt;      35
+## 9   9     105      40
+## 10 10     100      50</code></pre>
+<p>Using the tools we have introduced thus far, correct this dataset so
+that the missing values in <code>messy_x</code> are recorded as
+<code>NA</code> and the annotated values in <code>messy_y</code> are
+modified so that it can be correctly converted to numeric.</p>
 </div>
 <div id="anchoring" class="section level3">
 <h3>Anchoring</h3>
@@ -1927,17 +1966,118 @@ str_subset(s, &quot;a&quot;)</code></pre>
 <pre><code>## [1] &quot;apple&quot;     &quot;pineapple&quot; &quot;banana&quot;</code></pre>
 <pre class="r"><code>str_subset(s, &quot;^a&quot;)</code></pre>
 <pre><code>## [1] &quot;apple&quot;</code></pre>
+<p>Likewise, we use <code>&quot;$&quot;</code> to indicate the end of a string</p>
+<pre class="r"><code>s &lt;- c(&quot;apple&quot;, &quot;pineapple&quot;, &quot;banana&quot;)
+str_subset(s, &quot;a&quot;)</code></pre>
+<pre><code>## [1] &quot;apple&quot;     &quot;pineapple&quot; &quot;banana&quot;</code></pre>
+<pre class="r"><code>str_subset(s, &quot;a$&quot;)</code></pre>
+<pre><code>## [1] &quot;banana&quot;</code></pre>
+<p>Of course, if we actually wanted to find “^” or “$”, we would need to
+escape them</p>
+<pre class="r"><code>s &lt;- c(&quot;h^t&quot;, &quot;hat&quot;, &quot;hut&quot;, &quot;hit&quot;)
+str_subset(s, &quot;\\^&quot;)</code></pre>
+<pre><code>## [1] &quot;h^t&quot;</code></pre>
+<p><strong>Question 3</strong> Use <code>str_extract</code> to extract
+the first letter of each string in this vector. Then combine those
+letters with <code>str_c</code> to create a single character string</p>
+<pre class="r"><code>s &lt;- c(&quot;howdy&quot;, &quot;otter&quot;, &quot;tragedy&quot;, &quot;danger&quot;, &quot;octopus&quot;, &quot;grapes&quot;)</code></pre>
 </div>
 <div id="regular-expressions-1" class="section level3">
 <h3>Regular Expressions</h3>
+<p>While regular expressions does refer to this entire process itself,
+there are also sets of patterns that we refer to as regular expressions.
+A pretty decent list is included on the cheat sheet. Here, we will
+finally introduce the period we have seen so frequently in it’s natural
+environment. In a regular expression, <code>.</code> simply means any
+character.</p>
+<pre class="r"><code>s &lt;- c(&quot;X25YW&quot;, &quot;X91YW&quot;, &quot;R30WY&quot;, &quot;X11YW&quot;)
+
+# We want all X, followed by 2 of any character, then YW
+str_subset(s, &quot;X..YW&quot;)</code></pre>
+<pre><code>## [1] &quot;X25YW&quot; &quot;X91YW&quot; &quot;X11YW&quot;</code></pre>
+<p>Some other immediately useful ones are <code>&quot;\d&quot;</code> and
+<code>&quot;\b&quot;</code> which refer to digits and word boundaries,
+respectively. Regular expressions can be combined in powerful ways:</p>
+<pre class="r"><code>s &lt;- c(&quot;some words no numbers&quot;, &quot;see you 2nite&quot;, &quot;you are L8&quot;)
+
+# Find strings that have digits that start of a word
+str_subset(s, &quot;\\b\\d&quot;)</code></pre>
+<pre><code>## [1] &quot;see you 2nite&quot;</code></pre>
+<pre class="r"><code># Find strings that have digits at end of word
+str_subset(s, &quot;\\d\\b&quot;)</code></pre>
+<pre><code>## [1] &quot;you are L8&quot;</code></pre>
+<p>Other common ones includes <code>&quot;[:alpha:]&quot;</code>,
+<code>&quot;[:punct:]&quot;</code>, <code>&quot;[:lower:]&quot;</code>, etc., . This is
+especially useful with punctuation when you don’t want to escape a bunch
+of characters (though, see the cheat sheet as not all punctuation falls
+under <code>&quot;[:punct:]</code>)</p>
+<pre class="r"><code>s &lt;- c(&quot;dogs$(@!&quot;, &quot;^&amp;*are&quot;, &quot;;[co(]!ol&quot;)
+# This removes &quot;punctuation&quot;
+s &lt;- str_replace_all(s, pattern = &quot;[:punct:]&quot;, &quot;&quot;)
+s</code></pre>
+<pre><code>## [1] &quot;dogs$&quot; &quot;^are&quot;  &quot;cool&quot;</code></pre>
+<pre class="r"><code># This removes &quot;symbols&quot;
+s &lt;- str_replace_all(s, pattern = &quot;[:symbol:]&quot;, &quot;&quot;)
+s</code></pre>
+<pre><code>## [1] &quot;dogs&quot; &quot;are&quot;  &quot;cool&quot;</code></pre>
+<p><strong>Question 4</strong> A common problem in data processing
+involves the inclusion of “free response” questions in which respondents
+are able to enter data without restriction. In the following string,
+respondents were asked to give their phone numbers, but no
+standardization was enforced when doing so:</p>
+<pre class="r"><code>phone_strings &lt;- c(&quot;Home: (507)-645-5489&quot;, 
+                   &quot;Cell: 219.917.9871&quot;, 
+                   &quot;My work phone is 507-202-2332&quot;,
+                   &quot;I don&#39;t have a phone&quot;)</code></pre>
+<p>Using functions from this lab, <em>extract</em> the phone numbers
+from the character vector and modify the strings so that all of the
+numbers are of the form <code>XXX-XXX-XXXX</code>. If a number is not
+included, it can be left as an empty string (<code>&quot;&quot;</code>). Hint: A
+pattern like <code>&quot;\\d{3}[-.]&quot;</code> will identify any three digits
+followed by a hyphen or period. Regular expressions can be compounded.
+<code>str_replace</code> can get rid of pesky things we don’t need.</p>
 </div>
-<div id="anchoring-1" class="section level3">
-<h3>Anchoring</h3>
-</div>
-<div id="regex" class="section level3">
-<h3>Regex</h3>
-<pre class="r"><code># Which state has most vowels? which has highest ratio of vowels? lowest?
-states &lt;- data.frame(states = rownames(USArrests))
+<div id="alternates" class="section level3">
+<h3>Alternates</h3>
+<p>Sometimes we want to express patterns as a collection of possible
+matches, alternatives, or even exclude patterns. The most common of
+these is the square brackets, <code>[]</code> which indicate that we
+would like to match any one of the the patterns in brackets.</p>
+<pre class="r"><code>s &lt;- c(&quot;a1&quot;, &quot;b2&quot;, &quot;c3&quot;, &quot;d4&quot;)
+
+# Only match those with 1 or 3
+str_subset(s, pattern = &quot;[13]&quot;)</code></pre>
+<pre><code>## [1] &quot;a1&quot; &quot;c3&quot;</code></pre>
+<p>Using <code>&quot;^&quot;</code> combined with square brackets, we can also
+request anything <em>but</em> the patterns in brackets. We need to be
+careful, though, because this may match match other patterns in a
+string, returning results that you do not intend. Here, we might expect
+that “a1” and “c3” are not included, but since both “a” and “c” are not
+1 or 3, the pattern still flags</p>
+<pre class="r"><code>s &lt;- c(&quot;a1&quot;, &quot;b2&quot;, &quot;c3&quot;, &quot;d4&quot;)
+
+# Anything BUT 1 or 3
+str_subset(s, pattern = &quot;[^13]&quot;)</code></pre>
+<pre><code>## [1] &quot;a1&quot; &quot;b2&quot; &quot;c3&quot; &quot;d4&quot;</code></pre>
+<pre class="r"><code>str_view(s, pattern = &quot;[^13]&quot;)</code></pre>
+<pre><code>## [1] │ &lt;a&gt;1
+## [2] │ &lt;b&gt;&lt;2&gt;
+## [3] │ &lt;c&gt;3
+## [4] │ &lt;d&gt;&lt;4&gt;</code></pre>
+<p>By playing around a bit, we can modify expressions to get what we
+want</p>
+<pre class="r"><code>s &lt;- c(&quot;a1&quot;, &quot;b2&quot;, &quot;c3&quot;, &quot;d4&quot;)
+
+# Does not END in 1 or 3
+str_subset(s, pattern = &quot;[^13]$&quot;)</code></pre>
+<pre><code>## [1] &quot;b2&quot; &quot;d4&quot;</code></pre>
+<pre class="r"><code>s &lt;- c(&quot;dog^cat&quot;, &quot;dogacat&quot;)
+str_detect(s, &quot;[d^c]&quot;)</code></pre>
+<pre><code>## [1] TRUE TRUE</code></pre>
+<p><strong>Question 5</strong> The following code chunk takes the
+rownames from the <code>USArrests</code> dataset and uses them to create
+a data.frame with a single column containing all of the US states</p>
+<pre class="r"><code>states &lt;- data.frame(states = rownames(USArrests))
 head(states)</code></pre>
 <pre><code>##       states
 ## 1    Alabama
@@ -1946,66 +2086,75 @@ head(states)</code></pre>
 ## 4   Arkansas
 ## 5 California
 ## 6   Colorado</code></pre>
-<pre class="r"><code>states %&gt;% mutate(nvowel = str_count(str_to_lower(states), &quot;[aeiou]&quot;), 
-                  nlen = str_length(states), 
-                  ratio = nvowel/nlen) %&gt;% 
-  arrange(desc(ratio))</code></pre>
-<pre><code>##            states nvowel nlen     ratio
-## 1            Iowa      3    4 0.7500000
-## 2            Ohio      3    4 0.7500000
-## 3          Hawaii      4    6 0.6666667
-## 4       Louisiana      6    9 0.6666667
-## 5           Idaho      3    5 0.6000000
-## 6           Maine      3    5 0.6000000
-## 7         Alabama      4    7 0.5714286
-## 8         Arizona      4    7 0.5714286
-## 9         Georgia      4    7 0.5714286
-## 10        Indiana      4    7 0.5714286
-## 11         Alaska      3    6 0.5000000
-## 12     California      5   10 0.5000000
-## 13       Colorado      4    8 0.5000000
-## 14       Delaware      4    8 0.5000000
-## 15       Illinois      4    8 0.5000000
-## 16       Missouri      4    8 0.5000000
-## 17         Nevada      3    6 0.5000000
-## 18       Oklahoma      4    8 0.5000000
-## 19         Oregon      3    6 0.5000000
-## 20           Utah      2    4 0.5000000
-## 21       Virginia      4    8 0.5000000
-## 22      Minnesota      4    9 0.4444444
-## 23      Tennessee      4    9 0.4444444
-## 24        Florida      3    7 0.4285714
-## 25        Montana      3    7 0.4285714
-## 26 South Carolina      6   14 0.4285714
-## 27   South Dakota      5   12 0.4166667
-## 28     New Mexico      4   10 0.4000000
-## 29          Texas      2    5 0.4000000
-## 30  West Virginia      5   13 0.3846154
-## 31       Arkansas      3    8 0.3750000
-## 32       Michigan      3    8 0.3750000
-## 33       Nebraska      3    8 0.3750000
-## 34    Connecticut      4   11 0.3636364
-## 35    Mississippi      4   11 0.3636364
-## 36 North Carolina      5   14 0.3571429
-## 37         Kansas      2    6 0.3333333
-## 38   North Dakota      4   12 0.3333333
-## 39   Pennsylvania      4   12 0.3333333
-## 40   Rhode Island      4   12 0.3333333
-## 41      Wisconsin      3    9 0.3333333
-## 42  Massachusetts      4   13 0.3076923
-## 43  New Hampshire      4   13 0.3076923
-## 44     New Jersey      3   10 0.3000000
-## 45     Washington      3   10 0.3000000
-## 46        Vermont      2    7 0.2857143
-## 47        Wyoming      2    7 0.2857143
-## 48       Kentucky      2    8 0.2500000
-## 49       Maryland      2    8 0.2500000
-## 50       New York      2    8 0.2500000</code></pre>
-<pre class="r"><code>(str_count(str_to_lower(states), &quot;[aeiou]&quot;) / str_length(states))</code></pre>
-<pre><code>## Warning in stri_trans_tolower(string, locale = locale): argument is not an
-## atomic vector; coercing</code></pre>
-<pre><code>## Warning in stri_length(string): argument is not an atomic vector; coercing</code></pre>
-<pre><code>## [1] 0.2836538</code></pre>
+<p>Using the <code>dplyr</code> package along with <code>stringr</code>
+functions introduced in this lab, create a column that <em>counts</em>
+how many vowels are included in each state name, and then provide a
+ratio of the number of vowels to the number of total letters in each
+state name. Arrange the data set so that states with the highest ratio
+of vowels to letters are on top. Hint: don’t forget to deal with
+uppercase/lowercase letters</p>
+</div>
+<div id="quantifiers" class="section level3">
+<h3>Quantifiers</h3>
+<p>Quantifiers are special characters in regular expressions that allow
+us to quantify patterns in particular ways. In all cases, quantifiers
+modify the pattern that immediately precedes them. The first of these we
+will look at is <code>&quot;*&quot;</code>, which indicates “zero or more”
+matches. Here, we use it to find strings that contain the character “a”
+followed by zero or more “p”</p>
+<pre class="r"><code>s &lt;- c(&quot;Apple&quot;, &quot;Pineapple&quot;, &quot;Pear&quot;, &quot;Orange&quot;, &quot;Peach&quot;, &quot;Banana&quot;)
+str_subset(s, &quot;ap*&quot;)</code></pre>
+<pre><code>## [1] &quot;Pineapple&quot; &quot;Pear&quot;      &quot;Orange&quot;    &quot;Peach&quot;     &quot;Banana&quot;</code></pre>
+<p>This seems a little silly, but its utility becomes more apparent in
+the following example</p>
+<pre class="r"><code>s &lt;- c(&quot;xz&quot;, &quot;xyz&quot;, &quot;xyyz&quot;, &quot;xyyyz&quot;, &quot;xyyyyz&quot;)
+
+# We want everything that starts with &quot;x&quot;, may or may not have &quot;y&quot;, ends with &quot;z&quot;
+str_detect(s, &quot;xy*z&quot;)</code></pre>
+<pre><code>## [1] TRUE TRUE TRUE TRUE TRUE</code></pre>
+<p>Quantifiers also allow us to further define patterns. For this next
+example, we will use <code>str_count</code> to count the number of
+vowels in a string</p>
+<pre class="r"><code>s &lt;- &quot;iowa&quot;
+str_count(s, &quot;[aeiou]&quot;)</code></pre>
+<pre><code>## [1] 3</code></pre>
+<pre class="r"><code>str_view(s, &quot;[aeiou]&quot;)</code></pre>
+<pre><code>## [1] │ &lt;i&gt;&lt;o&gt;w&lt;a&gt;</code></pre>
+<p>However, we may be interested in knowing how many instances of
+subsequent vowels there are. In this case, we have “io” and “a”. We can
+specify that the pattern we are looking for will include one or more of
+something with “+”</p>
+<pre class="r"><code>s &lt;- &quot;iowa&quot;
+# Counts subsequent vowels as a single instance
+str_count(s, &quot;[aeiou]+&quot;)</code></pre>
+<pre><code>## [1] 2</code></pre>
+<pre class="r"><code>str_view(s, &quot;[aeiou]+&quot;)</code></pre>
+<pre><code>## [1] │ &lt;io&gt;w&lt;a&gt;</code></pre>
+<p>We can be more precise with our quantifiers using curly braces,
+<code>&quot;{}&quot;</code> to indicate exactly what quantity constitutes a
+pattern. For example, suppose we want to know how many instances of
+<em>exactly</em> two vowels occur in a string:</p>
+<pre class="r"><code>s &lt;- &quot;iowa&quot;
+str_count(s, &quot;[aeiou]{2}&quot;)</code></pre>
+<pre><code>## [1] 1</code></pre>
+<pre class="r"><code>str_view(s, &quot;[aeiou]{2}&quot;)</code></pre>
+<pre><code>## [1] │ &lt;io&gt;wa</code></pre>
+<p>Of course, as with other regular expressions, we must be very precise
+in what we are asking, for as we ask, thus we shall receive.</p>
+<p><strong>Question 6</strong> Consider the following character vector
+and the <code>str_subset</code> function that is intending to return all
+of the strings with exactly 2 digits. What does it actually return? Why
+do you think this is? Use <code>str_view</code> to see what patterns are
+being matched</p>
+<pre class="r"><code>s &lt;- c(&quot;1one&quot;, &quot;22two&quot;, &quot;333three&quot;, &quot;4444four&quot;)
+
+# Find
+str_subset(s, pattern = &quot;\\d{2}&quot;)</code></pre>
+<pre><code>## [1] &quot;22two&quot;    &quot;333three&quot; &quot;4444four&quot;</code></pre>
+<p>Now modify the regular expression so that in only pulls out
+<code>&quot;22two&quot;</code>. Hint: what is in front of the digits and what is
+behind them? What regular expressions can you combine to get what you
+want?</p>
 </div>
 </div>
 </div>

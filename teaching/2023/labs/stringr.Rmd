@@ -11,7 +11,7 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
 # Preamble
@@ -26,7 +26,7 @@ library(dplyr)
 
 ## Strings
 
-What is a string? Mostly simply, it's a sequence of characters in `R` enclosed between single or double quotes. It's analogous to a number (or numeric) in that a string, however long, is a single element in `R`. Also like numbers, multiple strings can be collected together to make a vector
+What is a string? Mostly simply, a string is a sequence of characters in `R` enclosed between single or double quotes. It's analogous to a number (or numeric) in that a string, however long, is a single element in `R`. Also like numbers, multiple strings can be collected together to make a vector
 
 ```{r}
 # This is a string
@@ -95,7 +95,7 @@ str_sub(y, start = -7, end = -3)
 
 We discussed [coercian](https://collinn.github.io/teaching/2023/labs/intro2.html#Miscellaneous) briefly in the second lab, but it is worth reviewing briefly here as this is a very common problem in data analysis.
 
-Vectors in `R` are all expected to be of the same type: logicals, numerics, characters, etc.,. In the case of a mixed type, `R` *coerces* all of the elements to be the same. There is a hierarchy in coercion in that all logicals can be represented by numerics, and all numerics can be represented as characters.
+Vectors in `R` are all expected to be of the same type: logicals, numerics, characters, etc.,. In the case of a mixed type, `R` *coerces* all of the elements to be the same. There is a hierarchy in coercion in that all logicals can be represented by numerics, and all numerics can be represented as characters, etc.,.
 
 ```{r}
 x <- c(1, 2, 3)
@@ -155,7 +155,7 @@ To that end, here are some of the more common functions we will be using, though
 Function | Description
 --------|---------------------------------------------------------
 `str_sub()` | Extract substring from a given start to end position
-`str_replace()`
+`str_replace()` |
 `str_detect()` |Detect presence/absence of first occurrence of substring 
 `str_locate()` | Give position (start, end) of first occurrence of substring
 `str_locate_all()`|Give positions of all occurrences of a substring 
@@ -180,7 +180,7 @@ str_sub(x, 1, 3) <- "statistics"
 x
 ```
 
-Using `str_sub` is a bit awkward, however, as it requires positional indices. More commonly, there is the `str_replace` function, which takes the two arguments we mentioned above, string and pattern. In this case, `string` is the string we are manipulating and `pattern` indicates what we wish to replace. Finally, there is a `replacement` argument which we use to replace `pattern`
+Using `str_sub` is a bit awkward, however, as it requires positional indices. More commonly, there is the `str_replace` function which takes the two arguments we mentioned above, string and pattern. In this case, `string` is the string we are manipulating and `pattern` indicates what we wish to replace. Finally, there is a `replacement` argument which we use to replace `pattern`
 
 ```{r}
 x <- "sta320"
@@ -251,6 +251,13 @@ str_squish(x)
 ```
 
 
+**Question 1** Using the functions we have learned so far, modify the string below to produce the string `"United_States"`
+
+```{r}
+s <- c("  UNITED  STATES  ")
+```
+
+
 ### Joining and splitting
 
 Next we have joining and splitting which, as the heading suggests, involves joining or splitting strings together. Joining strings is especially useful when we want to present summary information based on statistics that have yet to be computed. `str_c` takes a comma separated collection of values which it will then paste together to form a single string
@@ -282,7 +289,6 @@ This one is a bit strange in that it returns a `list` object instead of a charac
 s <- c("oneword", "two.words", "this.has.three")
 str_split(s, "\\.")
 ```
-
 
 
 
@@ -336,9 +342,10 @@ str_count(x, "s")
 
 ## Regular Expressions
 
+Up until this point, the `stringr` functions we have introduced may seem a bit limited in their usefulness. However, each of the above examples is intended to provide an unambiguous illustration of how each of these functions work. In this current section, we combine our `stringr` functions with patterns produced by *regular expressions*, infinitely expanding their utility.
+
 Regular expressions (regex) are an incredibly powerful tool for specifying patterns in a text; a short collection of examples is provided on the second page of the [cheatsheet](https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_strings.pdf), which you will want to reference frequently for the remaining portion of this lab.
 
-We will focus here on XX topics, meta-characters, expressions, and quantifiers.
 
 ### View
 
@@ -368,6 +375,24 @@ str_count(x, "\\.")
 
 We won't list out all of the  meta-characters here. Instead, understand that in the next sections we will introduce a number of expressions that use special characters. To use those characters literally, we will need to escape them in strings.
 
+**Question 2** Return to the dataset we introduced at the beginning of the lab
+
+```{r}
+dat <- read.csv("https://remiller1450.github.io/data/char_dom.csv")
+dat
+```
+
+Using the tools we have introduced thus far, correct this dataset so that the missing values in `messy_x` are recorded as `NA` and the annotated values in `messy_y` are modified so that it can be correctly converted to numeric.
+
+```{r, eval = FALSE, echo = FALSE}
+dat$messy_x <- as.numeric(dat$messy_x)
+s <- dat$messy_y
+s <- str_replace(s, "\\*", "") %>% as.numeric()
+dat$messy_y <- s
+dat
+```
+
+
 ### Anchoring
 
 Anchoring simply means that we wish to indicate the start or the end of the string. For example, if instead of finding *all* instances in which a string contains the letter "a" we want to find those that *start* with the letter "a", we can "anchor" our expression with `"^"` which indicates the beginning of a string
@@ -394,7 +419,7 @@ str_subset(s, "\\^")
 ```
 
 
-**Question XX** Use `str_extract` to extract the first letter of each string in this vector. Then combine those letters with `str_c` to create a single character string
+**Question 3** Use `str_extract` to extract the first letter of each string in this vector. Then combine those letters with `str_c` to create a single character string
 
 ```{r}
 s <- c("howdy", "otter", "tragedy", "danger", "octopus", "grapes")
@@ -408,10 +433,20 @@ str_extract(s, "^.") %>% str_c(collapse = "")
 
 ### Regular Expressions
 
-While regular expressions does refer to this entire process itself, there are also sets of patterns that we refer to as regular expressions. A pretty decent list is included on the cheat sheet. Some immediately useful ones are `"\d"` and `"\b"` which refer to digits and word boundaries, respectively. Regular expressions can be combined in powerful ways:
+While regular expressions does refer to this entire process itself, there are also sets of patterns that we refer to as regular expressions. A pretty decent list is included on the cheat sheet. Here, we will finally introduce the period we have seen so frequently in it's natural environment. In a regular expression, `.` simply means any character.
 
 ```{r}
-s <- c("some words no numbers", "see you 2nite", "you are l8")
+s <- c("X25YW", "X91YW", "R30WY", "X11YW")
+
+# We want all X, followed by 2 of any character, then YW
+str_subset(s, "X..YW")
+```
+
+
+Some other immediately useful ones are `"\d"` and `"\b"` which refer to digits and word boundaries, respectively. Regular expressions can be combined in powerful ways:
+
+```{r}
+s <- c("some words no numbers", "see you 2nite", "you are L8")
 
 # Find strings that have digits that start of a word
 str_subset(s, "\\b\\d")
@@ -420,18 +455,78 @@ str_subset(s, "\\b\\d")
 str_subset(s, "\\d\\b")
 ```
 
-Other common ones includes `"[:alpha:]"`, `"[:punct:]"`, `"[:lower:]"`, etc., . This is useful, for 
+Other common ones includes `"[:alpha:]"`, `"[:punct:]"`, `"[:lower:]"`, etc., . This is especially useful with punctuation when you don't want to escape a bunch of characters (though, see the cheat sheet as not all punctuation falls under `"[:punct:]`)
 
 ```{r}
-s <- c("$(@!")
+s <- c("dogs$(@!", "^&*are", ";[co(]!ol")
+# This removes "punctuation"
+s <- str_replace_all(s, pattern = "[:punct:]", "")
+s
+# This removes "symbols"
+s <- str_replace_all(s, pattern = "[:symbol:]", "")
+s
+```
+
+**Question 4** A common problem in data processing involves the inclusion of "free response" questions in which respondents are able to enter data without restriction. In the following string, respondents were asked to give their phone numbers, but no standardization was enforced when doing so:
+
+```{r}
+phone_strings <- c("Home: (507)-645-5489", 
+                   "Cell: 219.917.9871", 
+                   "My work phone is 507-202-2332",
+                   "I don't have a phone")
+```
+
+Using functions from this lab, *extract* the phone numbers from the character vector and modify the strings so that all of the numbers are of the form `XXX-XXX-XXXX`. If a number is not included, it can be left as an empty string (`""`). Hint: A pattern like `"\\d{3}[-.]"` will identify any three digits followed by a hyphen or period. Regular expressions can be compounded. `str_replace` can get rid of pesky things we don't need.
+
+
+### Alternates 
+
+Sometimes we want to express patterns as a collection of possible matches, alternatives, or even exclude patterns. The most common of these is the square brackets, `[]` which indicate that we would like to match any one of the the patterns in brackets.
+
+```{r}
+s <- c("a1", "b2", "c3", "d4")
+
+# Only match those with 1 or 3
+str_subset(s, pattern = "[13]")
+```
+
+Using `"^"` combined with square brackets, we can also request anything *but* the patterns in brackets. We need to be careful, though, because this may match match other patterns in a string, returning results that you do not intend. Here, we might expect that "a1" and "c3" are not included, but since both "a" and "c" are not 1 or 3, the pattern still flags
+
+```{r}
+s <- c("a1", "b2", "c3", "d4")
+
+# Anything BUT 1 or 3
+str_subset(s, pattern = "[^13]")
+str_view(s, pattern = "[^13]")
+```
+
+By playing around a bit, we can modify expressions to get what we want
+
+```{r}
+s <- c("a1", "b2", "c3", "d4")
+
+# Does not END in 1 or 3
+str_subset(s, pattern = "[^13]$")
 ```
 
 
-### Anchoring
+```{r}
+s <- c("dog^cat", "dogacat")
+str_detect(s, "[d^c]")
+```
 
-### Regex
+
+**Question 5** The following code chunk takes the rownames from the `USArrests` dataset and uses them to create a data.frame with a single column containing all of the US states
 
 ```{r}
+states <- data.frame(states = rownames(USArrests))
+head(states)
+```
+
+Using the `dplyr` package along with `stringr` functions introduced in this lab, create a column that *counts* how many vowels are included in each state name, and then provide a ratio of the number of vowels to the number of total letters in each state name. Arrange the data set so that states with the highest ratio of vowels to letters are on top. Hint: don't forget to deal with uppercase/lowercase letters
+
+
+```{r, eval = FALSE, echo=FALSE}
 # Which state has most vowels? which has highest ratio of vowels? lowest?
 states <- data.frame(states = rownames(USArrests))
 head(states)
@@ -445,4 +540,68 @@ states %>% mutate(nvowel = str_count(str_to_lower(states), "[aeiou]"),
 
 (str_count(str_to_lower(states), "[aeiou]") / str_length(states))
 ```
+
+
+### Quantifiers
+
+Quantifiers are special characters in regular expressions that allow us to quantify patterns in particular ways. In all cases, quantifiers modify the pattern that immediately precedes them. The first of these we will look at is `"*"`, which indicates "zero or more" matches. Here, we use it to find strings that contain the character "a" followed by zero or more "p"
+
+```{r}
+s <- c("Apple", "Pineapple", "Pear", "Orange", "Peach", "Banana")
+str_subset(s, "ap*")
+```
+
+This seems a little silly, but its utility becomes more apparent in the following example
+
+```{r}
+s <- c("xz", "xyz", "xyyz", "xyyyz", "xyyyyz")
+
+# We want everything that starts with "x", may or may not have "y", ends with "z"
+str_detect(s, "xy*z")
+```
+
+Quantifiers also allow us to further define patterns. For this next example, we will use `str_count` to count the number of vowels in a string
+
+```{r}
+s <- "iowa"
+str_count(s, "[aeiou]")
+str_view(s, "[aeiou]")
+```
+
+However, we may be interested in knowing how many instances of subsequent vowels there are. In this case, we have "io" and "a". We can specify that the pattern we are looking for will include one or more of something with "+"
+
+```{r}
+s <- "iowa"
+# Counts subsequent vowels as a single instance
+str_count(s, "[aeiou]+")
+str_view(s, "[aeiou]+")
+```
+
+We can be more precise with our quantifiers using curly braces, `"{}"` to indicate exactly what quantity constitutes a pattern. For example, suppose we want to know how many instances of *exactly* two vowels occur in a string:
+
+```{r}
+s <- "iowa"
+str_count(s, "[aeiou]{2}")
+str_view(s, "[aeiou]{2}")
+```
+
+Of course, as with other regular expressions, we must be very precise in what we are asking, for as we ask, thus we shall receive.
+
+**Question 6** Consider the following character vector and the `str_subset` function that is intending to return all of the strings with exactly 2 digits. What does it actually return? Why do you think this is? Use `str_view` to see what patterns are being matched
+
+```{r}
+s <- c("1one", "22two", "333three", "4444four")
+
+# Find
+str_subset(s, pattern = "\\d{2}")
+```
+
+Now modify the regular expression so that in only pulls out `"22two"`. Hint: what is in front of the digits and what is behind them? What regular expressions can you combine to get what you want?
+
+```{r, echo = FALSE, eval = FALSE}
+str_subset(s, pattern = "^\\d{2}[:alpha:]")
+```
+
+
+
 
