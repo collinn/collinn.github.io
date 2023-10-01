@@ -160,6 +160,7 @@ df <- data.frame(x = 1:5,
                  y = 6:10, 
                  z = 11:15)
 
+# Creates an empty numberic vector
 results <- numeric(length = ncol(df))
 
 for (i in 1:ncol(df)) {
@@ -243,7 +244,7 @@ x <- c(1, 2, 3, 4, 5)
 x <- c(5, 8, 10, 12)
 x <- c(2, 5, 9, 10, 1, 1, 1)
 
-long_square(x)
+#long_square(x)
 ```
 
 ```{r}
