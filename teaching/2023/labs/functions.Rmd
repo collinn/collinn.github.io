@@ -274,9 +274,13 @@ top_table(college$State, n = 10, top = FALSE)
 
 ## Files
 
+```{r, echo = FALSE}
+setwd("fundir/")
+```
 
-TBD
+Although much of the work we have done so far has involved reading data into our R session and manipulating in the environment here, we often are working with our computer in more intimate ways. In order to do this efficiently, it's important that we have a good mental layout of how computers are typically organized. As we will see much of the language around computer organization is structured around the "desk" metaphor. We have files, folders, a desktop, etc., 
 
+First, we have the concept of *files* (which are surprisingly tricky to define) which we think of as being containers for data. Files are typically made up of three parts: the name of a file, the file extension, and the contents or data in the file. So, for example, you have have `homework1.Rmd`, a file named "homework1" with an ".Rmd" extension, telling the computer that this file is formatted to be used with R Markdown. Finally, we have the text contents of the file containing your solutions. Once we knit this Rmd document, we end up with `homework1.html`, which shares the same *name* as `homework1.Rmd`, but now with the file extension ".html" indicating that is is meant to be opened with a web browser. Finally, we have the contents of `homework1.html` which contain the markup language necessary to create those knitted documents we all know and love.
 
 
 
