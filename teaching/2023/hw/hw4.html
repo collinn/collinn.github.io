@@ -371,7 +371,9 @@ below). This file contains 5000 tweets downloaded from Twitter on July
 ## characters and use them to define each element of the object it returns
 tweets &lt;- scan(&quot;https://raw.githubusercontent.com/ds4stats/case-studies/master/twitter-sentiment/Ghostbusters.txt&quot;, what = &quot;&quot;)</code></pre>
 <p>Rather than a traditional data set, <code>data</code> here represents
-a 5000 length character vector.</p>
+a 5000 length character vector which will be used for the problems
+related to question 1. To reduce the risk of traumatic brain injury, it
+is advised that you refrain from reading any of the tweets directly.</p>
 <div id="part-a" class="section level3">
 <h3>Part A</h3>
 <p>For Part A, use the <code>stringr</code> package, write code to clean
@@ -401,6 +403,46 @@ to <code>1</code>).</p>
 “hate” or “hated” (of any capitalization) appear, and the number of
 tweets where “love”, “loved”, or “looved” or “loooooved” (i.e., all
 variants with any number of “o”s or other capitalization) appear.</p>
+</div>
+<div id="part-d" class="section level3">
+<h3>Part D</h3>
+<p>When an individual embeds an image in their tweet, retweets, or links
+to another webpage, the resulting object is rendered in the text as
+<code>&quot;https://t.co/&quot;</code> followed by a string of additional
+characters identifying the original tweet, image, or link which we will
+call the identifier. For example, the first tweet in the
+<code>tweets</code> data is a retweet which references the original as
+<code>&quot;https://t.co/mgkk9E7CKR&quot;</code>. Here, the identifier is
+<code>&quot;mgkk9E7CKR&quot;</code>. In this problem, we are going to do an
+informal analysis to see if the assignment of these digits appears to be
+random. More specifically, we are going to see if letters and numbers
+occur at the same rate.</p>
+<p>To do this, we are going to begin by considering all of the
+identifiers that appear in the dataset. Then, across all of the
+identifiers, we should determine the total frequency of numeric and
+alphabetical values To determine the <em>rate</em> at which these
+appear, we should then divide the total frequency by the <em>number of
+total possible values</em>. For example, there are the numeric digits
+0-9, so we should divide the total number of numerics by 10. The
+resulting value will give us the average frequency of each number.
+Having done this, we should do the same thing for alphabetical
+values.</p>
+<ol style="list-style-type: decimal">
+<li>Does the rate at which numbers appear seem similar to the rate the
+alphabetical values appear?</li>
+<li>Does the rate seem the same between upper and lower case
+letters?</li>
+<li>What should be the rate across all alphanumeric values? How does the
+rate of numbers, upper and lower case letters compare?</li>
+<li>(Bonus) See if you can create a barchart demonstrating the frequency
+of appearance for each of the numeric digits. Does anything seem
+over-represented?</li>
+</ol>
+<p>Hint: Using <code>str_extract_all()</code> will return a list. We can
+turn this back to a vector using <code>unlist()</code>. This would look
+something like</p>
+<pre class="r"><code>## This will return a character vector of values
+ll &lt;- str_extract_all(...) %&gt;% unlist()</code></pre>
 <p><span class="math inline">\(~\)</span></p>
 </div>
 </div>

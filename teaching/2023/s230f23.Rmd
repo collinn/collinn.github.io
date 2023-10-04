@@ -64,8 +64,14 @@ Sta-230 uses a *workshop style* class format. This means that the majority of ou
 - Modeling a categorical outcome
     - Lab 17 (modeling a categorical outcome), Lab 18 (decision tree models)
     
-### Course Summary
+### Misc Announcements
 
+Math and Stats concentration welcome session, 2nd year students only, Thursday Oct 5 11AM - 12PM in Math Commons area (Noyce 2520). Faculty and SPEC members will be present. Ice cream and popsicles.
+    
+### Course Summary and Cheatsheets
+
+[ggplot2 Cheatsheet](https://www.maths.usyd.edu.au/u/UG/SM/STAT3022/r/current/Misc/data-visualization-2.1.pdf)
+[stringr Cheatsheet](https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_strings.pdf)
 [Summary](courseSummary.html)
 
 
@@ -161,8 +167,8 @@ The following readings are *recommended* in conjunction with the block of materi
     - [Ch 4 (Data wrangling) - Modern Data Science with R](https://mdsr-book.github.io/mdsr2e/ch-dataI.html)
     - [Ch 5 (Joins) - Modern Data Science with R](https://mdsr-book.github.io/mdsr2e/ch-join.html)
     - [Ch 13 (Relational data) - R for Data Science](https://r4ds.had.co.nz/relational-data.html)
-<!-- - Working with strings -->
-<!--     - [Ch 14 (Strings) - R for Data Science](https://r4ds.had.co.nz/strings.html) -->
+- Working with strings
+    - [Ch 14 (Strings) - R for Data Science](https://r4ds.had.co.nz/strings.html)
 <!-- - Interactive Data Visualizations -->
 <!--     - [Ch 2.1 (Intro Plotly) - Interactive web-based data visualization with R, plotly, and shiny](https://plotly-r.com/overview.html#intro-plotly) -->
 <!--     - [Ch 17 (Maps and Geospatial data) - Modern Data Science with R](https://mdsr-book.github.io/mdsr2e/ch-spatial.html#motivation-whats-so-great-about-geospatial-data) -->
