@@ -66,12 +66,14 @@ Sta-230 uses a *workshop style* class format. This means that the majority of ou
     
 ### Misc Announcements
 
-Math and Stats concentration welcome session, 2nd year students only, Thursday Oct 5 11AM - 12PM in Math Commons area (Noyce 2520). Faculty and SPEC members will be present. Ice cream and popsicles.
+Math and Stats concentration welcome session, 2nd year students only, Thursday Oct 5 11AM - 12PM in Math Commons area (Noyce 2520). Faculty and SEPC members will be present. Ice cream and popsicles.
     
 ### Course Summary and Cheatsheets
 
 [ggplot2 Cheatsheet](https://www.maths.usyd.edu.au/u/UG/SM/STAT3022/r/current/Misc/data-visualization-2.1.pdf)
+
 [stringr Cheatsheet](https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_strings.pdf)
+
 [Summary](courseSummary.html)
 
 
