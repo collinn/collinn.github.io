@@ -51,6 +51,7 @@ Sta-230 uses a *workshop style* class format. This means that the majority of ou
     - [Lab 8 (string processing with `stringr`)](labs/stringr.html)
     - [Lab 9 (functions conditionals and files)](labs/functions.html)
     - [Lab 10 (dates)](labs/dates.html)
+    - Labs due as a single document (MUST BE HTML) by 10/9 at 11:59pm
 - Interactive data visualizations
     - Lab 9 (interactive graphics with `plotly`), Lab 10 (maps with `ggplot` and `leaflet`)
 - R Shiny applications
