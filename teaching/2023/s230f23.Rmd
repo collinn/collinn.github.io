@@ -53,7 +53,9 @@ Sta-230 uses a *workshop style* class format. This means that the majority of ou
     - [Lab 10 (dates)](labs/dates.html)
     - Labs due as a single document (MUST BE HTML) by 10/9 at 11:59pm
 - Interactive data visualizations
-    - Lab 9 (interactive graphics with `plotly`), Lab 10 (maps with `ggplot` and `leaflet`)
+    - [Lab 11 (interactive graphics with `plotly`)](labs/plotly.html)
+    - [Lab 12 (maps with `ggplot`)](labs/ggmaps.html)
+    - Labs due TBD
 - R Shiny applications
     - Lab 11 (intro to `shiny`)
 - Principal component analysis
