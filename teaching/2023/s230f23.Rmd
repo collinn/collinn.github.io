@@ -57,7 +57,9 @@ STA 230 uses a *workshop style* class format. This means that the majority of ou
     - [Lab 12 (maps with `ggplot`)](labs/maps.html)
     - Labs due Wednesday AFTER break, 10/25 at 11:59pm
 - R Shiny applications
-    - Lab XX (intro to `shiny`)
+    - [Lab 13 Shiny UI](labs/shiny_ui.html)
+    - [Lab 14 Shiny Server](labs/shiny_server.html)
+    - [Lab 15 Shiny Style `r emo::ji("sunglasses")`](shiny_style.html)
 - Principal component analysis
     - Lab XX (intro to PCA)
 - Clustering
@@ -75,9 +77,15 @@ Math and Stats concentration welcome session, 2nd year students only, Thursday O
     
 ### Course Summary and Cheatsheets
 
-[ggplot2 Cheatsheet](https://www.maths.usyd.edu.au/u/UG/SM/STAT3022/r/current/Misc/data-visualization-2.1.pdf)
+[`ggplot2` Cheatsheet](https://www.maths.usyd.edu.au/u/UG/SM/STAT3022/r/current/Misc/data-visualization-2.1.pdf)
 
-[stringr Cheatsheet](https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_strings.pdf)
+[`stringr` Cheatsheet](https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_strings.pdf)
+
+[`lubridate` Cheatsheet](https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_lubridate.pdf)
+
+[R Shiny Cheatsheet](https://raw.githubusercontent.com/rstudio/cheatsheets/main/shiny.pdf)
+
+[R Markdown Cheatsheet](https://raw.githubusercontent.com/rstudio/cheatsheets/main/rmarkdown.pdf)
 
 [Summary](courseSummary.html)
 
@@ -117,7 +125,7 @@ Throughout the semester there will be 6-7 homework assignments:
 - [Homework #3](hw/hw3.html)
   - Due date: Monday 9/25 at 11:59pm
 - [Homework #4](hw/hw4.html)
-  - Due date: Friday 10/13 at 11:59pm
+  - Due date: Friday 10/25 at 11:59pm
 <!-- - [Homework #1](s230s23/hw1.html) -->
 <!--     - [.Rmd template file](s230s23/hw1.zip) -->
 <!-- - Due date: Wednesday 2/1 at 11:59pm -->
@@ -143,6 +151,8 @@ Throughout the semester there will be 6-7 homework assignments:
     - No class on Wednesday (9/27) to allow extra time
     - Will offer extra office hours during those times
     - [Practice take-home (from Spring 2023)](https://remiller1450.github.io/s230f23/takehome2.pdf)
+2. R Shiny Presentations (midterm 2)
+    - TBD
 
 <!-- There will be 3 major projects during the semester. Details on each project will be posted no later than 2 weeks before the project's first deadline. -->
 
