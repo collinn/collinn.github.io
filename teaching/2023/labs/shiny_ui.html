@@ -1495,6 +1495,13 @@ introduction to <a href="https://shiny.posit.co/r/gallery/">R Shiny</a>,
 a package that provides a framework for building interactive web
 applications in R without requiring any knowledge of HTML, CSS, or
 JavaScript.</p>
+<p>Additionally, much of this and the following labs “borrow heavily”
+from the <a href="https://mastering-shiny.org/index.html">Mastering
+Shiny</a> text, and in particular Chapters 1-6. I have tried to contain
+the bulk of what we need to get running in the labs that follow, but if
+you’re interested in learning more or if you’re not able to find
+guidance on what you are trying to do through an internet search, this
+would be a decent place to look.</p>
 <div id="lab-workflow" class="section level2">
 <h2>Lab Workflow</h2>
 <p>Because R Shiny requires an active R session to run, it can cause
@@ -1682,21 +1689,25 @@ unquoted variable names rather than character strings for their
 arguments. Addressing this issue (known as <a href="http://adv-r.had.co.nz/Computing-on-the-language.html">non-standard
 evaluation</a>) lies comfortably beyond the scope of this course.
 Regarding <code>dplyr</code> functions, we will simply try and perform
-all of our data manipulations prior to running Shiny. As for
-<code>ggplot</code>, we will introduce two idioms: the first is using
-<code>aes_string()</code> to pass character strings to aesthetics
-instead of names, while the second uses <code>as.formula()</code> in
-conjunction with faceting. I will include examples of both for
-reference. Here, we are asking for two inputs: one to choose a numeric
-variable to plot with displacement, the other with which to facet
-wrap.</p>
+most of our data manipulations prior to running Shiny, though we will
+see in the next lab a few ways around this when data manipulation is a
+critical aspect of the application. As for <code>ggplot</code>, we will
+introduce two idioms: the first is using <code>aes_string()</code> to
+pass character strings to aesthetics instead of names, while the second
+uses <code>as.formula()</code> in conjunction with faceting. I will
+include examples of both for reference. Here, we are asking for two
+inputs: one to choose a numeric variable to plot with displacement, the
+other with which to facet wrap.</p>
 <pre class="r"><code>ui &lt;- fluidPage(
   
-  # Select plotting variable
-  selectInput(inputId = &quot;var&quot;, label = &quot;Select Column:&quot;, choices = c(&quot;cty&quot;, &quot;hwy&quot;)), 
+  # Select plotting variable (we can used a named vector to change name of radio buttons)
+  selectInput(inputId = &quot;var&quot;, label = &quot;Select Column:&quot;, choices = c(&quot;City&quot; = &quot;cty&quot;, 
+                                                                     &quot;Highway&quot; = &quot;hwy&quot;)), 
 
-  # Select facet variable
-  radioButtons(inputId = &quot;facet&quot;, label = &quot;Select Column:&quot;, choices = c(&quot;cyl&quot;, &quot;drv&quot;, &quot;year&quot;)), 
+  # Select facet variable (in addition to named list, we can use choiceNames/choiceValues)
+  radioButtons(inputId = &quot;facet&quot;, label = &quot;Select Column:&quot;, 
+               choiceNames = c(&quot;Cylinder&quot;, &quot;Drive&quot;, &quot;Year&quot;),
+               choiceValues = c(&quot;cyl&quot;, &quot;drv&quot;,&quot;year&quot;)), 
   plotOutput(outputId = &quot;myhist&quot;)
 )
 
