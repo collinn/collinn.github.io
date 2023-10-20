@@ -1487,7 +1487,7 @@ border-radius: 0px;
 <pre class="r"><code>library(shiny)
 library(ggplot2)</code></pre>
 <p>As we introduced in our previous lab, the main components of every
-Shiny app looks like this:</p>
+Shiny app look like this:</p>
 <pre class="r"><code>ui &lt;- fluidPage(
   # user interface
 )
@@ -1501,7 +1501,7 @@ shinyApp(ui, server)</code></pre>
 frontend user interface, this lab will pick up where the previous left
 off. In particular, we are going to take a closer look at reactivity in
 the context of Shiny and paint a clearer illustration of how inputs
-relate to outputs in an interactive environment.</p>
+relate to outputs in an interactive environment</p>
 </div>
 <div id="lab" class="section level1">
 <h1>Lab</h1>
@@ -1648,8 +1648,8 @@ without any sort of explicit warning or errors. Next, we will
 investigate ways in which we can exercise a little bit more control on
 how our server side function responds to reactive objects.</p>
 </div>
-<div id="events" class="section level2">
-<h2>Events</h2>
+<div id="controlling-reactivity" class="section level2">
+<h2>Controlling Reactivity</h2>
 <p>As we have seen several times now, a rendering function will update
 in response to <em>any</em> changes in <em>any</em> of the reactive
 objects contained within their expression. There are primarily two ways
@@ -1753,7 +1753,7 @@ shinyApp(ui, server)</code></pre>
 regenerate. By introducing a reactive object that responds to a
 particular event, we gained more explicit control on the operations of
 the app.</p>
-<p><strong>Question X: </strong> not sure what question to have here</p>
+<p><strong>Question 3: </strong> not sure what question to have here</p>
 <pre class="r"><code>ui &lt;- fluidPage(
   numericInput(&quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100),
   sliderInput(&quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
@@ -1774,9 +1774,8 @@ server &lt;- function(input, output) {
 
 shinyApp(ui, server)</code></pre>
 </div>
-</div>
-<div id="isolate" class="section level2">
-<h2>Isolate</h2>
+<div id="isolate" class="section level3">
+<h3>Isolate</h3>
 <p>In nearly opposite fashion to the use of <code>eventReactive()</code>
 there is the <code>isolate()</code> function which, when wrapped around
 a reactive object, prevents changes from triggering changes in its
@@ -1804,35 +1803,14 @@ shinyApp(ui, server)</code></pre>
 <p>The <code>isolate()</code> function is less commonly used than
 <code>eventReactive()</code>, but it’s a helpful resource to be aware of
 in the event that you need it.</p>
-<!-- `isolate()` also allows us to see some perhaps unexpected behavior in Shiny. In the example that follows, we include an additional `print()` statement inside of the reactive environment containing `input$n`. Even though `isolate(X())` has made it so that our histogram does not update on changes to `input$n`, we would expect that the value of `X()` *does* continue to change. As we'll see, this is not the case. -->
-<!-- Instead, the value will change *only once it is needed*. Run the app below and look at the console: changing the value of `input$n` will not cause `X()` to update. However, changing the value of -->
-<!-- ```{r} -->
-<!-- ui <- fluidPage( -->
-<!--   numericInput("n", label = "Number of obs:", value = 100), -->
-<!--   sliderInput("bins", label = "Number of bins:", min = 2, max = 20, value = 10), -->
-<!--   plotOutput("myhist") -->
-<!-- ) -->
-<!-- server <- function(input, output) { -->
-<!--   X <- reactive({ -->
-<!--     print("cat") -->
-<!--     rnorm(input$n) -->
-<!--   }) -->
-<!--   bins <- reactive(input$bins) -->
-<!--   output$myhist <- renderPlot({ -->
-<!--     X <- isolate(X()) # including print will send value to console -->
-<!--     ggplot() + geom_histogram(aes(x = X), bins = bins()) -->
-<!--   }) -->
-<!-- } -->
-<!-- shinyApp(ui, server) -->
-<!-- ``` -->
-<p><strong>Question 3: </strong> Using the <code>isolate()</code>
+<p><strong>Question 4: </strong> Using the <code>isolate()</code>
 function, rewrite the Shiny app below so that it functions the same
-(updates on <code>input$simluate</code>) but without using
+(updates on <code>input$simluate</code>, not on <code>input$n</code> or
+<code>input$bins</code>) but without using
 <code>eventReactive()</code></p>
 <pre class="r"><code>ui &lt;- fluidPage(
   numericInput(&quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100),
   sliderInput(&quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
-  
   actionButton(&quot;simulate&quot;, label = &quot;Run Simulation&quot;, class = &quot;btn-success&quot;),
   
   plotOutput(&quot;myhist&quot;)
@@ -1849,25 +1827,215 @@ server &lt;- function(input, output) {
 }
 
 shinyApp(ui, server)</code></pre>
-<pre class="r"><code># ui &lt;- fluidPage(
-#   numericInput(&quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100),
-#   sliderInput(&quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
-#   actionButton(&quot;simulate&quot;, label = &quot;Run Simulation&quot;, class = &quot;btn-success&quot;),
-#   plotOutput(&quot;myhist&quot;)
-# )
-# 
-# server &lt;- function(input, output) {
-#   
-#   observeEvent(input$simulate, {
-#     output$myhist &lt;- renderPlot({
-#       X &lt;- isolate(rnorm(input$n)) # hmm
-#       bins &lt;- isolate(input$bins)
-#       ggplot() + geom_histogram(aes(x = X, bins = bins))
-#     })
-#   })
-# }
-# 
-# shinyApp(ui, server)</code></pre>
+</div>
+</div>
+<div id="additional-techniques" class="section level2">
+<h2>Additional Techniques</h2>
+<div id="using-dplyr" class="section level3">
+<h3>Using <code>dplyr</code></h3>
+<p>As mentioned in the previous lab, we run into a potential conflict
+with the fact that most of the <code>input</code> objects are either
+characters or numerics, while up until now <code>dplyr</code> and
+<code>ggplot2</code> both used <em>names</em>. That is, we are used to
+typing</p>
+<pre class="r"><code>mpg %&gt;% group_by(cyl) %&gt;% 
+  filter(cty &gt; 10) %&gt;% 
+  summarize(meanHwy = mean(hwy))</code></pre>
+<p>instead of what we would get using character vectors, which doesn’t
+work:</p>
+<pre class="r"><code>mpg %&gt;% group_by(&quot;cyl&quot;) %&gt;% 
+  filter(&quot;cty&quot; &gt; 10) %&gt;% 
+  summarize(meanHwy = mean(&quot;hwy&quot;))</code></pre>
+<p>Rather than spending any time discussing <em>why</em> this is, or why
+the solution is the way it is (you are more than welcome to come to my
+office to discuss, however), I am simply going to present the solution
+to this problem.</p>
+<p>First, we should understand that “variables” can have two meanings
+when discussing data manipulation in dplyr: first, there are variables
+<em>within</em> the data frame (such as <code>cyl</code>,
+<code>cty</code>, <code>displ</code>) that, for now, we will call
+<em>data variables</em>. Second, we have variables that exist within the
+environment which involves nearly everything that you might create with
+<code>&lt;-</code>. We will call these <em>environment
+variables</em>.</p>
+<p>To get around the issue with using dplyr with strings in Shiny and to
+remove any potential of confusing the app, we will always designate data
+variables with <code>.data.</code> and environment variables with
+<code>.env</code> and then reference the variable name within
+<code>[[]]</code> when using <code>.data</code> and <code>$</code> when
+using <code>.env</code>:</p>
+<pre class="r"><code>var1 &lt;- &quot;cyl&quot;
+var2 &lt;- &quot;cty&quot;
+var3 &lt;- &quot;hwy&quot;
+ten &lt;- 10
+
+mpg %&gt;% group_by(.data[[var1]]) %&gt;% 
+  filter(.data[[var2]] &gt; .env$ten) %&gt;% 
+  summarize(meanHwy = mean(.data[[var3]]))</code></pre>
+<p>Yes, this is cumbersome and weird, but unfortunately it is what it
+is. If its any consolation, the base R solution is not tremendously
+better:</p>
+<pre class="r"><code># base R solution
+mpg2 &lt;- mpg[mpg[[var2]] &gt; ten, ]
+by(mpg2, 
+   mpg2[[var1]], 
+   function(x) mean(x[[var3]])) %&gt;% array2DF()</code></pre>
+<p><strong>Question 5</strong> Complete the logic of this Shiny app so
+that it is dplyr compliant. Note that if an input (say,
+<code>input$cutoff</code>) has multiple values, you can access each one
+as you would a vector, i.e., <code>input$cutoff[1]</code> and
+<code>input$cutoff[2]</code></p>
+<pre class="r"><code>ui &lt;- fluidPage(
+  selectInput(&quot;group&quot;, &quot;Group by: &quot;, c(&quot;year&quot;, &quot;drv&quot;)),
+  selectInput(&quot;filter&quot;, &quot;Filter var: &quot;, c(&quot;cty&quot;, &quot;hwy&quot;)),
+  sliderInput(&quot;cutoff&quot;, &quot;Cutoff for filter:&quot;, min = 9, max = 44, value = c(10, 40)), 
+  DT::DTOutput(&quot;result&quot;)
+)
+
+server &lt;- function(input, output) {
+  
+  dat &lt;- reactive({
+    # Do stuff here
+  })
+  
+  output$result &lt;- renderDT({
+    # Example of how input vector value works, you can delete this
+    data.frame(x = input$cutoff[1], y = input$cutoff[2])
+    
+    #dat() # uncomment when you are done creating dat()
+  })
+}
+
+shinyApp(ui, server)</code></pre>
+</div>
+<div id="reactive-ui" class="section level3">
+<h3>Reactive UI</h3>
+<p>In many cases, the interface that we provide to a user of our app
+will be dependent on various user inputs. For example, if we wish to
+simulate the sampling of a random variable according to a distribution’s
+parameters, the parameters used as input will be dependent on the
+distribution from which we are sampling. The process of creating a
+responsive UI is similar to other server-side operations we have seen
+thus far: there is a <code>uiOutput()</code> function that reserves
+space on the UI side and a <code>renderUI()</code> on the server side.
+We include UI input functions within <code>renderUI()</code> just as we
+would in the UI object.</p>
+<pre class="r"><code>ui &lt;- fluidPage(
+  selectInput(&quot;dist&quot;, &quot;Select distribution&quot;, choices = c(&quot;normal&quot;, &quot;poisson&quot;)),
+  uiOutput(&quot;par1out&quot;), 
+  uiOutput(&quot;par2out&quot;),
+  plotOutput(&quot;plot&quot;)
+)
+
+server &lt;- function(input, output) {
+  
+  output$par1out &lt;- renderUI({
+    # This will create a numericInput based on input$dist
+    if (input$dist == &quot;normal&quot;) {
+      numericInput(inputId = &quot;normalMean&quot;, label = &quot;Mean&quot;, value = 0, min = -3, max = 3)
+    } else if (input$dist == &quot;poisson&quot;) {
+      numericInput(inputId = &quot;lambda&quot;, &quot;Lambda&quot;, value = 1, min = 0.1, max = 5)
+    }
+  })
+  
+  output$par2out &lt;- renderUI({
+    if (input$dist == &quot;normal&quot;) {
+      numericInput(inputId = &quot;normalSD&quot;, label = &quot;Standard Deviation&quot;, value = 1, min = 0.1, max = 5)
+    } else if (input$dist == &quot;poisson&quot;) {
+     # Returning NULL will leave the slot empty
+      NULL 
+    }
+  })
+  
+  dat &lt;- reactive({
+    if (input$dist == &quot;normal&quot;) {
+      X &lt;- rnorm(n = 1000, mean = input$normalMean, sd = input$normalSD)
+    } else {
+      X &lt;- rpois(n = 1000, lambda = input$lambda)
+    }
+    data.frame(x = X)
+  })
+  
+  output$plot &lt;- renderPlot({
+    ggplot(dat(), aes(x)) + geom_freqpoly(binwidth = 1)
+  })
+  
+}
+
+shinyApp(ui, server)</code></pre>
+</div>
+<div id="misc" class="section level3">
+<h3>Misc</h3>
+<p>Finally, we include two relatively simple functions that exist in
+base R that you may find helpful on your journey towards making a really
+cool Shiny app. The first of these, <code>switch()</code>, is a
+generally useful function to know – it takes a single input and,
+depending on it’s value, returns something else:</p>
+<pre class="r"><code>val &lt;- &quot;five&quot;
+
+switch(val, 
+       &quot;five&quot; = 5, # If equal to &quot;five&quot;, return 5
+       &quot;six&quot; = 6, 
+       &quot;seven&quot; = 7, 
+       &quot;I DON&#39;T KNOW&quot;)</code></pre>
+<pre><code>## [1] 5</code></pre>
+<pre class="r"><code>val &lt;- &quot;six&quot;
+
+switch(val, 
+       &quot;five&quot; = 5, 
+       &quot;six&quot; = 6, # If equal to &quot;six&quot; return 6
+       &quot;seven&quot; = 7, 
+       &quot;I DON&#39;T KNOW&quot;)</code></pre>
+<pre><code>## [1] 6</code></pre>
+<pre class="r"><code>val &lt;- &quot;nine&quot;
+
+switch(val, 
+       &quot;five&quot; = 5, 
+       &quot;six&quot; = 6, 
+       &quot;seven&quot; = 7, 
+       &quot;I DON&#39;T KNOW&quot;) # If a match isn&#39;t found, return the last row (default)</code></pre>
+<pre><code>## [1] &quot;I DON&#39;T KNOW&quot;</code></pre>
+<p>The other function you will be far less likely to run into in the
+wild but is incredibly useful with Shiny apps: this function is
+<code>get()</code>. <code>get()</code> takes as an argument a character
+vector and returns any objects in the environment with that name.</p>
+<pre class="r"><code>somevar &lt;- 1991
+get(&quot;somevar&quot;)</code></pre>
+<p>Of course, this works with variables containing strings as well:</p>
+<pre class="r"><code>somevar &lt;- 1991
+string &lt;- &quot;somevar&quot;
+get(string)</code></pre>
+<p>This may come in handy if your Shiny app utilizes multiple
+datasets.</p>
+<pre class="r"><code># Create some data sets named df1 and df2
+N &lt;- 1000
+X &lt;- rnorm(N)
+df1 &lt;- data.frame(x = X, y = -X + rnorm(N, sd = 0.1))
+df2 &lt;- data.frame(x = X, y = 4*X + rnorm(N, sd = 2))
+
+ui &lt;- fluidPage(
+  selectInput(&quot;dataset&quot;, label = &quot;Select dataset&quot;, choices = c(&quot;Data 1&quot;, &quot;Data 2&quot;)), 
+  plotOutput(&quot;plot&quot;)
+)
+
+server &lt;- function(input, output) {
+  
+  dat &lt;- reactive({
+    var &lt;- switch(input$dataset, 
+                  &quot;Data 1&quot; = &quot;df1&quot;, 
+                  &quot;Data 2&quot; = &quot;df2&quot;, 
+                  NULL)
+    get(var)
+  })
+  
+  output$plot &lt;- renderPlot({
+    ggplot(dat(), aes(x, y)) + geom_point()
+  })
+  
+}
+
+shinyApp(ui, server)</code></pre>
+</div>
 </div>
 </div>
 
