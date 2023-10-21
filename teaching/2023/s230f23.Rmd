@@ -60,6 +60,8 @@ STA 230 uses a *workshop style* class format. This means that the majority of ou
     - [Lab 13 Shiny UI](labs/shiny_ui.html)
     - [Lab 14 Shiny Server](labs/shiny_server.html)
     - [Lab 15 Shiny Style `r emo::ji("sunglasses")`](labs/shiny_style.html)
+    - [Resources for Shiny](labs/shiny_reference_page.html)
+    - Labs due 9/3 at 11:59pm
 - Principal component analysis
     - Lab XX (intro to PCA)
 - Clustering

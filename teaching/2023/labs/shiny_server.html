@@ -1501,20 +1501,22 @@ shinyApp(ui, server)</code></pre>
 frontend user interface, this lab will pick up where the previous left
 off. In particular, we are going to take a closer look at reactivity in
 the context of Shiny and paint a clearer illustration of how inputs
-relate to outputs in an interactive environment</p>
+relate to outputs in an interactive environment.</p>
 </div>
 <div id="lab" class="section level1">
 <h1>Lab</h1>
-<p>words</p>
+<p>In this lab we will review again the concept of reactivity, managing
+the relationship between reactive objects and rendering functions, and
+introduce a number of techniques for working with server-side logic.</p>
 <div id="reactivity-again" class="section level2">
 <h2>Reactivity again</h2>
 <p>We ended the previous lab with an illustration of the
 <code>reactive()</code> function which creates a reactive object
-responding to changes in user input. Here, we have created
-<code>n()</code> and <code>bins()</code> responding to
+responding to changes in user input. Here, we have created reactive
+objects <code>n()</code> and <code>bins()</code> responding to
 <code>input$n</code> and <code>input$bin</code>. We illustrate this
-again here with an additional <code>textOutput()</code> that tells us
-the mean and standard deviation of our simulated data.</p>
+again with an additional <code>textOutput()</code> that tells us the
+mean and standard deviation of our simulated data.</p>
 <pre class="r"><code>ui &lt;- fluidPage(
   numericInput(&quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100),
   sliderInput(&quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
@@ -1528,15 +1530,18 @@ server &lt;- function(input, output) {
   n &lt;- reactive(input$n)
   bins &lt;- reactive(input$bins)
   
+  ## It&#39;s also worth noting that the order that we define things in server() doesn&#39;t
+  # matter. Here, we have output$myhist defined before output$summary, even though
+  # summary comes first in the UI. This is true for ALL objects in server()
+  output$myhist &lt;- renderPlot({
+    X &lt;- rnorm(n())
+    ggplot() + geom_histogram(aes(x = X), bins = bins())
+  })
+  
   output$summary &lt;- renderText({
     X &lt;- rnorm(n())
     paste0(&quot;The mean is: &quot;,  round(mean(X), 4), 
            &quot; and the standard deviation is: &quot;, round(sd(X), 4))
-  })
-  
-  output$myhist &lt;- renderPlot({
-    X &lt;- rnorm(n())
-    ggplot() + geom_histogram(aes(x = X), bins = bins())
   })
 }
 
@@ -1544,18 +1549,19 @@ shinyApp(ui, server)</code></pre>
 <p>A critical thing to know about the relationship created between
 rendered and reactive objects is that a render function will respond to
 <em>any</em> changes from <em>any</em> of the reactive objects specified
-within it’s expression (between the <code>{}</code>).</p>
-<p>[Take note of this phrase (“within it’s expression”), as we will be
-using it several times in this lab. The comes from the fact that the
-first argument of any render function is <code>expr</code>, or
-expression (<code>?renderPlot</code>).]</p>
-<p>To illustrate this, run the Shiny app above and set the number of
-observations to 100 and the number of bins to 10. Make careful note of
-the shape of the distribution. Now, use the slider to change the number
-of bins to 11, let plot update, and then change the slider back to 10.
-What do you notice? Is the distribution the same? What about the summary
-information?</p>
-<p>Let’s unpack here what is happening. First, changing the value of
+within it’s expression (between the <code>{}</code>). (Take note of the
+phrase “within it’s expression” as we will be using it several times in
+this lab.)</p>
+<p><strong>Question 1: </strong> To illustrate this reactivity
+relationship, we will do an experiment. Run the Shiny app above and set
+the number of observations to 100 and the number of bins to 10. Make
+careful note of the shape of the distribution. Now, use the slider to
+change the number of bins to 11, wait for the plot to update, then
+change the slider back to 10. What do you notice? Is the distribution in
+the plot the same? What about the summary information? Explain why this
+is going on.</p>
+<hr />
+<p>Let’s unpack the solution to Question 1. First, changing the value of
 <code>input$bins</code> updates the reactive object <code>bins()</code>;
 any rendered objects dependent on the the previous value of
 <code>bins()</code> will be <em>invalidated</em> and Shiny will
@@ -1563,16 +1569,23 @@ determine that they need to be recomputed. In this case, since
 <code>renderPlot()</code> contains <code>bin()</code>, the entire block
 of code within it is rerun, causing the line
 <code>X &lt;- rnorm(n())</code> to be rerun, recomputing the data for
-our histogram.</p>
-<p>Here, we have inadvertently created a dependency between the data
-being plotted and the number of bins in our histogram. Our intention was
-likely that changing the bins would <em>only</em> change the histogram,
-not the underlying data. We need to find a way to divorce the
-relationship between the computation of the data and the creation of the
-histogram. In this particular case, we can solve the problem by moving
-the computing of the data inside of the reactive function associated
-with <code>input$n</code>; now, our underlying data will only change
-along with changes to <code>input$n</code>.</p>
+our histogram. This explains why the underlying data distribution
+changes each time we change the number of bins.</p>
+<p>The way this is currently set up, we have inadvertently created a
+dependency between the data being plotted and the number of bins in our
+histogram. Our intention was likely that changing the bins would
+<em>only</em> change the histogram, not the underlying data. We need to
+find a way to divorce the relationship between the computation of the
+data and the creation of the histogram. We can solve the problem by
+moving the computing of the data inside of the reactive function
+associated with <code>input$n</code>; now, our underlying data will only
+change along with changes to <code>input$n</code>.</p>
+<p>Take note that this solves a second, less obvious problem as well –
+previously, when the data was computed within the
+<code>renderText()</code> and <code>renderPlot()</code> functions, the
+data in the plot and the data in the summary weren’t even the same! This
+sort of logical error is far more insidious as there is nothing directly
+within the app that will warn you of its existence.</p>
 <pre class="r"><code>ui &lt;- fluidPage(
   numericInput(inputId = &quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100),
   sliderInput(inputId = &quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
@@ -1584,10 +1597,10 @@ server &lt;- function(input, output) {
   X &lt;- reactive(rnorm(input$n))
   bins &lt;- reactive(input$bins)
   
+  # Now it&#39;s the same X() here as in renderPlot()
   output$summary &lt;- renderText({
-    X &lt;- rnorm(n())
-    paste0(&quot;The mean is: &quot;,  round(mean(X), 4), 
-           &quot; and the standard deviation is: &quot;, round(sd(X), 4))
+    paste0(&quot;The mean is: &quot;,  round(mean(X()), 4), 
+           &quot; and the standard deviation is: &quot;, round(sd(X()), 4))
   })
   
   output$myhist &lt;- renderPlot({
@@ -1596,12 +1609,6 @@ server &lt;- function(input, output) {
 }
 
 shinyApp(ui, server)</code></pre>
-<hr />
-<p><strong>Question 1: </strong> Run the Shiny plot at the beginning.
-Thinking of how to ask this question. Want to get at the fact that the X
-in summary is different than the X in histogram. not sure if i should
-have them try and remove it or remove it myself and ask for explanation.
-will think on this.</p>
 <hr />
 <p><strong>Question 2: </strong> The shiny code below draws two samples
 from a <a href="https://en.wikipedia.org/wiki/Poisson_distribution">Poisson
@@ -1748,31 +1755,30 @@ server &lt;- function(input, output) {
 }
 
 shinyApp(ui, server)</code></pre>
-<p>Here you’ll notice that changes to either <code>input$n</code> or
+<p>Notice that changes to either <code>input$n</code> or
 <code>input$bins</code> no longer causes the histogram or data to
 regenerate. By introducing a reactive object that responds to a
 particular event, we gained more explicit control on the operations of
 the app.</p>
-<p><strong>Question 3: </strong> not sure what question to have here</p>
-<pre class="r"><code>ui &lt;- fluidPage(
-  numericInput(&quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100),
-  sliderInput(&quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
-  actionButton(&quot;simulate&quot;, label = &quot;Run Simulation&quot;, class = &quot;btn-success&quot;),
-  plotOutput(&quot;myhist&quot;)
-)
-
-server &lt;- function(input, output) {
-
-  observeEvent(input$simulate, {
-    output$myhist &lt;- renderPlot({
-      X &lt;- rnorm(input$n) # hmm
-      bins &lt;- input$bins
-      ggplot() + geom_histogram(aes(x = X), bins = bins)
-    })
-  })
-}
-
-shinyApp(ui, server)</code></pre>
+<!-- **Question 3: ** not sure what question to have here -->
+<!-- ```{r} -->
+<!-- ui <- fluidPage( -->
+<!--   numericInput("n", label = "Number of obs:", value = 100), -->
+<!--   sliderInput("bins", label = "Number of bins:", min = 2, max = 20, value = 10), -->
+<!--   actionButton("simulate", label = "Run Simulation", class = "btn-success"), -->
+<!--   plotOutput("myhist") -->
+<!-- ) -->
+<!-- server <- function(input, output) { -->
+<!--   observeEvent(input$simulate, { -->
+<!--     output$myhist <- renderPlot({ -->
+<!--       X <- rnorm(input$n) # hmm -->
+<!--       bins <- input$bins -->
+<!--       ggplot() + geom_histogram(aes(x = X), bins = bins) -->
+<!--     }) -->
+<!--   }) -->
+<!-- } -->
+<!-- shinyApp(ui, server) -->
+<!-- ``` -->
 </div>
 <div id="isolate" class="section level3">
 <h3>Isolate</h3>
@@ -1803,7 +1809,7 @@ shinyApp(ui, server)</code></pre>
 <p>The <code>isolate()</code> function is less commonly used than
 <code>eventReactive()</code>, but it’s a helpful resource to be aware of
 in the event that you need it.</p>
-<p><strong>Question 4: </strong> Using the <code>isolate()</code>
+<p><strong>Question 3: </strong> Using the <code>isolate()</code>
 function, rewrite the Shiny app below so that it functions the same
 (updates on <code>input$simluate</code>, not on <code>input$n</code> or
 <code>input$bins</code>) but without using
@@ -1880,7 +1886,7 @@ mpg2 &lt;- mpg[mpg[[var2]] &gt; ten, ]
 by(mpg2, 
    mpg2[[var1]], 
    function(x) mean(x[[var3]])) %&gt;% array2DF()</code></pre>
-<p><strong>Question 5</strong> Complete the logic of this Shiny app so
+<p><strong>Question 4</strong> Complete the logic of this Shiny app so
 that it is dplyr compliant. Note that if an input (say,
 <code>input$cutoff</code>) has multiple values, you can access each one
 as you would a vector, i.e., <code>input$cutoff[1]</code> and
