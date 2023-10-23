@@ -1890,7 +1890,7 @@ by(mpg2,
 that it is dplyr compliant. Note that if an input (say,
 <code>input$cutoff</code>) has multiple values, you can access each one
 as you would a vector, i.e., <code>input$cutoff[1]</code> and
-<code>input$cutoff[2]</code></p>
+<code>input$cutoff[2]</code>.</p>
 <pre class="r"><code>ui &lt;- fluidPage(
   selectInput(&quot;group&quot;, &quot;Group by: &quot;, c(&quot;year&quot;, &quot;drv&quot;)),
   selectInput(&quot;filter&quot;, &quot;Filter var: &quot;, c(&quot;cty&quot;, &quot;hwy&quot;)),
@@ -1901,7 +1901,9 @@ as you would a vector, i.e., <code>input$cutoff[1]</code> and
 server &lt;- function(input, output) {
   
   dat &lt;- reactive({
-    # Do stuff here
+    mpg %&gt;% group_by(input$group) %&gt;% 
+      filter(input$filter &gt; input$cutoff[1] &amp; input$filter &lt; input$cutoff[2]) %&gt;% 
+      summarize(meanHwy = mean(hwy))
   })
   
   output$result &lt;- renderDT({
