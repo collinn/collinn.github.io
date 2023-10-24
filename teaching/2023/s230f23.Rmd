@@ -61,7 +61,7 @@ STA 230 uses a *workshop style* class format. This means that the majority of ou
     - [Lab 14 Shiny Server](labs/shiny_server.html)
     - [Lab 15 Shiny Style `r emo::ji("sunglasses")`](labs/shiny_style.html)
     - [Resources for Shiny](labs/shiny_reference_page.html)
-    - Labs due 9/3 at 11:59pm
+    - Labs due 11/3 at 11:59pm
 - Principal component analysis
     - Lab XX (intro to PCA)
 - Clustering
@@ -128,23 +128,7 @@ Throughout the semester there will be 6-7 homework assignments:
   - Due date: Monday 9/25 at 11:59pm
 - [Homework #4](hw/hw4.html)
   - Due date: Friday 10/25 at 11:59pm
-<!-- - [Homework #1](s230s23/hw1.html) -->
-<!--     - [.Rmd template file](s230s23/hw1.zip) -->
-<!-- - Due date: Wednesday 2/1 at 11:59pm -->
-<!-- - [Homework #2](s230s23/hw2.html) -->
-<!--     - Due date: Wednesday 2/15 at 11:59pm -->
-<!-- - [Homework #3](s230s23/hw3.html) -->
-<!--     - Due date: Friday 3/3 at 11:59pm -->
-<!-- - [Homework #4](s230s23/hw4.html) -->
-<!--     - Due date: Monday 4/10 at 11:59pm -->
-<!-- - [Homework #5](s230s23/hw5.html) -->
-<!--     - Due date: Wednesday 4/19 at 11:59pm -->
-<!-- - [Homework #6](s230s23/hw6.html) -->
-<!--     - Due date: Wednesday 5/3 at 11:59pm -->
-<!-- - [Homework #7](s230s23/hw7.html) -->
-<!--     - Due date: Friday 5/12 at 11:59pm -->
-<!-- - *Note*: this assignment focuses on data ethics and involves reading and reflection rather than `R` coding. -->
-        
+
 ### Projects
 
 
@@ -154,7 +138,11 @@ Throughout the semester there will be 6-7 homework assignments:
     - Will offer extra office hours during those times
     - [Practice take-home (from Spring 2023)](https://remiller1450.github.io/s230f23/takehome2.pdf)
 2. R Shiny Presentations (midterm 2)
-    - TBD
+    - Details [here!](projects/rshiny_project.html)
+    - Proposal due 10/27
+    - Data cleaning/visualization sketch due 11/1
+    - Final code, data, and report due 11/10
+    - Don't forget about the [resources page](labs/shiny_reference_page.html)
 
 <!-- There will be 3 major projects during the semester. Details on each project will be posted no later than 2 weeks before the project's first deadline. -->
 
