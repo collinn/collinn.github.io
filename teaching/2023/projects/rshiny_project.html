@@ -362,7 +362,9 @@ in R Shiny to assist your less technically inclined collaborators in
 exploring the data visually.</p>
 <p>Even though this particular project is unpaid, you will still be held
 to the highest of professional standards. Consequently, it is not enough
-that your app <em>works</em>, it should also look really cool.</p>
+that your app <em>works</em>, it should also look really cool. In the
+document that follows, I provide a timeline, an outline of expectations,
+and a rubric that will be used to assess your project.</p>
 </div>
 <div id="timeline" class="section level2">
 <h2>Timeline</h2>
@@ -508,7 +510,8 @@ plot is reactive, it should match what the plot shows</li>
 <ul>
 <li>Should be between 5-7 minutes</li>
 <li>You should include all three components listed in the Presentation
-Expectations section above</li>
+Expectations section above, with most emphasis on the research question
+you are wishing to investigate</li>
 </ul>
 <p><strong>Difficulty</strong> – 20 pts</p>
 <ul>
@@ -534,14 +537,15 @@ though in no particular order.</p>
 <h4>Grade C</h4>
 <p><a href="https://collinn.shinyapps.io/appc/">Example C</a></p>
 <ul>
-<li>Default them on ggplot</li>
+<li>Merging data from different sources to create plot</li>
+<li>Default theme on ggplot</li>
 <li>Labels for plot are the default xy values from dataset</li>
 <li>Once “Create Map” is used once, it no longer does anything. Changing
-the State from the dropdown will immediately update the map</li>
+the State from the drop down will immediately update the map</li>
 <li>You can select “Green” for both high and low values of gradient</li>
-<li>Metric dropdown uses default values from dataset</li>
+<li>Metric drop down uses default values from dataset</li>
 <li>Creates error when Metric == “percasian”</li>
-<li>The choropleth looks “stretched” and unproportional</li>
+<li>The choropleth looks “stretched” and not proportional</li>
 <li>No other tabs or information</li>
 </ul>
 </div>
@@ -549,12 +553,14 @@ the State from the dropdown will immediately update the map</li>
 <h4>Grade B</h4>
 <p><a href="https://collinn.shinyapps.io/appb/">Example B</a></p>
 <ul>
+<li>Merging data from different sources to create plot with additional
+data source for table</li>
 <li>Metric values look better (though High School is written as
 “Highschool”)</li>
 <li>The “Create Map” button works to update state however, changing the
 value of State will change the title of the plot without changing plot
 (error in <code>isolate()</code> most likely)</li>
-<li>The colors for gradient are better – if “Red” is selcted for Color
+<li>The colors for gradient are better – if “Red” is selected for Color
 One, it cannot be selected for Color Two. However, the value for Color
 One changes without prompting if Color Two is changed</li>
 <li>Still an issue with changing state and the title of the plot
@@ -562,13 +568,15 @@ changing</li>
 <li>Adds a table that subsets the college dataset to include only
 colleges located in the state</li>
 <li>Has input that updates based on other input – i.e., Gradient or
-Virids and allow to choose either high/low values or scale</li>
+Viridis and allow to choose either high/low values or scale</li>
 </ul>
 </div>
 <div id="grade-a" class="section level4">
 <h4>Grade A</h4>
 <p><a href="https://collinn.shinyapps.io/appa/">Example A</a></p>
 <ul>
+<li>Many separate data sources combined in interesting ways for
+comprehensive analysis.</li>
 <li>The colors associated with Gradient work as they should – cannot
 select two of the same, they do not update without being explicitly
 changed. This likely took a bit of work and trial/error</li>
@@ -638,9 +646,15 @@ competitions.</p>
 </div>
 <div id="comments" class="section level2">
 <h2>Comments</h2>
-<p>During the next two weeks, I am happy to schedule meetings with
-anyone who would like to discuss in more detail what their options are
-or in planning a good research question.</p>
+<p>During the next two weeks, I am happy to meet with anyone who would
+like to discuss in more detail what their options are, in planning a
+good research question, or for working through parts of your Shiny code.
+If outside of typical office hours, please email me to schedule a time
+so that I can be sure that I have enough time allotted to work through
+whatever it is we need to.</p>
+<p>I will also plan on hosting an informal session in our standard
+classroom on Sunday, Nov 5 from 5-630 to get last minute feedback on
+your projects.</p>
 </div>
 
 
