@@ -1901,9 +1901,9 @@ as you would a vector, i.e., <code>input$cutoff[1]</code> and
 server &lt;- function(input, output) {
   
   dat &lt;- reactive({
-    mpg %&gt;% group_by(input$group) %&gt;% 
-      filter(input$filter &gt; input$cutoff[1] &amp; input$filter &lt; input$cutoff[2]) %&gt;% 
-      summarize(meanHwy = mean(hwy))
+    # filter input$filter by input$cutoff values
+    # group by input$group
+    # summarize to find mean hwy by group
   })
   
   output$result &lt;- renderDT({
