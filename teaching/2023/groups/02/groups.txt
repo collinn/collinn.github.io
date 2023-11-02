@@ -26,3 +26,15 @@ Group 3: Raj and Hyeyun and Rio
 Group 4: Harold and Sean
 Group 5: Ayu and Phuong
 Group 6: Moiz and Huy
+
+Shiny
+
+1: Ayu and Raj
+2: Sam and Sean
+3: Harold
+4: Rio
+5: Hyeyun
+6: Carter and Moiz
+7: Huy and Phuong
+8: Malina
+9: Jackson

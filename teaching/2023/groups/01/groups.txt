@@ -34,3 +34,17 @@ Group 6: Adriane and Duncan
 Group 7: Campbell and Paula
 Group 8: Esther and Dylan
 Group 9: Emily and Syd
+
+Shiny Groups
+
+1: Ella and Candice
+2: Dylan
+3: Peter
+4: Duncan
+5: Brigid and Esther
+6: Paula and Campbell
+7: Taylor
+8: Jules
+9: Adriane
+10: Alexander
+11: Syd
