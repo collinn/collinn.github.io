@@ -143,8 +143,11 @@ Throughout the semester there will be 6-7 homework assignments:
     - Data cleaning/visualization sketch due 11/1
     - Final code, data, and report due 11/10
     - Don't forget about the [resources page](labs/shiny_reference_page.html)
-    - [ZOOM LINK](https://uiowa.zoom.us/j/91220312963?pwd=R2wwQ3k5N0pWZnVjMjZnWWtHNnUrdz09)
+    - [ZOOM LINK](https://uiowa.zoom.us/j/94921676456?pwd=Qld4MjBwSzZNWkxNTWJ1VFlXQ3Y5Zz09)
     - [WEBEX LINK](https://grinnellcollege.webex.com/grinnellcollege-en/j.php?MTID=m2aacef174631ea0fc8f532fabca5a670)
+    - [webex link 2 (try this first)](https://grinnellcollege.webex.com/meet/noltecollin)
+    - [Submission Format Example](data/submission.zip)
+        + Zip file with raw data, clean data, cleaning script and app
 
 <!-- There will be 3 major projects during the semester. Details on each project will be posted no later than 2 weeks before the project's first deadline. -->
 
