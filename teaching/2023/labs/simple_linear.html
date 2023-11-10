@@ -1799,23 +1799,12 @@ y = \alpha + X \beta
 <p>tells us that a unit change in <span class="math inline">\(X\)</span>
 results in a <span class="math inline">\(\beta\)</span> change in <span class="math inline">\(y\)</span>. <em>When the variable <span class="math inline">\(X\)</span> has no linear relationship with out
 outcome <span class="math inline">\(y\)</span>, we expect that <span class="math inline">\(\beta = 0\)</span> and that <span class="math inline">\(\alpha = \overline{y}\)</span>.</em></p>
-<p>While there are a number of ways to calculate the value of <span class="math inline">\(\beta\)</span> using calculus, there is an
-interesting relationship that appears in the formulation. Letting <span class="math inline">\(r = cor(X, y)\)</span>, the linear correlation of
-<span class="math inline">\(X\)</span> and <span class="math inline">\(y\)</span>, we can express the construction of
-<span class="math inline">\(\hat{\beta}\)</span> as</p>
-<p><span class="math display">\[
-\hat{\beta} = r \frac{s_y}{s_x}
-\]</span></p>
-<p>where <span class="math inline">\(s_y\)</span> represents the
-standard deviation in <span class="math inline">\(y\)</span> while <span class="math inline">\(s_x\)</span> represents the standard deviation in
-<span class="math inline">\(X\)</span>.</p>
-<p><strong>Question 2: </strong> It is common in regression to begin by
-<em>scaling</em> our independent variables so that they have a mean
-value of 0 and a standard deviation of 1. Given what we know about the
-construction of <span class="math inline">\(\beta\)</span>, suppose we
-have scaled our <span class="math inline">\(X\)</span> term so that
-<span class="math inline">\(s_x = 1\)</span>. How might we then describe
-the value of <span class="math inline">\(\beta\)</span>?</p>
+<!-- While there are a number of ways to calculate the value of $\beta$ using calculus, there is an interesting relationship that appears in the formulation. Letting $r = cor(X, y)$, the linear correlation of $X$ and $y$, we can express the construction of $\hat{\beta}$ as  -->
+<!-- $$ -->
+<!-- \hat{\beta} = r \frac{s_y}{s_x} -->
+<!-- $$ -->
+<!-- where $s_y$ represents the standard deviation in $y$ while  $s_x$ represents the standard deviation in $X$. -->
+<!-- **Question 2: ** It is common in regression to begin by *scaling* our independent variables so that they have a mean value of 0 and a standard deviation of 1. Given what we know about the construction of $\beta$, suppose we have scaled our $X$ term so that $s_x = 1$. How might we then describe the value of $\beta$? -->
 </div>
 <div id="intercept" class="section level3">
 <h3>Intercept</h3>
@@ -2043,7 +2032,7 @@ determine how much of the variation in <span class="math inline">\(y\)</span> is
 with <span class="math inline">\(X\)</span>. We will investigate this
 more in the next lab where we introduce additional covariates into our
 model.</p>
-<p><strong>Question: </strong> Although this will be discussed in the
+<p><strong>Question 2: </strong> Although this will be discussed in the
 next section, use only your intuition for this question. Suppose that
 you have fit a model with strong evidence for a linear relationship
 between <span class="math inline">\(X\)</span> and <span class="math inline">\(y\)</span>, but with an <span class="math inline">\(R^2 &lt; 0.2\)</span>. Would you feel comfortable
