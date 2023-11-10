@@ -62,14 +62,16 @@ STA 230 uses a *workshop style* class format. This means that the majority of ou
     - [Lab 15 Shiny Style `r emo::ji("sunglasses")`](labs/shiny_style.html)
     - [Resources for Shiny](labs/shiny_reference_page.html)
     - Labs due 11/3 at 11:59pm
+- Regression
+    - [Lab 16 Simple Linear Regression](labs/simple_linear.html)
+    - [Lab 17 Multivariate Regression]()
+    - [Lab 18 Logistic Regression]()
+    - Labs due 11/29 at 11:59pm
 - Principal component analysis
     - Lab XX (intro to PCA)
 - Clustering
     - Lab XX (partitional clustering), Lab XX (hierarchical clustering)
-- Modeling a numeric outcome
-    - Lab XX (modeling a numeric outcome), Lab XX (cross-validation)
-- Modeling a categorical outcome
-    - Lab XX (modeling a categorical outcome), Lab XX (decision tree models)
+
     
 ### Misc Announcements
 
