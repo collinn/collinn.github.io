@@ -64,7 +64,7 @@ STA 230 uses a *workshop style* class format. This means that the majority of ou
     - Labs due 11/3 at 11:59pm
 - Regression
     - [Lab 16 Simple Linear Regression](labs/simple_linear.html)
-    - [Lab 17 Multivariate Regression]()
+    - [Lab 17 Multivariate Regression](labs/multivariate_regression.html)
     - [Lab 18 Logistic Regression]()
     - Labs due 11/29 at 11:59pm
 - Principal component analysis
