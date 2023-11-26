@@ -66,10 +66,12 @@ STA 230 uses a *workshop style* class format. This means that the majority of ou
     - [Lab 16 Simple Linear Regression](labs/simple_linear.html)
     - [Lab 17 Multivariate Regression](labs/multivariate_regression.html)
     - [Lab 18 Logistic Regression](labs/logistic.html)
-    - [Lab 19 Principal Components Analysis (TBD)]()
+    - [Regression Review](labs/regression_review.html)
     - Labs due 12/01 at 11:59pm
-- Clustering
-    - Lab XX (partitional clustering), Lab XX (hierarchical clustering)
+- Misc
+    - [Lab 19 Principal Components Analysis (TBD)]()
+    - [Lab 20 Clustering (TBD)]()
+    - Labs due 12/08 at 11:59pm
 
     
 ### Misc Announcements
@@ -131,7 +133,7 @@ Throughout the semester there will be 6-7 homework assignments:
   - Due date: Monday 9/25 at 11:59pm
 - [Homework #4](hw/hw4.html)
   - Due date: Friday 10/25 at 11:59pm
-- [Homework #5 (incomplete)](hw/hw5.html)
+- [Homework #5](hw/hw5.html)
   - Due date: 12/8 at 11:59
 
 ### Projects

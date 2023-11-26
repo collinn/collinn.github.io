@@ -389,10 +389,11 @@ variable by subtracting out its mean and dividing by its standard
 deviation, the end result being a <em>scaled</em> variable with a mean
 value of 0 and a standard deviation of 1.</p>
 <ul>
-<li>Use <code>mutate()</code> to scale both <code>balance</code> and
-<code>income</code>, naming these variables <code>balance.z</code> and
-<code>income.z</code> (z is used to represent scaled variables).
-Reconstruct the model that was created in part B.</li>
+<li>Use <code>mutate()</code> and <code>scale()</code> to scale both
+<code>balance</code> and <code>income</code>, naming these variables
+<code>balance.z</code> and <code>income.z</code> (z is used to represent
+scaled variables). Reconstruct the model that was created in part
+B.</li>
 <li>Again extract the coefficients and exponentiate them so that the
 values are in terms of odds ratio. Interpret the coefficient for
 <code>balance.z</code>. What does it mean for <code>balance.z</code> to
@@ -445,8 +446,144 @@ residuals on the y-axis</p>
 <code>y ~ x1</code>, then plot <code>x2</code> against the residuals.
 How does this align with what you found in Part B?</p>
 </div>
-<div id="question-3-tbd" class="section level2">
-<h2>Question 3 (TBD)</h2>
+<div id="question-3-simulation-and-r" class="section level2">
+<h2>Question 3 (Simulation and R)</h2>
+<p>For this question, we will be re-examining the impact of sample size
+on variability by assessing the confidence intervals associated with
+parameter estimation. In doing so, we are also going to extend the
+usefulness of our R skills by not simply manipulating data, but by
+simulating it. While we are not introducing anything entirely new, we
+include here a few snippets of code and examples that may prove
+useful.</p>
+<p>First, we can write functions that do not take any arguments, yet
+still return results. In this example, our function uses
+<code>rnorm()</code> to draw two random normal numbers and add them
+together. As this process is random, we get a different result each time
+we run <code>addSim()</code>.</p>
+<pre class="r"><code># Takes no argument but does return a number
+addSim &lt;- function() {
+  x &lt;- rnorm(1)
+  y &lt;- rnorm(1)
+  x + y
+}
+
+addSim()</code></pre>
+<pre><code>## [1] -1.2422</code></pre>
+<pre class="r"><code>addSim()</code></pre>
+<pre><code>## [1] -0.66359</code></pre>
+<p>We can use the <code>replicate()</code> function which takes our
+<code>addSim()</code> as an argument, along with a value
+<code>n = 1000</code>, indicating that we wish to run this particular
+function 1000 times. The results are returned as a vector, and we use
+<code>mean()</code> to find the average sum from our simulation.</p>
+<pre class="r"><code>results &lt;- replicate(n = 1000, addSim())
+mean(results)</code></pre>
+<pre><code>## [1] 0.02356</code></pre>
+<p>Sometimes our simulation returns multiple numbers, in which case
+<code>replicate()</code> returns an object called an array. We can get
+this into a form that we are used to passing the
+<code>simplify = TRUE</code> argument to <code>replicate()</code>.
+Finally, <code>replicate()</code> returns a matrix with each column
+representing one interaction of the function making it very wide. We can
+get it in long format using the transpose (flip rows and columns)
+function, <code>t()</code></p>
+<pre class="r"><code>summarySim &lt;- function() {
+  x &lt;- rnorm(100)
+  c(mean(x), var(x))
+}
+summarySim()</code></pre>
+<pre><code>## [1] -0.031351  0.995095</code></pre>
+<pre class="r"><code>results &lt;- replicate(n = 1000, summarySim(), simplify = TRUE)
+results &lt;- t(results)
+head(results)</code></pre>
+<pre><code>##           [,1]    [,2]
+## [1,]  0.123354 0.98863
+## [2,] -0.157598 1.07245
+## [3,]  0.020331 0.89356
+## [4,]  0.029451 1.04335
+## [5,]  0.090739 1.17278
+## [6,] -0.031153 1.20700</code></pre>
+<p>Finally, there are times in which we may wish to store our results in
+a data frame. One way to do this, using the tools we have discussed in
+class, is to create a data frame with the appropriate number of columns
+and use positional indexing to assign results</p>
+<pre class="r"><code># Create an NA data.frame
+df &lt;- data.frame(x = NA, y = NA)
+
+for (i in 1:3) {
+  # Assign to ith row
+  df[i, ] &lt;- c(i, i+10)
+}
+
+df</code></pre>
+<pre><code>##   x  y
+## 1 1 11
+## 2 2 12
+## 3 3 13</code></pre>
+<hr />
+<p><strong>Part A:</strong> The construction of 95% confidence intervals
+is such that if we were to repeat our experiment with new data, the
+resulting confidence interval should contain the true value 95% of the
+time. We are going to verify this via simulation.</p>
+<p>First create a function that does the following:</p>
+<ol style="list-style-type: decimal">
+<li>Draw 100 random observations for variables <code>x</code> and
+<code>y</code></li>
+<li>Use <code>lm()</code> to fit a linear model with <code>y</code> as
+the outcome. As these values are random and unrelated, the true value of
+<span class="math inline">\(\beta\)</span> is equal to 0</li>
+<li>Use the <code>confint()</code> (<code>?confint</code>) function to
+extract the confidence interval associated with <span class="math inline">\(\beta\)</span> (this corresponds to
+<code>param = 2</code> in the <code>confint</code> arguments)</li>
+<li>Determine if 0 is contained within your confidence interval. Your
+function should return <code>TRUE</code> or <code>FALSE</code></li>
+</ol>
+<p>Then, using <code>replicate()</code>, run this simulation 1000 times.
+What proportion of these simulations contained the true value of 0 in
+their confidence intervals?</p>
+<p><strong>Part B:</strong> Modify the simulation function you wrote in
+Part A so that it now includes an argument <code>N</code> specifying how
+many random numbers to draw before fitting a model. Repeat the
+simulation in Part A, this time for values of N = 10, 50, and 100. Does
+the proportion of simulations containing the true value of 0 change as N
+gets larger?</p>
+<p><strong>Part C:</strong> For Part C, we will again use a simulation
+function taking <code>N</code> as an argument, except this time instead
+of determining if the confidence interval contains zero, we will be
+interested in returning the confidence interval from the simulation
+itself (that is, our simulation will now return 2 numbers). We will be
+running simulations of sample sizes with the following values of N:</p>
+<pre class="r"><code>N &lt;- c(10, 20, 50, 100, 500, 1000)</code></pre>
+<p><em>For each N</em>, we will do the following:</p>
+<ol style="list-style-type: decimal">
+<li>Use <code>replicate(n = 1000, runSim(N), simplify = TRUE)</code> to
+run the simulation 1000 times</li>
+<li>Using the results from <code>replicate()</code>, use
+<code>colMeans()</code> (or <code>rowMeans()</code>) to compute the mean
+upper and lower limits of the 95% confidence interval for that value of
+N.</li>
+</ol>
+<p>Create a data frame using the results from your simulation. Your data
+frame should have one row for each simulation with a column for
+<code>N</code>, as well as columns for the mean values of the upper and
+lower confidence interval. Finally, create a scatter/line plot in ggplot
+with <code>factor(N)</code> (this will help with spacing) on the x-axis,
+the value of the confidence interval on the y-axis, and assign a color
+aesthetic according to whether it is the upper or lower limit.</p>
+<p>Comment on the resulting plot. What do you notice? Does the marginal
+value of adding more observations remain the same as our sample size
+increases?</p>
+<!-- **Part D:** Change level -->
+<!-- ```{r} -->
+<!-- runSim <- function(lvl = 0.9) { -->
+<!--   x <- rnorm(100) -->
+<!--   y <- rnorm(100) -->
+<!--   fit <- lm(y ~ x) -->
+<!--   cc <- confint(fit, 2, level = lvl) -->
+<!--   cc[1] < 0 & cc[2] > 0 -->
+<!-- } -->
+<!-- replicate(1000, runSim(0.9), simplify = TRUE) %>% mean() -->
+<!-- ``` -->
 <!-- With regards to linear models, up until this point we have made inference on model covariates and have explored confidence intervals related to our estimates of the outcome. It would be useful, also, to construct confidence intervals for our model covariates. -->
 <!-- [confidence interval interpretation] -->
 <!-- **Part A:** -->
