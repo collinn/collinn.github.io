@@ -69,7 +69,7 @@ STA 230 uses a *workshop style* class format. This means that the majority of ou
     - [Regression Review](labs/regression_review.html)
     - Labs due 12/01 at 11:59pm
 - Misc
-    - [Lab 19 Principal Components Analysis (TBD)]()
+    - [Lab 19 Principal Components Analysis](labs/pca.html)
     - [Lab 20 Clustering (TBD)]()
     - Labs due 12/08 at 11:59pm
 
