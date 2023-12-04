@@ -157,6 +157,8 @@ Throughout the semester there will be 6-7 homework assignments:
     - [webex link 2 (try this first)](https://grinnellcollege.webex.com/meet/noltecollin)
     - [Submission Format Example](data/submission.zip)
         + Zip file with raw data, clean data, cleaning script and app
+3. [Final Endeavor](final.pdf)
+    - Due Thursday December 14 at 5pm
 
 <!-- There will be 3 major projects during the semester. Details on each project will be posted no later than 2 weeks before the project's first deadline. -->
 
