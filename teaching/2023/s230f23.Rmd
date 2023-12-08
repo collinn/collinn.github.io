@@ -70,11 +70,14 @@ STA 230 uses a *workshop style* class format. This means that the majority of ou
     - Labs due 12/01 at 11:59pm
 - Misc
     - [Lab 19 Principal Components Analysis](labs/pca.html)
-    - [Lab 20 Clustering (TBD)]()
     - Labs due 12/08 at 11:59pm
 
     
 ### Misc Announcements
+
+[Grade Calculator](https://shiny.grinnell.edu/content/6330e78b-9295-4c94-9734-919fc256b8c5)
+
+[End of Semester Evals](https://grinnell.smartevals.com)
 
 11/28 [Statistics Major survey](https://grinnell.co1.qualtrics.com/jfe/form/SV_3w3mfN1l2Z2C4No)
 
