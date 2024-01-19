@@ -1,0 +1,272 @@
+\documentclass{beamer}
+%
+% Choose how your presentation looks.
+%
+% For more themes, color themes and font themes, see:
+% http://deic.uab.es/~iblanes/beamer_gallery/index_by_theme.html
+%
+\mode<presentation>
+{
+  \usetheme{Boadilla}      % or try Darmstadt, Madrid, Warsaw, ...
+  \usecolortheme{beaver} % or try albatross, beaver, crane, ...
+  \usefonttheme{default}  % or try serif, structurebold, ...
+  \setbeamertemplate{navigation symbols}{}
+  \setbeamertemplate{caption}[numbered]
+  
+} 
+
+\usepackage{xcolor,colortbl}
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage{courier}
+\usepackage{dsfont}
+\usepackage{verbatim} 
+\usepackage{tikz}
+\usepackage{multirow}
+\usepackage{venndiagram}
+%\usepackage{xcolor}
+
+\usepackage{enumitem}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
+
+\usetikzlibrary{shapes,decorations,arrows,calc,arrows.meta,fit,positioning}
+\tikzset{
+    -Latex,auto,node distance =1 cm and 1 cm,semithick,
+    state/.style ={ellipse, draw, minimum width = 0.7 cm},
+    point/.style = {circle, draw, inner sep=0.04cm,fill,node contents={}},
+    bidirected/.style={Latex-Latex,dashed},
+    el/.style = {inner sep=2pt, align=left, sloped}
+}
+
+
+
+\setitemize{label=\usebeamerfont*{itemize item}%
+  \usebeamercolor[fg]{itemize item}
+  \usebeamertemplate{itemize item}}
+
+\newcommand{\Mypm}{\mathbin{\tikz [x=1.4ex,y=1.4ex,line width=.1ex] \draw (0.0,0) -- (1.0,0) (0.5,0.08) -- (0.5,0.92) (0.0,0.5) -- (1.0,0.5);}}%
+
+\title[STA-209]{Sampling Distributions}
+\subtitle{}
+\author{Grinnell College}
+\date{January 24, 2024}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Review}
+Last week, we considered randomness and distributions
+
+
+\begin{itemize}
+\item[-] A distribution describes relationship between ``events" and probabilities
+\item[-] Sampling is a \textit{random process}
+\item[-] Central Limit Theorem (CLT) tells us that sample mean follows a normal distribution
+\end{itemize}
+\begin{align*}
+\overline{X} \sim N \left(\mu, \frac{\sigma^2}{n} \right)
+\end{align*}
+Specifically, this tells us that the sampling distribution of $\overline{X}$ has an expected value $E(\overline{X}) = \mu$ and standard deviation $\hat{\sigma} = \sigma/\sqrt{n}$
+\end{frame}
+
+\begin{frame}{The Statistical Framework}
+\begin{center}
+\usetikzlibrary{decorations.pathreplacing,positioning, arrows, shapes, calc,shapes.multipart}
+\tikzstyle{block1} = [rectangle, draw, fill=yellow!20, 
+    text width=10em, text centered, rounded corners, minimum height=6em]
+\tikzstyle{block2} = [rectangle, draw, fill=yellow!20, 
+    text width=5em, text centered, rounded corners, minimum height=3em]
+\tikzset{
+    %Define standard arrow tip
+    >=stealth,
+    % Define arrow style
+    pil/.style={
+           ->,
+           thick,
+           shorten <=2pt,
+           shorten >=2pt,}
+}
+\tikzstyle{line} = [draw, -latex]
+\begin{tikzpicture}[node distance = 3cm, auto]
+            % Place nodes
+            \node [block1] (pop) {Population \\ (Parameter)};
+            \node [block2, below of=pop] (samp) {Sample \\ (Statistic)};
+            
+            % Draw edges
+            \draw[<-, >=latex, shorten >=2pt, shorten <=2pt, bend right=45, thick]  (pop.west) to node[auto, swap] {Inference}(samp.west);
+            \draw[<-, >=latex, shorten >=2pt, shorten <=2pt, bend right=45, thick] (samp.east) to node[auto, swap] {Study Design}(pop.east); 
+            
+        \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+
+
+
+
+\begin{frame}{Samples are Random ($n = 20$)}
+Each random sample will have a different (random) sample mean, $\overline{x}$
+
+\end{frame}
+
+\begin{frame}{Review of Sampling Distribution}
+Recall last time that, as a consequence of the CLT, we made the claim that by only collecting a single sample from a population, we would be able to approximate its distribution and leverage this to make further claims regarding our statistic \newline \vspace{3mm}
+
+Specifically, we noted that our statistic follows a \textit{normal distribution}, centered around the true population mean, with an estimate of variability based on sample size \newline \vspace{3mm}
+
+Our intention here is to construct a suitable interval of values around the sample mean that contains the true mean with some specified probability
+
+\end{frame}
+
+\begin{frame}{Normal Distribution}
+A quick reminder on some properties of the normal distribution
+
+\end{frame}
+
+\begin{frame}{Simulation and Statistics}
+In some sense, accepting that a single sample yielding a single estimate of the mean and standard deviation can follow a particular distribution demands a leap of faith. Let's try and make this leap shorter \\ \vspace{5mm}
+
+To do so, we will approach this same problem from two different ways: through the use of simulation and an application of the CLT (admittedly, also via simulation). Arriving at the same conclusions in each should give us confidence that the methods are equivalent \\ \vspace{5mm}
+
+This is especially handy, considering that only one of them can be used for practical purposes
+\end{frame}
+
+\begin{frame}{Notation}
+We will have some unfortunately overlapping notation, so this slide will serve to be a reference when reviewing
+\begin{itemize}
+  \item[1.] $\mu =$ population mean and $\sigma = $ population s.d.
+  \item[2.] $\overline{x}_i$ will be sample mean from $i$th sample
+  \item[3.] $\hat{\sigma}_{\overline{x}}$ will be the standard devition of 1,000 samples of $\overline{x}_i$
+  \item[4.] $\hat{\sigma}_n$ will be the standard deviation from a single sample of size $n$
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Simulation}
+For our simluation, we will follow these steps \vspace{3mm}
+
+\begin{itemize}
+\item[1.] Start with a population with mean $\mu = 0$ and standard deviation $\sigma^2 = 1$
+\item[2.] We will collect 1,000 samples of size $n = 25$ and for each one,  compute the sample mean $\overline{x}_i$
+\item[3.] We will plot all 1,000 samples of $\overline{x}_i$, creating a histogram, allowing us to visualize the resulting distribution
+\item[4.] We will confirm that the expected value is $E(\overline{X}) = \mu = 1$ and that the standard deviation is $\hat{\sigma}_{\overline{x}} = \sigma/\sqrt{n} = 0.2$
+\item[5.] Finally, we will look at the interval $\overline{x} \pm \hat{\sigma}_{\overline{x}}$ and confirm that it contains about 68\% of the total observations
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Simulation}
+Under CLT, the distribution of $\overline{X}$ should have mean $0$, standard deviation of $0.2$, with 68.2\% of observations between $\overline{X} \pm \hat{\sigma}$
+\begin{columns}
+
+  \begin{column}{0.55\textwidth}
+
+
+  \end{column}
+  \begin{column}{0.45\textwidth}
+    \begin{itemize}
+      \item[-] Average value of sample is $\overline{x} = - 0.00622$
+      \item[-] Standard deviation of sample is $\hat{\sigma}_{\overline{x}} = 0.19104$
+      \item[-] Interval $\overline{x} \pm \hat{\sigma}_{\overline{x}}$ contains 68.9\% of total observations
+
+    \end{itemize}
+  \end{column}
+
+\end{columns}
+
+\end{frame}
+
+
+\begin{frame}{Statistics}
+For our verification with statistics, we will do something slightly different: \vspace{3mm}
+
+\begin{itemize}
+\item[1.] Start with the same population with $\mu = 0$ and $\sigma^2 = 1$
+\item[2.] We will collect 10 samples of size $n = 25$, and for each one, we will compute the sample mean $\overline{X}$ and standard error $\hat{\sigma}$
+\item[3.] For each sample, we will look at the interval $\overline{x} \pm \hat{\sigma}$ and compare it with what we saw in the simulation
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Statistics}
+Here, 60\% of the constructed confidence intervals contain the true population mean, $\mu = 0$
+\begin{center}
+% latex table generated in R 4.1.2 by xtable 1.8-4 package
+% Sun Jan 30 14:43:09 2022
+\begin{table}[ht]  
+\centering
+\begin{tabular}{cccc}
+  \hline
+Sample & $\overline{x}_n$ & $\hat{\sigma}_n$ & $\overline{x}_n \pm \hat{\sigma}_n/\sqrt{n}$ \\ 
+  \hline
+\rowcolor{pink} 1 & 0.28 & 0.96 & (0.09, 0.47) \\ 
+\rowcolor{pink}  2 & 0.52 & 1.04 & (0.31, 0.72) \\ 
+  3 & 0.03 & 1.32 & (-0.24, 0.29) \\ 
+\rowcolor{pink}  4 & -0.55 & 1.05 & (-0.76, -0.34) \\ 
+  5 & 0.13 & 0.75 & (-0.02, 0.28) \\ 
+  6 & -0.06 & 0.94 & (-0.25, 0.12) \\ 
+  7 & 0.01 & 1.1 & (-0.21, 0.23) \\ 
+  8 & -0.13 & 0.98 & (-0.32, 0.07) \\ 
+  9 & -0.09 & 1.36 & (-0.36, 0.19) \\ 
+\rowcolor{pink}  10 & -0.22 & 0.96 & (-0.41, -0.03) \\ 
+   \hline
+Average & -0.008 & 1.04 & (-0.217, 0.201) \\
+\hline
+\end{tabular}
+\end{table}
+\end{center}
+\end{frame}
+
+\begin{frame}{What does this mean?}
+The full simulation portion above allowed us to actually perform iterations of this random process -- by carrying this process out and examining the results, we were able to confirm empirically that the observed distribution was as expected \\ \vspace{3mm}  
+
+The ``statistics`` portion enabled us to really zoom in on ten of the samples collected to see what would happen if, using that sample alone, we made an estimate of mean, along with an interval about that mean \\ \vspace{3mm}
+
+While the individual estimates and intervals themselves showed some variability, \textit{on average}, they agreed with what was found in the full simulation
+\end{frame}
+
+\begin{frame}{Intervals}
+For each of the methods investigated, we concerned ourselves with the construction of the interval $\overline{x} \pm \hat{\sigma}$ which, according to properties of a normal distribution, should contain roughly 68.2\% of the total observations \\ \vspace{3mm}
+
+This bore out in the simulation, with the constructed interval containing 68.9\% of the total simulated sample means \\ \vspace{3mm}
+
+And in the second portion, we nearly found this, with 60\% of the constructed intervals containing the true mean $\mu = 0$. Had we examined more than ten samples, this proportion would have become increasingly closer to 68.2\% \\ \vspace{3mm}
+
+As it turns out, the process behind both of these constructions is identical
+\end{frame}
+
+\begin{frame}{Intervals, cont.}
+Let's limit our attention for now on the ten intervals we constructed, where 60\% of them did not contain the true population mean. This value is known as the \textit{coverage probability} \\ \vspace{5mm}
+
+Critically, the coverage probability is associated with \textit{the random process of generating intervals}, \textbf{not} the probability that a particular interval contains the true parameter value \\ \vspace{3mm}
+
+In other words, a particular interval either does or does not contain the true parameter value. We don't know, and we have no way of knowing for sure. We can only make probablistic statements about the process itself
+
+\end{frame}
+
+
+
+\begin{frame}{Review}
+\begin{itemize}
+  \item[1.] Sampling distribution as random process
+  \item[2.] Coverage probability describes probability that a \textit{process} of constructing intervals contains true parameter
+  \item[3.] Wider intervals have higher coverage probability but are also less informative
+\end{itemize}
+\end{frame}
+
+
+
+
+
+%%%%%%%%%%%%%%%%
+
+
+\end{document}
