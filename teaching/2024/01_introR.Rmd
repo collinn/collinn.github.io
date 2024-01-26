@@ -1,0 +1,317 @@
+---
+title: "Lab 01 - Introduction to R and R Markdown"
+output:
+  html_document:
+    toc: yes
+    toc_float:
+      collapsed: yes
+      smooth_scroll: no
+  pdf_document:
+    toc: yes
+date: "`r Sys.Date()`"
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Getting Started with R Markdown
+
+This is an R Markdown document. 
+
+At present, you are reading it formatted as an HTML document, but as we have seen, it can also be rendered as a PDF -- when working with an .Rmd file, you can choose how it is presented by selecting the arrow next to the Knit ball of yarn an choose between "Knit to HTML" or "Knit to PDF". For most of the work in this class, we will be knitting to a PDF to facilitate submissions to [Gradescope](www.gradescope.com).
+
+When you Knit an R Markdown file, it will ask you to first save and name your document. I recommend sticking to a consistent format throughout the semester: something like "lastname_firstname_lab/hwk#". For example, I would name this "nolte_collin_lab1.Rmd". After you knit, this will also be the name of your pdf.
+
+For this lab, we will be following along with this document which we can begin by downloading the .Rmd file associated with it [here](01_introR.Rmd); this is allow us to see side-by-side how the .Rmd file looks compared to the finished output. 
+
+For example, reading this online we see that **this sentence is bold**, while in the .Rmd file we see that the sentence is a plain-text sentence surrounded by two asterisks (*) on each side. This is an example of using [Markdown](https://www.markdownguide.org/basic-syntax/) to format our documents. For this lab, we will be following along with the .Rmd file, filling bits in as prompted. Let's begin by introducing some of the more common markdown syntax that we will use in this class.
+
+## Text Editing
+
+We can use .Rmd files to write text just as we would with a standard word processor. As we saw previously, using **two asterisks** creates bold text, whereas using *single asterisks* creates text that is italicized.
+
+Headers can be created using the # symbol. Using one creates a large header, two a smaller header, and so on. You can see examples of this in the text above. Take note that you need to leave a space between the # and the header text -- forgetting to do so will render the text exactly as you have written it.
+
+#For example, this will not show up as a header
+
+We can also create sequential lists. To do so, start new lines with sequential numbers
+
+1. Like this
+2. And this 
+3. And finally this
+
+We can create un-ordered lists with using stars or dashes
+
+* Here is an item
+* Here is another item
+    * And if I indent, I can make nested lists
+
+We can also create horizontal dividers with a line of stars (at least 3, but any number greater is ok). This is a good way to separate your answers from a given problem 
+
+****
+Things are more clear if I put my answers between bars, but I need to be sure to leave a blank line between my text and the bottom star
+
+****
+
+**Question 1:**
+
+Between the stars below, do the following:
+
+1. Use two # to create a header that says About Me
+2. Type your first name in bold and your last name in italics
+3. Create a bullet point list of the people sitting on either side of you
+4. Create a numbered list of your 3 favorite books or movies
+
+Once you have done this, Knit to PDF by clicking the bar of yarn above and verify that everything looks like it should.
+
+***
+
+
+***
+
+# Getting Started with R Studio
+
+Whereas R is the programming language responsible for doing our relevant computation, our interactions with R will be primarily through R Studio. When you first open R Studio, your screen will partitioned into 3 panes: *Console*, *Environment*, and *Files* (and often, *Editor*)
+
+### Console
+
+The console makes up the entire left-hand side of the screen, and it is here that we can interact with R directly. Some information will appear on start-up, followed by a prompt (indicated with `>`). Try copying and pasting the following lines into your console one at a time and pressing enter
+
+5 + 2
+
+sqrt(25)
+
+pi
+
+(3^2 + 1)*5
+
+x <- 5
+
+### Environment
+
+The environment panel is located in the top right and includes all of the named variables that we have created in R. If you copied the lines above correctly, you should see a single line here, indicating that the variable `x` has the value `5`. When starting a new R session, this pane will be empty.
+
+### Files
+
+In the bottom right is the Files pane which, in addition to giving us information about our file system also includes tabs for Plots and Help. Copy each of the lines below to see how this pane changes
+
+?sqrt
+
+plot(1:10)
+
+You can click any of the tabs in this pane to change what is currently being shown.
+
+### Editor
+
+Finally, we have the editor. If you start a new R Studio session, there will be nothing in the editor, but this will change if we open either a .R or .Rmd file. An R Script is the simplest type of file which can be created from the menus at the top:
+
+> File -> New File -> R Script
+
+The editor pane will appear with a blank R file in which you can write and store R code. Try copying the R commands from the *Console* section into an R Script, click on the line with code and click "Ctrl+Enter" on your keyboard. R Studio should execute this code and display the results in the Console. You do not have to save this file, and you can close it when you are finished.
+
+# Getting Started with R
+
+While it is true that R scripts (files that end in .R) are used for the vast majority of written R code, we will primarily be using R Markdown files (files that end in .Rmd).
+
+Perhaps the most obvious utility in using R Markdown documents for this course is their ability to interweave regular text with R. We can include and run R code by including it in a *code chunk*, such as the one shown below:
+
+```{r}
+# This is a code comment, beginning with #
+x <- 4 
+x^2
+```
+
+This code will run and display its results when we push the Knit button, but we can also run the code without knitting by place by again clicking the line with our cursor and hitting "Ctrl+Enter"
+
+For this portion of the lab, we will be introducing some of the basic mechanics in the R language. This will include `vectors`, similar to the variables we discussed in class, as well as `data.frames`, the primary data type we will be using for collections of observations.
+
+You are welcome to follow along on the course website or read the R Markdown directly. In either event, I highly encourage you to try running the code that we see, either by coping it from the website and pasting into the console, or by running with the R Markdown code chunks.
+
+## Vectors
+
+### Creating and subsetting
+
+Vectors in R are the simplest type of object. Every vector has two attributes that will dictate how we use it: length and type. We have already seen vectors of length one, which are created by assigning a number to a name using `<-`
+
+```{r}
+# This is a numeric vector of length 1
+x <- 4
+x
+```
+
+We can create vectors of greater than length one using `c()`, which is short for "combine"
+
+```{r}
+y <- c(2, 4, 6, 8, 10)
+y
+```
+
+Sequences of vectors can also be created with `:`
+
+```{r}
+z <- 1:5
+z
+```
+
+Every element of a vector has a position that we can access directly using square brackets `[]` in a process called *subsetting*. Here, we grab the 3rd element of the vector `w`
+
+```{r}
+w <- c(3, 6, 9, 12)
+w[3]
+```
+
+
+**Question 2:**
+
+Let's practice creating vectors and subsetting with a short exercise.
+
+1. First, create an R code chunk between the rows of stars below (Ctrl+Alt+I is quick way to do this)
+2. Next, create a vector called `x` that has all of the numbers from 1 to 10
+3. Use square brackets and subsetting to select all of the even numbers
+
+****
+
+
+
+****
+
+### Vector types
+
+Just as we saw in class that variables can be quantitative or categorical, so it is with vectors in R. There are primarily 3 types of vectors we need to be aware of:
+
+1. *numeric* - for example: `x <- c(1, 2, 3)`
+2. *character* - for example: `x <- c("a", "b", "c")`
+3. *logical* - for example `x <- c(TRUE, FALSE, TRUE)`
+
+Don't worry about memorizing everything -- we will continue to review them together as they appear in the course. For now, we will be satisfied with simply having made our introductions.
+
+As we mentioned in class, the type of a variable will often dictate what we are able to do with it. For example, it should make sense to take the mean of a numeric variable, but less so with a character vector:
+
+```{r}
+# This will return a warning and NA
+z <- c("a", "b", "c")
+mean(z)
+
+x <- c(1, 2, 3)
+mean(x)
+```
+
+Some situations can be confusing based on appearances. The `class()` function will tell us what type a vector is if we are not sure
+
+```{r}
+# This looks numeric
+z <- c("1", "2", "3")
+mean(z)
+
+class(z)
+```
+
+Usually in situations like this, we can *coerce* a vector to being a different type
+
+```{r}
+z_num <- as.numeric(z)
+class(z_num)
+
+mean(z_num)
+```
+
+One important characteristic of a vector to note: all elements of a vector *must* be the same type. They are either all numeric, all logical, or all character.
+
+
+**Question 3:**
+
+Can you think of a situation in which we start with a numeric vector that we would like to coerce to a character vector? Write your answer in the space below:
+
+****
+
+
+****
+
+## Data Frames
+
+Most of the data we will be working with in this class will be stored in objects known as data frames. Put simply, a data frame is a collection of vectors that are all the same length. 
+
+```{r}
+# Create two vectors of the same length
+x <- c("Alice", "Mary", "Bob")
+y <- c(1, 4, 10)
+
+# We can create a data frame with columns named `name` and `value`
+df <- data.frame(name = x, value = y)
+
+df
+```
+
+As we can see, this has the format of having rows as observations and columns being variables. We can select one of the variables from our `data.frame` using `$` which will extract the vector
+
+```{r}
+# Extract the "name" column
+df$name
+
+# Extract the "value" column and use it to find median
+median(df$value)
+```
+
+While we can create data frames directly, it is far more likely that we will be reading into R data that has already been created. The most common way to do so is with the `read.csv()` function (CSV stands for comma separated values). This can be read directly from your computer OR you can pass in a URL
+
+```{r}
+# Use read.csv to pull Happy Planet data
+planet <- read.csv("https://remiller1450.github.io/data/HappyPlanet.csv")
+```
+
+(Images in this next section will appear online but not on your own computer as you do not have these images)
+
+Once a data frame is read in, you will see it show up in your environment. Right away, we get two critical pieces of information: this data frame has 143 observations and 11 variables.
+
+![](planet_1.png)
+
+
+If we click on the blue arrow to the left, we will get a drop down showing us a more detailed description of the variables we do have. Note also the additional information given about the vectors (num = numeric, int = integer, chr = character).
+
+![](planet_2.png)
+
+Clicking on the white box pane to the right of `planet` brings us to the tabular view in R, giving us the opportunity to navigate and explore the data more directly
+
+![](planet_3.png)
+
+**Question 4:**
+
+For this question, we will be using the `HappyPlanet` data that we have just read in:
+
+  - **Part A** Looking at the Happy Planet data, explain in one or two sentences what consitutes an observation in this dataset
+  
+  - **Part B** Using `$` to extract columns from the dataset, what is average life expectancy of countries in the dataset?
+  
+  - **Part C** Are there any variables in this dataset that are stored as a numeric that would be better suited as a categorical variable? Explain your answer
+  
+****
+
+****
+
+## Wrapping Up
+
+This concludes our first introduction to R! Once you have finished with your lab, make sure that you are able to successfully Knit to PDF. Once that is finished, we are ready to submit to [Gradescope](www.gradescope.com).
+
+If you are in STA-209-03 (1-2:20), the Entry Code is B272WD
+
+If you are in STA-209-05 (2:30-3:50), the Entry Code is B2WB5B
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
