@@ -1,0 +1,40 @@
+---
+title: "Homework 1"
+author: "Collin Nolte"
+date: "2024-02-02"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# I can include any packages I want at the top
+library(ggplot2)
+```
+
+## Question 4.1
+
+Blah blah blah statistics is really cool and so is ggplot
+
+```{r}
+ggplot(mpg, aes(cty, hwy)) + geom_point()
+```
+
+## Question 5.2
+
+I can also just submit text. If a problem has multiple parts, I can create a list
+
+  a. like this
+  b. and this
+  
+## Question 3
+
+All of my headers are the same size, the text is written underneath and R code is included as necessary
+
+```{r}
+3+4
+```
+
+
