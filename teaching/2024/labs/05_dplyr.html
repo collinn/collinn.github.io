@@ -10,8 +10,9 @@
 
 
 
+<meta name="date" content="2024-02-22" />
 
-<title>STA-209 - Applied Statistics (Spring 2024)</title>
+<title>Lab 5 – dplyr</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1477,297 +1478,445 @@ border-radius: 0px;
 
 
 
-<h1 class="title toc-ignore">STA-209 - Applied Statistics (Spring
-2024)</h1>
+<h1 class="title toc-ignore">Lab 5 – <code>dplyr</code></h1>
+<h4 class="date">2024-02-22</h4>
 
 </div>
 
 
-<p><span class="math inline">\(~\)</span></p>
-<p>Last updated: Thu Feb 22 2024, 11:10</p>
-<div id="syllabus" class="section level1">
-<h1>Syllabus</h1>
-<p>Welcome to the course website for STA 209, Introduction to Applied
-Statistics. To begin, you can find the course syllabus linked below:</p>
-<ul>
-<li><a href="syllabus209s24.html">Click here</a> to view the course
-syllabus</li>
-</ul>
-<p>You can locate course content by scrolling, or by using the
-navigation bar in the upper left.</p>
-<p>Please note: material will not be posted until we’ve reached that
-point in the course.</p>
-</div>
-<div id="course-materials" class="section level1">
-<h1>Course Materials</h1>
-<div id="exam-1-content" class="section level2">
-<h2>Exam #1 Content</h2>
-<div id="week-1-intro" class="section level3">
-<h3>Week 1 (Intro)</h3>
-<table style="width:100%;">
+<pre class="r"><code>library(ggplot2)
+library(dplyr)
+
+theme_set(theme_bw())
+
+## College data
+college &lt;- read.csv(&quot;https://remiller1450.github.io/data/Colleges2019_Complete.csv&quot;)
+
+## For this lab, we don&#39;t need all of the columns so we will  
+# select only a few of them
+college &lt;- select(college, Name, State, Enrollment, Private, 
+                  Region, Adm_Rate, ACT_median, Cost, Net_Tuition, 
+                  Avg_Fac_Salary, Debt_median, 
+                  FourYearComp_Males, FourYearComp_Females, 
+                  Salary10yr_median)</code></pre>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>This lab serves as our introduction to the <code>dplyr</code>
+(pronounced dee-ply-R) package in <code>R</code> which provides a
+cohesive framework for working with and manipulating data. In
+particular, there are four aspects of data manipulation on which we will
+focus today:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Filtering –</strong> Filtering involves creating subsets of
+our data according to some criterion. For example, we may be interested
+in filtering our college dataset to only include private college or
+colleges located in Iowa</li>
+<li><strong>Mutating –</strong> Mutating is involved with the creation
+of new variables in our dataset or the transformation of existing
+one</li>
+<li><strong>Summarizing –</strong> Summarizing is used to calculate
+descriptive statistics</li>
+<li><strong>Grouping –</strong> Grouping allows us to specify groups of
+our data for the preceding functions rather than acting upon the entire
+dataset</li>
+</ol>
+<p>The <code>dplyr</code> package contains a suite of functions that
+accommodate these procedures, often <em>chained together</em> in a
+sequence of operations, connected with our pipe operator,
+<code>%&gt;%</code>. For example, if I wanted to subset my data to only
+include colleges in Iowa and then compute the average cost for both
+public and private schools, my code would look like this:</p>
+<pre class="r"><code>college %&gt;% filter(State %in% &quot;IA&quot;) %&gt;% 
+  group_by(Private) %&gt;% 
+  summarize(meanCost = mean(Cost))</code></pre>
+<pre><code>## # A tibble: 2 × 2
+##   Private meanCost
+##   &lt;chr&gt;      &lt;dbl&gt;
+## 1 Private   46645.
+## 2 Public    21420</code></pre>
+<p>Here, we first <em>filter</em> our data to include only schools in
+Iowa, then we <em>group by</em> the <code>Private</code> variable, and
+finally we <em>summarize</em> the cost.</p>
+<p>We will introduce several additional helper functions in this lab
+when they are needed, but primarily, we will be concerned with these
+functions:</p>
+<table>
 <colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
+<col width="28%" />
+<col width="71%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
+<th>Verb/Function</th>
+<th>Meaning</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Mon 1/22</td>
-<td align="left"><a href="syllabus209s24.html">Syllabus</a></td>
-<td align="left">-</td>
-<td align="left">-</td>
+<td><code>select</code></td>
+<td>Choose variables we wish to keep in our data</td>
 </tr>
 <tr class="even">
-<td align="left">Wed 1/24</td>
-<td align="left"><a href="lectures/introduction.pdf">Introduction</a></td>
-<td align="left"><a href="labs/00_markdown.html">In-class</a></td>
-<td align="left">-</td>
+<td><code>filter</code></td>
+<td>pick specific observations (i.e. specific rows)</td>
 </tr>
 <tr class="odd">
-<td align="left">Fri 1/26</td>
-<td align="left"><a href="lectures/r_intro.pdf">Intro to R</a></td>
-<td align="left"><a href="labs/01_introR.html">Intro R Lab</a></td>
-<td align="left"><a href="https://openintro-ims2.netlify.app/01-data-hello#sec-data-basics">1.2,
-1.3 from IMS</a></td>
+<td><code>mutate</code></td>
+<td>add new derived columns to a data frame</td>
+</tr>
+<tr class="even">
+<td><code>summarize</code></td>
+<td>aggregate many rows into a summary measure</td>
+</tr>
+<tr class="odd">
+<td><code>group_by</code></td>
+<td>perform subsequent operations separtely on the groups created by a
+categorical variable</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Assignments and Deadlines</strong>: None</p>
-<hr />
 </div>
-<div id="week-2-data-visualization" class="section level3">
-<h3>Week 2 (Data Visualization)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
+<div id="filter" class="section level2">
+<h2><code>filter</code></h2>
+<p>The purpose of filtering is to reduce a data set to only contain rows
+that meet a certain criteria. That criteria must be specified in the
+form of a <em>logical expression</em>. A few common logical operators
+are described in the table below:</p>
+<table>
 <thead>
 <tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
+<th align="left">Operator</th>
+<th align="left">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Mon 1/29</td>
-<td align="left"><a href="lectures/data_viz.pdf">Data
-Visualization</a></td>
-<td align="left">-</td>
-<td align="left"><a href="https://openintro-ims2.netlify.app/">4.2.1,
-5.1 from IMS</a></td>
+<td align="left"><code>==</code></td>
+<td align="left">equal to</td>
 </tr>
 <tr class="even">
-<td align="left">Wed 1/31</td>
-<td align="left"><a href="lectures/viz_table.pdf">Data Visualization
-cont.</a></td>
-<td align="left"><a href="labs/02_ggplot.html"><code>ggplot2</code></a></td>
-<td align="left"><a href="https://openintro-ims2.netlify.app/">4.1, 4.3,
-4.6</a></td>
+<td align="left"><code>!=</code></td>
+<td align="left"><em>not</em> equal to</td>
 </tr>
 <tr class="odd">
-<td align="left">Fri 2/2</td>
-<td align="left"><a href="lectures/ggplot_extra.pdf">ggplot</a> and <a href="examples/ggplot_aesthetics_label.pdf">aesthetics</a></td>
-<td align="left">Continue Lab</td>
-<td align="left">-</td>
+<td align="left"><code>%in%</code></td>
+<td align="left">equal to <em>any element</em> in a given vector</td>
+</tr>
+<tr class="even">
+<td align="left"><code>&lt;</code> and <code>&lt;=</code></td>
+<td align="left">less than (strict) or less than or equal to</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>&gt;</code> and <code>&gt;=</code></td>
+<td align="left">greater than (strict) or greater than or equal to</td>
+</tr>
+<tr class="even">
+<td align="left"><code>&amp;</code></td>
+<td align="left">and</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>|</code></td>
+<td align="left">or</td>
+</tr>
+<tr class="even">
+<td align="left"><code>!</code></td>
+<td align="left">not</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Assignments and Deadlines</strong>:</p>
+<p>When we use the <code>filter</code> function, we specify a logical
+criteria for our data to meet. For example, here is how we would filter
+to keep only colleges with a median ACT of 30 or more</p>
+<pre class="r"><code>act30 &lt;- college %&gt;% filter(ACT_median &gt; 29)
+head(act30)</code></pre>
+<pre><code>##                    Name State Enrollment Private      Region Adm_Rate
+## 1       Amherst College    MA       1855 Private New England   0.1281
+## 2    Bentley University    MA       4177 Private New England   0.4321
+## 3 Binghamton University    NY      13990  Public    Mid East   0.3981
+## 4        Boston College    MA       9639 Private New England   0.2789
+## 5     Boston University    MA      17238 Private New England   0.2209
+## 6   Brandeis University    MA       3627 Private New England   0.3115
+##   ACT_median  Cost Net_Tuition Avg_Fac_Salary Debt_median FourYearComp_Males
+## 1         33 71300       27541         116775       11900            0.84211
+## 2         30 66180       30307         126936       23250            0.81663
+## 3         30 25846        8187          88011       16750            0.68695
+## 4         33 70588       34327         137907       16000            0.87246
+## 5         32 70216       33686         127224       22500            0.80713
+## 6         31 70848       24212         118584       24708            0.78462
+##   FourYearComp_Females Salary10yr_median
+## 1              0.89691             65000
+## 2              0.89170             86900
+## 3              0.76490             61600
+## 4              0.91693             72500
+## 5              0.79152             65300
+## 6              0.84483             57900</code></pre>
+<p>The <code>filter</code> function can take more than one expression if
+needed, either separated by commas or the logical operator
+<code>&amp;</code>. Here, we illustrate filtering our dataset to include
+only those with median ACT of 30 or more <em>and</em> colleges located
+in Iowa (IA) or Minnesota</p>
+<pre class="r"><code>act30_iamn &lt;- college %&gt;% filter(ACT_median &gt; 29, 
+                            State %in% c(&quot;IA&quot;, &quot;MN&quot;))
+head(act30_iamn)</code></pre>
+<pre><code>##                 Name State Enrollment Private Region Adm_Rate ACT_median  Cost
+## 1   Grinnell College    IA       1683 Private Plains   0.2438         32 65814
+## 2 Macalester College    MN       2160 Private Plains   0.4124         31 66280
+##   Net_Tuition Avg_Fac_Salary Debt_median FourYearComp_Males
+## 1       20369         101979       15000            0.74138
+## 2       23225          95607       19432            0.80714
+##   FourYearComp_Females Salary10yr_median
+## 1              0.83721             49100
+## 2              0.91237             47600</code></pre>
+<p>Notice how the <code>%in%</code> operator is used here:
+<code>State %in% c(&quot;IA&quot;, &quot;MN&quot;)</code> first considers the variable
+<code>State</code> and then matches it to each of the values in the
+vector <code>c(&quot;IA&quot;, &quot;MN&quot;)</code></p>
+<p><strong>Question 1:</strong> Filter the college dataset to include
+only schools located in the Plains and the Great Lakes regions and with
+enrollments less than 20,000. Using your filtered data, create a two-way
+table with the variables <code>Region</code> and
+<code>Private</code></p>
+</div>
+<div id="mutate" class="section level2">
+<h2><code>mutate</code></h2>
+<p>The purpose of mutating is typically to create new variables out of
+old ones. For example, our college dataset contains variables for both
+cost and median debt, and it may be of interest to see for a given
+school what the typical ratio of debt to cost is</p>
+<pre class="r"><code>debt_cost &lt;- college %&gt;% 
+  mutate(debt_cost_ratio = Debt_median/Cost)</code></pre>
+<p>Within the <code>mutate</code> function, we see
+<code>debt_cost_ratio = Debt_median/Cost</code>; the left hand side of
+this indicates the new variable name that we are creating, while the
+right hand side shows us how we created it out of the existing variables
+<code>Debt_median</code> and <code>Cost</code>.</p>
+<pre class="r"><code>ggplot(debt_cost, aes(debt_cost_ratio, Private)) + 
+  geom_boxplot()</code></pre>
+<p><img src="data:image/png;base64,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" width="384" style="display: block; margin: auto;" /></p>
+<p>From this, we see that students at public colleges take a generally
+much greater proportion of the total cost of college out as debt.</p>
+<p>A very helpful function for changing the values of a vector or for
+turning a continuous variable into a categorical one is the
+<code>ifelse()</code> function. <code>ifelse()</code> takes three
+arguments:</p>
+<ol style="list-style-type: decimal">
+<li>A logical expression</li>
+<li>What to return if <code>TRUE</code></li>
+<li>What to return if <code>FALSE</code></li>
+</ol>
+<p>For example, consider a variable <code>x</code> with the values 1-10
+which we may want to assign to one of two groups, depending on its
+value.</p>
+<pre class="r"><code>x &lt;- 1:10
+x</code></pre>
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
+<pre class="r"><code># If x &lt; 5, return &quot;A&quot;, otherwise return &quot;B&quot;
+ifelse(x &lt; 5, &quot;A&quot;, &quot;B&quot;)</code></pre>
+<pre><code>##  [1] &quot;A&quot; &quot;A&quot; &quot;A&quot; &quot;A&quot; &quot;B&quot; &quot;B&quot; &quot;B&quot; &quot;B&quot; &quot;B&quot; &quot;B&quot;</code></pre>
+<p>Now consider our college dataset with the variable
+<code>Adm_Rate</code>, indicating the percentage of applicants that are
+admitted. This is a continuous variable by default, but we could use it
+to create a <em>new</em> variable indicating whether or not a school is
+considered <em>selective</em>:</p>
+<pre class="r"><code>ia_select &lt;- college %&gt;% 
+  filter(State %in% &quot;IA&quot;) %&gt;% 
+  mutate(Selective = ifelse(Adm_Rate &lt; 0.3, &quot;selective&quot;, &quot;not selective&quot;))
+
+# How many selective schools are in Iowa?
+with(ia_select, table(Selective))</code></pre>
+<pre><code>## Selective
+## not selective     selective 
+##            24             1</code></pre>
+<p><strong>Question 2:</strong> Use the <code>mutate()</code> and
+<code>ifelse()</code> functions to create a new variable called “Size”
+that has the value “large” if enrollment is greater than 10,000 and
+“small” if enrollment is less than 10,000. Then, create an appropriate
+bar chart to determine which region has the greatest proportion of small
+schools</p>
+</div>
+<div id="summarize" class="section level2">
+<h2><code>summarize</code></h2>
+<p>The <code>summarize()</code> function helps us calculate descriptive
+statistics requiring an aggregation of rows. As a result, we will nearly
+always end up with fewer rows than with which we begin. For example, I
+may be interested in a table of quantitative statistics describing the
+variable “Cost”:</p>
+<pre class="r"><code>college %&gt;% summarize(meanCost = mean(Cost), 
+                      sdCost = sd(Cost), 
+                      minCost = min(Cost), 
+                      maxCost = max(Cost))</code></pre>
+<pre><code>##   meanCost sdCost minCost maxCost
+## 1    37129  15251   12223   75735</code></pre>
+<p>The general syntax for something like
+<code>meanCost = mean(Cost)</code> is such that the name of our new
+variable is on the left hand side, while the function of our original
+variable “Cost” is on the right hand side. You will also note that the
+data frame returned contains <em>only</em> the new variables that were
+created in the <code>summarize()</code> function.</p>
+<p>While the <code>summarize()</code> function is useful, it is most
+frequently used with <code>group_by()</code>, which we illustrate
+next.</p>
+</div>
+<div id="group_by" class="section level2">
+<h2><code>group_by</code></h2>
+<p>Typically when we are summarizing information in our data frame, we
+want to do so at a <em>group level</em>. We can indicate that we wish to
+do this using the <code>group_by()</code> function. The function works
+in two steps:</p>
+<ol style="list-style-type: decimal">
+<li>First, <code>group_by()</code> determines which categorical
+variables we wish to use to create groups and creates invisible tags so
+that other functions know these groups exist. Typically this is one
+variable, but it can also be several.</li>
+<li>Whenever functions from the <code>dplyr</code> package see data that
+is grouped (typically with the <code>summarize()</code> function), it
+performs whatever operations it intends to at the group level.</li>
+</ol>
+<p>The application of this is straightforward enough. Here, we indicate
+that we wish to group our college dataset by “Region” and then find the
+mean cost of attending</p>
+<pre class="r"><code>college %&gt;% group_by(Region) %&gt;% 
+  summarize(meanCost = mean(Cost))</code></pre>
+<pre><code>## # A tibble: 8 × 2
+##   Region          meanCost
+##   &lt;chr&gt;              &lt;dbl&gt;
+## 1 Far West          40409.
+## 2 Great Lakes       37403.
+## 3 Mid East          43212.
+## 4 New England       45682.
+## 5 Plains            35810.
+## 6 Rocky Mountains   26503.
+## 7 South East        32933.
+## 8 South West        31289.</code></pre>
+<p>All of the functions that we have introduced in this lab form a
+cohesive framework for interactive data analysis. In particular, there
+were designed with the philosophy in mind that they should be able to be
+chained together to succinctly perform some of the most common
+applications. Consider for example the code below where we</p>
+<ol style="list-style-type: decimal">
+<li>First limit our colleges to those located in Iowa (IA), Missouri
+(MO), and Minnesota (MN) using <code>filter()</code></li>
+<li>We then compute the debt to cost ratio for each school just as we
+did before using <code>mutate()</code></li>
+<li>We indicate that we wish to group our data according to
+<em>both</em> State and Private, which we do with
+<code>group_by()</code></li>
+<li>Finally, we summarize our data to find the mean and standard
+deviation of the debt to cost ratio using <code>summarize()</code></li>
+</ol>
+<pre class="r"><code>college %&gt;% 
+  filter(State %in% c(&quot;IA&quot;, &quot;MO&quot;, &quot;MN&quot;)) %&gt;% 
+  mutate(debt_cost_ratio = Debt_median / Cost) %&gt;% 
+  group_by(State, Private) %&gt;% 
+  summarize(mean_dcr = mean(debt_cost_ratio), 
+            sd_dcr = sd(debt_cost_ratio))</code></pre>
+<pre><code>## # A tibble: 6 × 4
+## # Groups:   State [3]
+##   State Private mean_dcr sd_dcr
+##   &lt;chr&gt; &lt;chr&gt;      &lt;dbl&gt;  &lt;dbl&gt;
+## 1 IA    Private    0.399 0.0597
+## 2 IA    Public     0.780 0.0967
+## 3 MN    Private    0.423 0.0783
+## 4 MN    Public     0.673 0.0797
+## 5 MO    Private    0.420 0.121 
+## 6 MO    Public     0.716 0.0459</code></pre>
+<p>Very quickly we are able to see that public schools in Iowa have the
+largest debt to cost ratio, while private schools in Iowa have the
+lowest.</p>
+<p>Lastly, we have a helperl function <code>n()</code> which can be used
+in side of summarize – this permits us to display the number of
+observations in our groups in addition to other statistical
+summaries</p>
+<pre class="r"><code>college %&gt;% 
+  filter(State %in% c(&quot;IA&quot;, &quot;MO&quot;, &quot;MN&quot;)) %&gt;% 
+  mutate(debt_cost_ratio = Debt_median / Cost) %&gt;% 
+  group_by(State, Private) %&gt;% 
+  summarize(Count = n()) # helper function</code></pre>
+<pre><code>## # A tibble: 6 × 3
+## # Groups:   State [3]
+##   State Private Count
+##   &lt;chr&gt; &lt;chr&gt;   &lt;int&gt;
+## 1 IA    Private    22
+## 2 IA    Public      3
+## 3 MN    Private    16
+## 4 MN    Public     10
+## 5 MO    Private    18
+## 6 MO    Public     10</code></pre>
+<p><strong>Question 3:</strong> Intensive care units, or ICUs, are
+primary spaces in hospitals that are reserved for patients in critical
+condition. The data below is a random sample of n = 200 ICU patients
+from a research hospital affiliated with Carnegie Mellon University
+(CMU).</p>
+<pre class="r"><code>icu &lt;- read.csv(&quot;https://remiller1450.github.io/data/ICUAdmissions.csv&quot;)</code></pre>
+<p>The data dictionary below documents each variable that was
+recorded:</p>
 <ul>
-<li>Lab 01 due Monday, Feb 05 at 11:59pm</li>
+<li><strong>ID</strong> - Patient ID number</li>
+<li><strong>Status</strong> - Patient status: 0=lived or 1=died</li>
+<li><strong>Age</strong> - Patient’s age (in years)</li>
+<li><strong>Sex</strong> - 0=male or 1=female</li>
+<li><strong>Race</strong> - Patient’s race: 1=white, 2=black, or
+3=other</li>
+<li><strong>Service</strong> - Type of service: 0=medical or
+1=surgical</li>
+<li><strong>Cancer</strong> - Is cancer involved? 0=no or 1=yes</li>
+<li><strong>Renal</strong> - Is chronic renal failure involved? 0=no or
+1=yes</li>
+<li><strong>Infection</strong> - Is infection involved? 0=no or
+1=yes</li>
+<li><strong>CPR</strong> - Patient received CPR prior to admission? 0=no
+or 1=yes</li>
+<li><strong>Systolic</strong> - Systolic blood pressure (in mm of
+Hg)</li>
+<li><strong>HeartRate</strong> - Pulse rate (beats per minute)</li>
+<li><strong>Previous</strong> - Previous admission to ICU within 6
+months? 0=no or 1=yes</li>
+<li><strong>Type</strong> - Admission type: 0=elective or
+1=emergency</li>
+<li><strong>Fracture</strong> - Fractured bone involved? 0=no or
+1=yes</li>
+<li><strong>PO2</strong> - Partial oxygen level from blood gases under
+60? 0=no or 1=yes</li>
+<li><strong>PH</strong> - pH from blood gas under 7.25? 0=no or
+1=yes</li>
+<li><strong>PCO2</strong> - Partial carbon dioxide level from blood gas
+over 45? 0=no or 1=yes</li>
+<li><strong>Bicarbonate</strong> - Bicarbonate from blood gas under 18?
+0=no or 1=yes</li>
+<li><strong>Creatinine</strong> - Creatinine from blood gas over 2.0?
+0=no or 1=yes</li>
+<li><strong>Consciousness</strong> - Level upon arrival: 0=conscious,
+1=deep stupor, or 2=coma</li>
 </ul>
-<p><a href="hw/hw1.html">Homework 1</a> due Monday, Feb 05 at
-11:59pm</p>
-<p><strong>Note:</strong> Homework should be neatly formatted with
-questions specified as headers and with your R code and written
-solutions underneath. <a href="examples/example_hw1.pdf">Here is an
-example</a> of how it should look.</p>
-<hr />
-</div>
-<div id="week-3-numerical-summaries" class="section level3">
-<h3>Week 3 (Numerical Summaries)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 2/5</td>
-<td align="left"><a href="lectures/tables.pdf">Tables</a></td>
-<td align="left">Wrap up lab</td>
-<td align="left">-</td>
-</tr>
-<tr class="even">
-<td align="left">Wed 2/7</td>
-<td align="left">Cont. tables</td>
-<td align="left"><a href="labs/03_tables.html">Table Lab</a></td>
-<td align="left">-</td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 2/9</td>
-<td align="left"><a href="lectures/numsum.pdf">Numerical
-Summaries</a></td>
-<td align="left"><a href="labs/03_tables.html">Table Lab cont.</a></td>
-<td align="left">-</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ul>
-<li>Lab 02 due Monday, Feb 12 at 11:59pm</li>
-<li>Lab 03 due Monday, Feb 12 at 11:59pm</li>
-<li><a href="hw/hw2.html">Homework 2</a> due Mon, Feb 12 at 11:59pm</li>
-</ul>
-<p><strong>Extra Practice:</strong></p>
-<p>Our <code>ggplot2</code> lab really only covered the basics. You can
-get in-depth practice if you want to trick out your graphs by going
-through STA-230 labs which do not require any additional knowledge than
-what we have already acquired:</p>
-<ul>
-<li><a href="https://collinn.github.io/teaching/2023/labs/ggplot_lab3.html">Extra
-lab 1 – the basics</a></li>
-<li><a href="https://collinn.github.io/teaching/2023/labs/lab4.html">Extra lab
-2 – the frills</a></li>
-</ul>
-<p><strong>NOTE</strong> Exam 1 will be February 21 – details to
-follow</p>
-<hr />
-</div>
-<div id="week-4-regression" class="section level3">
-<h3>Week 4 (Regression)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 2/12</td>
-<td align="left"><a href="lectures/correlation.pdf">Correlation</a></td>
-<td align="left">-</td>
-<td align="left">-</td>
-</tr>
-<tr class="even">
-<td align="left">Wed 2/14</td>
-<td align="left"><a href="lectures/regression.pdf">Linear
-Regression</a></td>
-<td align="left"><a href="labs/04_regression.html">Regression</a></td>
-<td align="left">-</td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 2/16</td>
-<td align="left"><a href="lectures/cat_pred.pdf">Linear Regression
-(Categorical Predictor)</a></td>
-<td align="left">-</td>
-<td align="left">-</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ul>
-<li><a href="hw/hw3.html">Homework 3</a> due Mon, Feb 19 at 11:59pm</li>
-<li><a href="labs/04_regression.html">Lab 4</a> due Mon, Feb 19 at
-11:59pm</li>
-</ul>
-<p>Practice exam posted <a href="https://remiller1450.github.io/s209s24/practice_exam1.pdf">here</a>.
-Note that you can skip/ignore questions about risk and relative risk, as
-well as those with multivariate regression</p>
-<p><a href="review/exam1_review.html">Here</a> is a rough sketch of the
-topics that may be covered. I will continue to fill in with more
-examples as the week progresses</p>
-<hr />
-</div>
-<div id="week-5-exam-week" class="section level3">
-<h3>Week 5 (Exam Week)</h3>
-<p><strong>EXAM REMINDERS:</strong></p>
-<ul>
-<li>In Noyce 2022</li>
-<li>Bring calculator</li>
-</ul>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 2/19</td>
-<td align="left"><a href="lectures/exam1_review.pdf">Review Day</a></td>
-<td align="left">-</td>
-<td align="left">-</td>
-</tr>
-<tr class="even">
-<td align="left">Wed 2/21</td>
-<td align="left">Exam 😎</td>
-<td align="left">-</td>
-<td align="left">-</td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 2/23</td>
-<td align="left"><a href="lectures/dplyr.pdf">dplyr package</a></td>
-<td align="left"><a href="labs/05_dplyr.html">dplyr</a></td>
-<td align="left">-</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<p>None</p>
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 2/19 | - | - | - | -->
-<!-- | Wed 2/21 | -| - | - | -->
-<!-- | Fri 2/23 | -| dplyr | - | -->
-</div>
-</div>
-<div id="exam-2-content" class="section level2">
-<h2>Exam #2 Content</h2>
-<p>TBD, yo</p>
-</div>
+<p>Using the <code>icu</code> dataset and the functions described in
+this lab, complete the following stages:</p>
+<ol style="list-style-type: decimal">
+<li>Change the <code>Previous</code> variable to have values “no” and
+“yes” instead of 0 and 1</li>
+<li>Filter the data to <em>only</em> include patients whose visit
+involves an infection</li>
+<li>For the “Age” variable, find the mean, standard deviation, and group
+size (found using the function <code>n()</code>) of patients with and
+without a previous admission to the ICU in the prior 6 months.</li>
+</ol>
+<p>Your solution should indicate the total number of patients with and
+without previous admission, along with each group’s mean age and
+standard deviation. It will contain two rows and four columns – your
+final output should look like this:</p>
+<pre><code>##   Previous MeanAge  SDAge  N
+## 1       no  62.369 17.842 65
+## 2      yes  57.000 17.601 19</code></pre>
+<!-- **Question** -->
+<!-- ```{r} -->
+<!-- infant <- read.csv("https://remiller1450.github.io/data/InfantHeart.csv") -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- infant %>% group_by(Treatment, Sex) %>%  -->
+<!--   summarize(mp = mean(PDI),  -->
+<!--             mm = mean(MDI)) -->
+<!-- ggplot(infant, aes(Weight, Length, color = PDI)) +  -->
+<!--   geom_point() -->
+<!-- ``` -->
 </div>
 
 
@@ -1829,7 +1978,7 @@ $(document).ready(function ()  {
       scrollTo: 0
     };
     options.showAndHide = true;
-    options.smoothScroll = false;
+    options.smoothScroll = true;
 
     // tocify
     var toc = $("#TOC").tocify(options).data("toc-tocify");
