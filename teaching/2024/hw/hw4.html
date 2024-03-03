@@ -375,6 +375,10 @@ bootstrap &lt;- function(x, statistic, n = 1000L) {
   data.frame(Sample = seq_len(n), 
              Statistic = bs)
 }</code></pre>
+<p>This homework contains several sections with included code that is
+intended to be run, either for loading functions or creating samples or
+subsets from the data. I encourage you to try and understand what it is
+doing as this may shed light on the underlying processes involved.</p>
 <div id="question-1" class="section level1">
 <h1>Question 1</h1>
 <p>A network operator has compiled data demonstrating the number of
@@ -394,13 +398,14 @@ above, find and report a 95% confidence interval for the mean.</p></li>
 <li><p><strong>Part C:</strong> Upon inspection of the server equipment,
 it appears that the network has not been able to adequately detect
 traffic in ranges below 100 or above 180, with numbers in these ranges
-being recorded at their caps (i.e., traffic at level 82 gets recorded at
-100 and traffic at 192 recorded at 180). This is reflected in the
-updated <code>capped</code> data below. Using this capped data, recreate
-a 95% confidence interval and compare it with the interval you found in
-Part B. How has it changed, and what explanation for this do you have?
-(Hint: reference the histogram you created in Part A – what data is
-getting censored?)</p></li>
+being recorded at their caps (i.e., traffic at level 82 would recorded
+at 100 and traffic at 192 would be recorded at 180). This is reflected
+in the updated <code>capped</code> data below. Using this capped data,
+recreate a 95% confidence interval and compare it with the interval you
+found in Part B. How has it changed, and what explanation for this do
+you have? (Hint: Consider the distribution you visualized in Part A.
+What data is getting censored and how might this impact our
+intervals?)</p></li>
 </ul>
 <pre class="r"><code>## Capped data
 capped &lt;- WWWusage
@@ -409,16 +414,18 @@ capped &lt;- WWWusage
 capped[capped &lt; 100] &lt;- 100
 capped[capped &gt; 180] &lt;- 180</code></pre>
 <ul>
-<li><strong>Part D:</strong> A friend of yours observes this censored
-data and notes that it is <em>biased</em>, as some of the small numbers
-are rounded to larger ones and large numbers are rounded to smaller
-ones. Better, they say, that we remove these biased ones all together
-and just focus on the data we know is correct. As proof, they compute
-the 95% confidence interval on the “cleaned” data and argue that even
-though there are fewer observations as some were removed, the confidence
-interval got smaller, making it more precise and providing a better
-estimate of the range of plausible values. Using the cleaned data,
-compute this confidence interval to verify their statement.</li>
+<li><strong>Part D:</strong> A friend of yours observes this capped data
+and notes that it is <em>biased</em>, as some of the small numbers are
+rounded to larger ones and large numbers are rounded to smaller ones.
+Better, they say, that we remove these biased ones all together and just
+focus on the data we know is correct. As proof that this is superior,
+they compute the 95% confidence interval on the “cleaned” data and argue
+that even though there are fewer observations as some were removed, the
+confidence interval got smaller, making it more precise and providing a
+better estimate of the range of plausible values. Using the cleaned
+data, compute this confidence interval to verify their statement. How
+many observations remain in the cleaned data, and how does this
+confidence interval compare to those we found previously.</li>
 </ul>
 <pre class="r"><code>cleaned &lt;- WWWusage
 
@@ -433,7 +440,7 @@ samples of the population in question?</li>
 <li>Why do you think the 95% confidence interval became smaller for the
 “cleaned” data even though it had fewer observations?</li>
 <li>If you had to choose between <code>capped</code> and
-<code>cleaned</code>, which would you prefer? Justify your answer.</li>
+<code>cleaned</code> for your analysis, which would you prefer?</li>
 </ul></li>
 </ul>
 </div>
@@ -448,25 +455,32 @@ computed the following contingency table:</p>
 ##   &lt;25 4475   65
 ##   25+ 1597   31</code></pre>
 <ul>
-<li><strong>Part A:</strong> Compute the odds for both groups of women
-(those &lt;25 years old at the delivery of their first child and those
-25+ years old) for developing breast cancer.</li>
-<li><strong>Part B:</strong> Compute the <em>odds ratio</em> of getting
-breast cancer for those younger than 25 compared to those older than 25.
-Based on this <em>point estimate</em>, would you say that women &lt;25
-have increased odds of getting breast cancer?</li>
-<li><strong>Part C:</strong> Unlike the mean, a statistic which has a
+<li><p><strong>Part A:</strong> Compute the odds for both groups of
+women (those &lt;25 years old at the delivery of their first child and
+those 25+ years old) for developing breast cancer.</p></li>
+<li><p><strong>Part B:</strong> Compute the <em>odds ratio</em> of
+getting breast cancer for those younger than 25 compared to those older
+than 25. Based on this <em>point estimate</em>, would you say that women
+&lt;25 have increased odds of getting breast cancer?</p></li>
+<li><p><strong>Part C:</strong> Unlike the mean, a statistic which has a
 measure of departure such as the standard deviation, this is no
 immediate deviation metric available for the odds ratio. Use the
 function defined below, <code>bootstrap_or()</code> to compute a 95%
 confidence interval for the odds ratio. Based on this, would you say
 that there is evidence to suggest there is increased risk associated
-with early child birth?</li>
-<li><strong>Part D (not graded):</strong> For a simple numeric vector,
-we simply resampled from the vector itself to create our bootstrapped
-sample. How do you think resampling is done with table data? (Hint: try
-reading the code for <code>bootstrap_or()</code> and see if you can
-explain what is happening)</li>
+with early child birth?</p></li>
+<li><p><strong>Part D (not graded for credit):</strong> For a simple
+numeric vector, we simply resampled the vector itself to create our
+bootstrapped sample. Hopw would you describe the bootstrapping process
+for this problem? You might consider the following when summarizing your
+answer:</p>
+<ol style="list-style-type: decimal">
+<li>Is a table considered data or a summary of data?</li>
+<li>Are we bootstrapping a variable or observations? How are these
+different?</li>
+<li>Try reading and interpretting the R code for the
+<code>bootstrap_or()</code> function below.</li>
+</ol></li>
 </ul>
 <pre class="r"><code>## Here is data.frame containing data, 
 df &lt;- expand.grid(Cancer = c(&quot;Yes&quot;, &quot;No&quot;), 
@@ -486,8 +500,7 @@ bootstrap_or &lt;- function(x, n = 1000L) {
              Statistic = bs)
 }
 
-## Uncomment this to run function
-# bs &lt;- bootstrap_or(df)</code></pre>
+bs &lt;- bootstrap_or(df)</code></pre>
 </div>
 <div id="question-3" class="section level1">
 <h1>Question 3</h1>
@@ -508,29 +521,38 @@ it with that drawn from our random sample in <code>rs</code>. Do they
 appear to be reasonably close? If we were not able to verify the
 population distribution, what can we do to ensure the quality of our
 sample?</li>
-<li><strong>Part B:</strong> When distributions of data are skewed, as
-they are in the Grinnell rain data, we know that the mean and median
-will not be equal to one another. One statistic that can capture this
-information is the <em>ratio</em> between the mean and the median; if
-this ratio is greater than 1, we know the mean is greater than the
-median, and the data must be skewed right. If it is less than one, it
-must be skewed left. Find the ratio of the mean and median precipitation
-in the <em>sample</em> data. Is there compelling evidence that our data
-is skewed? If so, in which direction?</li>
+<li><strong>Part B:</strong> When distributions of data are skewed, such
+as they are in the Grinnell rain data, we know that the mean and the
+median will not be equal to one another. One statistic that can capture
+this information is the <em>ratio</em> between the mean and the median.
+We will call this the <em>centrality ratio</em>, denoted <span class="math inline">\(CR\)</span>, where</li>
+</ul>
+<p><span class="math display">\[
+  CR = \frac{mean}{median}
+  \]</span> If the mean value is <em>greater</em> than the median, we
+expect to find <span class="math inline">\(CR &gt; 1\)</span>, and if
+the median is greater than the mean, we should expect <span class="math inline">\(CR &lt; 1\)</span>; <span class="math inline">\(CR
+= 1\)</span> when the mean and median are equal. Find the centrality
+ratio of our sample data. Does there appear to be compelling evidence
+that our data are skewed? If so, in which direction?</p>
+<ul>
 <li><strong>Part C:</strong> Instead of relying on a point estimate, we
 might instead consider creating a 95% confidence interval of this skew.
-Uncomment and run the code below to create bootstrapped samples and
-describe the 95% confidence interval</li>
+Run the code below to create bootstrapped samples and describe the 95%
+confidence interval. Does it appear symmetric about our point estimate?
+In other words, is the upper bound of our confidence interval the same
+distance away from our point estimate as the lower bound of the
+confidence interval?</li>
 </ul>
 <pre class="r"><code>mm_ratio &lt;- function(x) mean(x) / median(x)
 
-# mm_boot &lt;- bootstrap(rs$precip, mm_ratio)</code></pre>
+mm_boot &lt;- bootstrap(rs$precip, mm_ratio)</code></pre>
 <ul>
 <li><strong>Part D:</strong> Using <code>mm_boot</code> that you
 computed in the prevoius part, create a histogram showing the
-<em>sampling distribution</em> of the mean/median statistic. What do you
-notice about this distribution? Would the 68-95-99 rule be applicable
-here?</li>
+<em>sampling distribution</em> of the centrality ratio statistic. What
+do you notice about this distribution? Would the 68-95-99 rule be
+applicable here?</li>
 </ul>
 <!-- # Question 1 -->
 <!-- For this question, we are going to be considering a situation in which gathering new samples from a population converges with the idea of resampling from an existing sample -->
