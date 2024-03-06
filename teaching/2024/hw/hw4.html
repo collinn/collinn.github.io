@@ -492,7 +492,7 @@ bootstrap_or &lt;- function(x, n = 1000L) {
   bs &lt;- replicate(n, {
     # Randomly select rows of data frame
     idx &lt;- sample(nrow(x), replace = TRUE)
-    samp_df &lt;- df[idx, ]
+    samp_df &lt;- x[idx, ]
     tt &lt;- with(samp_df, table(Age, Cancer))
     (tt[1] * tt[4]) / (tt[2] * tt[3])
   })
