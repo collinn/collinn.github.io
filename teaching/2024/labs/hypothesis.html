@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-03-11" />
+<meta name="date" content="2024-04-03" />
 
 <title>Lab 7 – Hypothesis Testing</title>
 
@@ -1479,7 +1479,7 @@ border-radius: 0px;
 
 
 <h1 class="title toc-ignore">Lab 7 – Hypothesis Testing</h1>
-<h4 class="date">2024-03-11</h4>
+<h4 class="date">2024-04-03</h4>
 
 </div>
 
@@ -1579,9 +1579,9 @@ interval using the argument <code>conf.level</code></p>
 <p><strong>Question 1:</strong> We see above that changing our
 confidence interval to 80% from 95% changed the interval, but not the
 resulting p-value. Why is this the case?</p>
-<p><strong>Question 2:</strong> You might also notice that the
+<p><del><strong>Question 2:</strong> You might also notice that the
 confidence interval we found using <code>binom.test()</code> is no
-longer <em>symmetric</em> around the estimate <span class="math inline">\(\hat{p}\)</span>. Why is this the case?</p>
+longer <em>symmetric</em> around the estimate <span class="math inline">\(\hat{p}\)</span>. Why is this the case?</del></p>
 <p><strong>Question 3:</strong> There is an intimate relationship
 between p-values and confidence intervals in that the exact same
 attributes of our sample data are used to construct each. Presented
@@ -1605,12 +1605,136 @@ null hypothesis? Why?</li>
 </div>
 <div id="testing-means" class="section level3">
 <h3>Testing means</h3>
+<p>In R, we can create perform hypothesis testing and create standard
+confidence intervals based on the <span class="math inline">\(t\)</span>-distribution using the function
+<code>t.test()</code>. While the <code>t.test()</code> function will
+take a number of useful arguments that we will use in the future, for
+now we only concern ourselves with three:</p>
+<ul>
+<li><code>x</code>, a numeric vector we wish to construct a confidence
+interval for</li>
+<li><code>mu</code>, a single number indicating the null hypothesis</li>
+<li><code>conf.level</code> which gives the confidence interval for a
+specified <span class="math inline">\(\alpha\)</span></li>
+</ul>
+<p>The output of the <code>t.test()</code> function will include a
+collection of useful information, ranging from the point estimate for
+the mean value of <code>x</code>, as well as a confidence interval for
+this value. For example, consider the built-in dataset
+<code>mtcars</code> in R. Here, we use <code>t.test()</code> to find a
+90% confidence interval for average miles per gallon:</p>
+<pre class="r"><code>t.test(mtcars$mpg, conf.level = 0.9)</code></pre>
+<pre><code>## 
+##  One Sample t-test
+## 
+## data:  mtcars$mpg
+## t = 18.9, df = 31, p-value &lt;0.0000000000000002
+## alternative hypothesis: true mean is not equal to 0
+## 90 percent confidence interval:
+##  18.284 21.897
+## sample estimates:
+## mean of x 
+##    20.091</code></pre>
+<p>From the output, you should note a few things:</p>
+<ol style="list-style-type: decimal">
+<li><p>At the bottom of the output, we see our point estimate, <span class="math inline">\(\overline{x} = 20.09\)</span></p></li>
+<li><p>Just above the point estimate, we see our estimate of the 90%
+confidence interval, here <span class="math inline">\((18.24,
+21.89)\)</span></p></li>
+<li><p>All of the information above this is related to <em>hypothesis
+testing</em>. This includes:</p>
+<ul>
+<li>A <span class="math inline">\(t\)</span>-statistic, equal to <span class="math inline">\(t = 18.9\)</span></li>
+<li>Degrees of freedom equal to <span class="math inline">\(df =
+31\)</span></li>
+<li>A <span class="math inline">\(p\)</span>-value of <span class="math inline">\(p &lt; 2 \times 10^{-15}\)</span></li>
+</ul></li>
+</ol>
+<p>However, as we were not conducting any hypothesis test in this
+particular example, this information can be ignored.</p>
+<p>By default, the <code>t.test()</code> function assumes a null
+hypothesis of <span class="math inline">\(H_0: \mu_0 = 0\)</span>. As
+our t-statistic is computed as</p>
+<p><span class="math display">\[
+t = \frac{\overline{x} - \mu_0}{\hat{\sigma}/\sqrt{n}}
+\]</span> this gives rise to the computed statistic <span class="math inline">\(t = 18.9\)</span> that we saw in the output (and
+was subsequently used to compute the p-value).</p>
+<p>To see a more realistic example, suppose we wanted to investigate the
+hypothesis that the average miles per gallon was equal to 16 mpg. That
+is, suppose we have <span class="math inline">\(H_0: \mu_0 =
+18\)</span>. We could evaluate this hypothesis using the
+<code>t.test</code> function with the <code>mu</code> argument:</p>
+<pre class="r"><code>t.test(x = mtcars$mpg, 
+       mu = 18, 
+       conf.level = 0.9)</code></pre>
+<pre><code>## 
+##  One Sample t-test
+## 
+## data:  mtcars$mpg
+## t = 1.96, df = 31, p-value = 0.059
+## alternative hypothesis: true mean is not equal to 18
+## 90 percent confidence interval:
+##  18.284 21.897
+## sample estimates:
+## mean of x 
+##    20.091</code></pre>
+<p>In this example, note that our point estimate did not change, nor did
+our 90% confidence interval. What did change, however, was the
+calculated t-statistic as well as the p-value.</p>
+<p><strong>Question 4:</strong> Explain why both the t-statistic and the
+p-value changed in our second call of <code>t.test()</code> while the
+point estimate and the confidence interval stayed the same.</p>
+<p><strong>Question 5:</strong> Using the subsets of the data below,
+find and report 95% confidence intervals for total enrollment at public
+and private colleges.</p>
+<pre class="r"><code>library(dplyr)
+college &lt;- read.csv(&quot;https://remiller1450.github.io/data/Colleges2019.csv&quot;)
+
+col_priv &lt;- filter(college, Private == &quot;Private&quot;)
+col_pub &lt;- filter(college, Private == &quot;Public&quot;)</code></pre>
+</div>
+<div id="testing-correlation" class="section level3">
+<h3>Testing Correlation</h3>
+<p>Testing and evaluating confidence intervals for correlation can be
+done with the function <code>cor.test</code>. For example, using our
+college data, suppose we are interested in evaluating the correlation
+between net tuition and average faculty salary</p>
+<pre class="r"><code>cor.test(college$Net_Tuition, college$Avg_Fac_Salary)</code></pre>
+<pre><code>## 
+##  Pearson&#39;s product-moment correlation
+## 
+## data:  college$Net_Tuition and college$Avg_Fac_Salary
+## t = 19.6, df = 1648, p-value &lt;0.0000000000000002
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  0.39538 0.47364
+## sample estimates:
+##     cor 
+## 0.43534</code></pre>
+<p>Just as with the other testing functions, we can modify the range of
+our confidence interval with the function <code>conf.level</code>:</p>
+<pre class="r"><code>cor.test(college$Net_Tuition, college$Avg_Fac_Salary, conf.level = 0.8)</code></pre>
+<pre><code>## 
+##  Pearson&#39;s product-moment correlation
+## 
+## data:  college$Net_Tuition and college$Avg_Fac_Salary
+## t = 19.6, df = 1648, p-value &lt;0.0000000000000002
+## alternative hypothesis: true correlation is not equal to 0
+## 80 percent confidence interval:
+##  0.40939 0.46057
+## sample estimates:
+##     cor 
+## 0.43534</code></pre>
+<p><strong>Question 6:</strong> Using the <code>ToothGrowth</code> data
+built-in to R that we have seen previously, construct a 90% confidence
+interval for the correlation between dose of Vitamin C and tooth length.
+What is the null hypothesis when evaluating if two variables are
+correlated? Does this data seem to support or refute our null
+hypothesis?</p>
 </div>
 <div id="testing-odds-ratios" class="section level3">
 <h3>Testing Odds Ratios</h3>
-</div>
-<div id="testing-things-beyond-our-wildest-dreams" class="section level3">
-<h3>Testing things beyond our wildest dreams</h3>
+<p>tbd</p>
 </div>
 </div>
 
