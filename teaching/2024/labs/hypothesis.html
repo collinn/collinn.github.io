@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-04-03" />
+<meta name="date" content="2024-04-12" />
 
 <title>Lab 7 – Hypothesis Testing</title>
 
@@ -1479,7 +1479,7 @@ border-radius: 0px;
 
 
 <h1 class="title toc-ignore">Lab 7 – Hypothesis Testing</h1>
-<h4 class="date">2024-04-03</h4>
+<h4 class="date">2024-04-12</h4>
 
 </div>
 
@@ -1510,9 +1510,47 @@ testing. Where available, we will use built-in functions in R to find
 and report p-values. In particular, we will investigate the finding of
 p-values for proportions, differences in proportions, odds ratios,
 means, and differences of means</p>
+<div id="note-412" class="section level3">
+<h3>Note (4/12)</h3>
+<p>A quick note on these tests and statistical tests done in R generally
+– much of what we have introduced and talked about in class describes
+the basic theoretical justification for hypothesis testing. That is,
+establish a an assumption via the null hypothesis, construct a
+distribution of values we may see under the null, and then determine if
+our observed data is inconsistent with what we had assumed. This general
+procedure underlies much of statistical inference.</p>
+<p>As is often the case in many disciplines, there are typically several
+ways to solve a problem. An example that came up for some students
+involves the question of whether <span class="math inline">\(p_0\)</span> or <span class="math inline">\(\hat{p}\)</span> should be used in the
+construction of the standard error. Both are valid constructions, and
+though they offer slightly different results, asymptotically (that is as
+<span class="math inline">\(n \rightarrow \infty\)</span>) they lead to
+the same conclusion.</p>
+<p>This will be the case for many of the functions we will use in R for
+hypothesis testing; the solutions that you find here will not
+necessarily match what you would find by hand following the procedures
+we introduce in class. As such, guidance for answering questions should
+be as follows:</p>
+<ol style="list-style-type: decimal">
+<li>When a question is strictly conceptual (i.e., how would you do this,
+how does changing X impact Y), use what you have learned in lecture or
+from your notes to answer the question</li>
+<li>When the question asks to report a value or an interval, use what is
+provided by the output in R</li>
+<li>If a question combines both conceptual questions with an applied
+example, use R to find your values, but continue to let your answer be
+guided by concepts. An example might be asking about sample size and
+confidence intervals for the binomial – the methods introduced in class
+will always result in symmetrical interavls, while those provided by
+<code>binom.test()</code> will not. However, the impact of sample size
+on the width of intervals will act the same in both cases.</li>
+</ol>
 </div>
-<div id="hypothesis-testing" class="section level2">
-<h2>Hypothesis Testing</h2>
+</div>
+<div id="one-sample-hypothesis-testing" class="section level2">
+<h2>One Sample Hypothesis Testing</h2>
+<p>This set of tests involves collecting data on a single group of
+observations and testing various hypotheses.</p>
 <div id="testing-proportions" class="section level3">
 <h3>Testing proportions</h3>
 <p>While we are able to use our normality assumptions in constructing
@@ -1525,7 +1563,7 @@ a <a href="https://en.wikipedia.org/wiki/Binomial_distribution">binomial
 distribution</a>. As such, we can use an exact binomial to compute our
 confidence intervals and p-values rather than relying a normal
 approximations. This is done with the R function
-<code>binom.test()</code>. This function takes several arugments which
+<code>binom.test()</code>. This function takes several arguments which
 you can learn more about with <code>?binom.test</code>.</p>
 <p>For now, let’s consider again the Johns Hopkins study that found 31
 of 39 infants born preterm survived to 6 months. Here, we are wanting to
@@ -1731,10 +1769,126 @@ interval for the correlation between dose of Vitamin C and tooth length.
 What is the null hypothesis when evaluating if two variables are
 correlated? Does this data seem to support or refute our null
 hypothesis?</p>
+<p><strong>Question 7:</strong> Revist the lab on <a href="https://collinn.github.io/teaching/2024/labs/02_ggplot.html"><code>ggplot</code></a>
+to refresh how to use a data.frame to create a plot in R. For the
+<code>ToothGrowth</code> dataset, create a scatter plot showing the
+relationship between “dose” on the x-axis and “len” (length) on the
+y-axis. Does this plot seem consistent with you conclusion in Question
+6? (Hint: Use <code>geom_jitter()</code> instead of
+<code>geom_point()</code> for a slightly nicer looking plot)</p>
 </div>
-<div id="testing-odds-ratios" class="section level3">
-<h3>Testing Odds Ratios</h3>
-<p>tbd</p>
+</div>
+<div id="two-sample-hypothesis-tests" class="section level2">
+<h2>Two Sample Hypothesis Tests</h2>
+<p>These sets of tests will involve testing proportions or differences
+between two groups</p>
+<div id="difference-in-proportion" class="section level3">
+<h3>Difference in proportion</h3>
+<p>We have seen previously hypothesis testing for a single proportion,
+for example, establishing the null hypothesis that <span class="math inline">\(H_0: p_0\)</span> when evaluating the outcome of a
+series of binary events, i.e., what proportion of severely pre-term
+infants survive past 6 months? A related question seeks to investigate
+the proportion of events between two separate groups. For example,
+consider giving a drug and a placebo to two groups of patients and
+investigating the proportion of recipients who develop negative side
+effects: if the proportion of side effects is the <em>same</em> between
+two groups, we may conclude that there is no association between the
+drug and side-effects. Likewise, if this proportion is
+<em>different</em>, we may conclude that there <em>is</em> an
+association between the groups and an outcome.</p>
+<p>One method for investigating this is examining the <em>difference in
+proportions</em>. For groups 1 and 2 with proportions <span class="math inline">\(p_1\)</span> and <span class="math inline">\(p_2\)</span>, respectively, we might frame the
+null hypothesis that there is no difference as</p>
+<p><span class="math display">\[
+H_0: p_1 - p_2 = 0
+\]</span> Like with the single proportion case, the central limit
+theorem also applies to the difference in proportions, with the
+approximate distribution being</p>
+<p><span class="math display">\[
+\hat{p}_1 - \hat{p}_2 \sim N \left(p_1 - p_2, \
+\sqrt{\frac{p_1(1-p_1)}{n_1} + \frac{p_2(1-p_2)}{n_2}} \right)
+\]</span> where <span class="math inline">\(n_1\)</span> and <span class="math inline">\(n_2\)</span> represent the number of observations
+in each group. Note that the standard deviation term, which includes the
+sum of standard deviations of both groups, is known as the <em>pooled
+variance</em> which we will describe in some detail when reviewing the
+two-sample t-test.</p>
+<p>Again as before, a confidence interval around this estimate takes the
+form of</p>
+<p><span class="math display">\[
+(\hat{p}_1 - \hat{p}_2) \pm C \times \text{SE}
+\]</span></p>
+<p>For our example here, consider again the Titanic dataset in R, where
+we investigate the number of passengers and crew members of each sex who
+survived or died</p>
+<pre class="r"><code>## Titanic data in R
+titanic &lt;- as.data.frame(Titanic)
+titanic &lt;- titanic[rep(1:nrow(titanic), times = titanic$Freq), ]
+titanic$Freq &lt;- NULL
+
+# Table
+with(titanic, table(Sex, Survived))</code></pre>
+<pre><code>##         Survived
+## Sex        No  Yes
+##   Male   1364  367
+##   Female  126  344</code></pre>
+<p>Of the males, we find the proportion of survived to be <span class="math inline">\(\hat{p}_1 = \frac{367}{1731}\)</span>, whereas the
+proportion for females is <span class="math inline">\(\hat{p}_2 =
+\frac{344}{470}\)</span>. Implied in this is our group sizes, with <span class="math inline">\(n_1 = 1731\)</span> and <span class="math inline">\(n_2 = 470\)</span>. To test the difference in
+proportions, we will use the <code>prop.test()</code> function, similar
+to the <code>binom.test()</code>, but now passing in a <em>vector</em>
+indicating the number of “successes” and a vector for the total</p>
+<pre class="r"><code># Difference in proportion test for titanic data
+prop.test(x = c(367, 344), n = c(1731, 470))</code></pre>
+<pre><code>## 
+##  2-sample test for equality of proportions with continuity correction
+## 
+## data:  c(367, 344) out of c(1731, 470)
+## X-squared = 454, df = 1, p-value &lt;0.0000000000000002
+## alternative hypothesis: two.sided
+## 95 percent confidence interval:
+##  -0.56569 -0.47411
+## sample estimates:
+##  prop 1  prop 2 
+## 0.21202 0.73191</code></pre>
+<p>There are a few things from this output to notice. From the top:</p>
+<ol style="list-style-type: decimal">
+<li>In the header of the results, we see that this is a 2-sample test
+for equality of proportions with a <em>continuity correction</em>.
+Recall the note at the top of the lab indicating that these differences
+in software will slightly modify what we would find computing this by
+hand</li>
+<li>Next, we see information on a “chi-squared test.” We will discuss
+this next week</li>
+<li>Next, we see a p-value along with a 95 percent confidence interval
+for the true difference in proportions. We can change the width of this
+confidence interval with the argument <code>conf.level</code></li>
+<li>Finally, we see sample estimates for each proportion, which is
+equivalent to what we would have found had we computed <span class="math inline">\(\hat{p}_1\)</span> and <span class="math inline">\(\hat{p}_2\)</span> directly</li>
+</ol>
+<p>Generally speaking, from these tests we will be interested in
+identifying the p-value, the confidence interval, and possibly estimates
+of each of the relevant proportions.</p>
+<p><strong>Question 8:</strong> The results of the clinical trial for
+the Pfizer Covid-19 mRNA injections were <a href="https://www.nejm.org/doi/full/10.1056/NEJMoa2034577">published in
+December 2020</a>. The study consisted of a sample of 43,548
+individuals, 21,720 of whom were given the BNT162b2 injection and 21,728
+being given a placebo. After a period of 6 months, 8 individuals in the
+drug group exhibited symptoms of Covid-19, while the number in the
+placebo group was 162.</p>
+<ul>
+<li>What is the estimated proportion of individuals in each group who
+developed symptoms of Covid-19</li>
+<li>Find a 95% confidence interval for the true difference in proportion
+between these groups</li>
+<li>Perform a statistical test on the difference in proportions. Base on
+this, what would you conclude?</li>
+</ul>
+</div>
+<div id="two-sample-t-test" class="section level3">
+<h3>Two-sample t-test</h3>
+</div>
+<div id="paired-t-test" class="section level3">
+<h3>Paired t-test</h3>
 </div>
 </div>
 
