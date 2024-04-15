@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-04-12" />
+<meta name="date" content="2024-04-15" />
 
 <title>Lab 7 – Hypothesis Testing</title>
 
@@ -1479,7 +1479,7 @@ border-radius: 0px;
 
 
 <h1 class="title toc-ignore">Lab 7 – Hypothesis Testing</h1>
-<h4 class="date">2024-04-12</h4>
+<h4 class="date">2024-04-15</h4>
 
 </div>
 
@@ -1778,8 +1778,8 @@ y-axis. Does this plot seem consistent with you conclusion in Question
 <code>geom_point()</code> for a slightly nicer looking plot)</p>
 </div>
 </div>
-<div id="two-sample-hypothesis-tests" class="section level2">
-<h2>Two Sample Hypothesis Tests</h2>
+<div id="two-sample-hypothesis-testing" class="section level2">
+<h2>Two Sample Hypothesis Testing</h2>
 <p>These sets of tests will involve testing proportions or differences
 between two groups</p>
 <div id="difference-in-proportion" class="section level3">
@@ -1886,10 +1886,170 @@ this, what would you conclude?</li>
 </div>
 <div id="two-sample-t-test" class="section level3">
 <h3>Two-sample t-test</h3>
+<p>Just as with the one sample test, two sample t-tests are done with
+the function <code>t.test()</code>. There are two ways to use this
+function, depending on how your data is stored.</p>
+<p>The simplest case involves passing two independent vectors. For
+example, here we have a vector <code>x</code> of length 50 and a vector
+<code>y</code> of length 20. To conduct a t-test on the difference of
+these two vectors, its enough to simply pass them in as the first two
+arguments:</p>
+<pre class="r"><code>## Random vector x
+set.seed(123)
+x &lt;- rnorm(50, mean = 20, sd = 2)
+y &lt;- rnorm(20, mean = 15, sd = 1)
+
+t.test(x, y)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  x and y
+## t = 15, df = 66, p-value &lt;0.0000000000000002
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  4.2438 5.5491
+## sample estimates:
+## mean of x mean of y 
+##    20.069    15.172</code></pre>
+<p>As before, you’ll find that the <code>t.test()</code> function
+returns a t-statistic, degrees of freedom, a p-value, confidence
+interval, and then estimates of the mean difference. You’ll also note in
+this case that the heading at the top indicates that this is a “Welch
+Two Sample t-test”, corresponding to the fact that it makes no
+assumptions about the standard deviations of your samples being the
+same.</p>
+<p>The next two cases involve data that is stored in a data.frame.
+First, consider the case where each of the varibles we wish to test are
+stored in a data.frame as columns</p>
+<pre class="r"><code>## Pretend data set
+set.seed(123)
+df &lt;- data.frame(A = rnorm(5, 1, 1), 
+                 B = rnorm(5, 0, 1))
+
+print(df)</code></pre>
+<pre><code>##         A        B
+## 1 0.43952  1.71506
+## 2 0.76982  0.46092
+## 3 2.55871 -1.26506
+## 4 1.07051 -0.68685
+## 5 1.12929 -0.44566</code></pre>
+<p>If the two variables that you wish to test are both columns in a
+data.frame, you can use the <code>$</code> operator to pass them in like
+vectors</p>
+<pre class="r"><code>## Pass in A and B columns
+t.test(df$A, df$B)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  df$A and df$B
+## t = 1.95, df = 7.14, p-value = 0.091
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.25577  2.73155
+## sample estimates:
+## mean of x mean of y 
+##  1.193570 -0.044319</code></pre>
+<p>Implicit in this data structure is the assumption that these
+variables are the same length. More frequently, you have a data.frame
+that contains a column indicating groups and a second column indicating
+the values we want to test. For example, consider the format of the
+following example data:</p>
+<pre class="r"><code>set.seed(123)
+df &lt;- data.frame(Group = rep(c(&quot;A&quot;, &quot;B&quot;), times = c(6, 5)), 
+                 Value = c(rnorm(6, 0, 1), rnorm(5, 0, 1)))
+print(df)</code></pre>
+<pre><code>##    Group     Value
+## 1      A -0.560476
+## 2      A -0.230177
+## 3      A  1.558708
+## 4      A  0.070508
+## 5      A  0.129288
+## 6      A  1.715065
+## 7      B  0.460916
+## 8      B -1.265061
+## 9      B -0.686853
+## 10     B -0.445662
+## 11     B  1.224082</code></pre>
+<p>Here, there is no simple way to to separate the values associated
+with group A over those with group B; indeed, to use the
+<code>t.test</code> function as we did before would require creating
+multiple subsets of the data.frame.</p>
+<p>Alternatively, we can use a <em>formula</em> syntax of the form
+<code>Value ~ Group</code> indicating that we want to test the
+differences in means from the <code>Value</code> column associated with
+the groups in the <code>Group</code> column</p>
+<pre class="r"><code>t.test(Value ~ Group, data = df)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  Value by Group
+## t = 1, df = 8.53, p-value = 0.34
+## alternative hypothesis: true difference in means between group A and group B is not equal to 0
+## 95 percent confidence interval:
+##  -0.75217  1.93150
+## sample estimates:
+## mean in group A mean in group B 
+##         0.44715        -0.14252</code></pre>
+<p>Next we consider <em>paired</em> testing with the
+<code>t.test()</code> function. This can be done by adding the argument
+<code>paired = TRUE</code> when calling the function. Here is the
+example with the language scores from lecture</p>
+<pre class="r"><code>## Pre and post test scores on French language exam
+pre &lt;- c(32,31,29,10,30,33,22,25,32,20,30,20,24,24,31,30,15,32,23,23)
+post &lt;- c(34,31,35,16,33,36,24,28,26,26,36,26,27,24,32,31,15,34,26,26)
+
+t.test(post, pre, paired = TRUE)</code></pre>
+<pre><code>## 
+##  Paired t-test
+## 
+## data:  post and pre
+## t = 3.86, df = 19, p-value = 0.001
+## alternative hypothesis: true mean difference is not equal to 0
+## 95 percent confidence interval:
+##  1.1461 3.8539
+## sample estimates:
+## mean difference 
+##             2.5</code></pre>
+<p>Because the t-test is symmetrical the order in which we put these in
+doesn’t matter, though it is worth while noting that switching the order
+will change the sign of the confidence interval and t-statistic, but it
+won’t change the p-value</p>
+<pre class="r"><code>t.test(pre, post, paired = TRUE)</code></pre>
+<pre><code>## 
+##  Paired t-test
+## 
+## data:  pre and post
+## t = -3.86, df = 19, p-value = 0.001
+## alternative hypothesis: true mean difference is not equal to 0
+## 95 percent confidence interval:
+##  -3.8539 -1.1461
+## sample estimates:
+## mean difference 
+##            -2.5</code></pre>
+<p><strong>Question 9:</strong> Using the <code>college</code> dataset,
+conduct a two-sample t-test on the difference in means for the variable
+<code>ACT_median</code> between public and private schools. Modify the
+arguments to the <code>t.test()</code> function so that it returns an
+estimate of the 99% confidence interval. Testing at the <span class="math inline">\(\alpha = 0.01\)</span> level, would you reject or
+fail to reject the hypothesis that the median ACT between public and
+private schools is the same.</p>
+<pre class="r"><code>college &lt;- read.csv(&quot;https://remiller1450.github.io/data/Colleges2019.csv&quot;)</code></pre>
+<p><strong>Question 10:</strong> Again using the <code>college</code>
+dataset, this time now conduct a two-sample t-test on the four-year
+completion rate of males and females (<code>FourYearComp_Females</code>
+and <code>FourYearComp_Males</code>). What would you conclude from the
+results of your test?</p>
+<p><strong>Question 11:</strong> Using the <code>pre</code> and
+<code>post</code> variables for the French language test created above,
+create a new vector <code>difference</code> that is equal to the
+difference between the two. Then, do a one sample t-test on the new
+<code>difference</code> vector, testing the null hypothesis that the
+difference is equal to zero. How do the results of this test compare
+with the paired t-test done above?</p>
 </div>
-<div id="paired-t-test" class="section level3">
-<h3>Paired t-test</h3>
 </div>
+<div id="chi2-tests" class="section level2">
+<h2><span class="math inline">\(\chi^2\)</span> Tests</h2>
 </div>
 
 
