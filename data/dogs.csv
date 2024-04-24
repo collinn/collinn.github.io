@@ -1,0 +1,401 @@
+breed,speed,color,size
+Greyhound,34.4597175256225,black,large
+Greyhound,40.1532927240876,white,large
+Greyhound,36.9478793505521,black,large
+Greyhound,40.8492245421034,white,large
+Greyhound,45.7021518674712,black,large
+Greyhound,42.9779192893359,white,large
+Greyhound,42.8009176119449,black,large
+Greyhound,39.0825815461931,white,large
+Greyhound,40.7883754475814,black,large
+Greyhound,44.828615095489,white,large
+Greyhound,41.2733469056991,black,large
+Greyhound,34.3048045854898,white,large
+Greyhound,38.3796365678033,black,large
+Greyhound,43.9815462627361,white,large
+Greyhound,43.835271150561,black,large
+Greyhound,43.6723515852798,white,large
+Greyhound,39.3961215924736,black,large
+Greyhound,35.1077248445352,white,large
+Greyhound,36.5247028454488,black,large
+Greyhound,35.8300585403828,white,large
+Greyhound,35.5854488677325,black,large
+Greyhound,41.7767402465464,white,large
+Greyhound,39.1801975510091,black,large
+Greyhound,46.7025297325933,white,large
+Greyhound,39.4747110002783,black,large
+Greyhound,39.2004680882753,white,large
+Greyhound,40.2196496617285,black,large
+Greyhound,37.2713380458193,white,large
+Greyhound,37.0891834074294,black,large
+Greyhound,36.5523828562387,white,large
+Greyhound,39.8499075400239,black,large
+Greyhound,33.4743070390552,white,large
+Greyhound,40.7086663835498,black,large
+Greyhound,39.9499968036873,white,large
+Greyhound,38.4227314942964,black,large
+Greyhound,41.406251724884,white,large
+Greyhound,43.5150702508797,black,large
+Greyhound,40.8186163209224,white,large
+Greyhound,36.4504771584331,black,large
+Greyhound,38.0911357668218,white,large
+Greyhound,38.9290361865812,black,large
+Greyhound,46.343436652607,white,large
+Greyhound,40.1876023787918,black,large
+Greyhound,41.4259871089798,white,large
+Greyhound,39.5144799787185,black,large
+Greyhound,39.8556326316024,white,large
+Greyhound,36.0754100530928,black,large
+Greyhound,38.2629606893883,white,large
+Greyhound,39.730062578833,black,large
+Greyhound,43.9275782638558,white,large
+Mastiff,3.07589521741002,black,large
+Mastiff,3.54980143471204,black,large
+Mastiff,2.30710439947622,black,large
+Mastiff,4.1460926387177,black,large
+Mastiff,3.4499271609077,black,large
+Mastiff,3.22714728548395,black,large
+Mastiff,3.90759371711934,black,large
+Mastiff,2.34821255632724,black,large
+Mastiff,2.2919315245086,black,large
+Mastiff,4.23747361880531,black,large
+Mastiff,4.56719381103463,black,large
+Mastiff,7.86017293249653,black,large
+Mastiff,1.71894476390434,black,large
+Mastiff,1.35576351426717,black,large
+Mastiff,6.45766321078999,black,large
+Mastiff,2.90308793528826,black,large
+Mastiff,3.74798501573151,black,large
+Mastiff,5.37543744326241,black,large
+Mastiff,5.410400751943,black,large
+Mastiff,5.60295685818173,black,large
+Mastiff,3.07423364167272,black,large
+Mastiff,2.23089003179837,black,large
+Mastiff,0.73814485315994,black,large
+Mastiff,5.12446117583931,black,large
+Mastiff,3.34821633074675,black,large
+Mastiff,4.48275124019712,yellow,large
+Mastiff,6.17173819891453,yellow,large
+Mastiff,7.81412322932016,yellow,large
+Mastiff,5.62585489860373,yellow,large
+Mastiff,4.98977757422637,yellow,large
+Mastiff,3.80970447296524,yellow,large
+Mastiff,6.2775609990026,yellow,large
+Mastiff,5.00462925772383,yellow,large
+Mastiff,2.96917189195014,yellow,large
+Mastiff,0.93678093416942,yellow,large
+Mastiff,2.25489451254814,yellow,large
+Mastiff,5.92817615979051,yellow,large
+Mastiff,5.82159249741563,yellow,large
+Mastiff,7.85161767489337,yellow,large
+Mastiff,3.39418610415742,yellow,large
+Mastiff,1.8905858997746,yellow,large
+Mastiff,4.83623217036779,yellow,large
+Mastiff,5.40254564386523,yellow,large
+Mastiff,4.49351656470368,yellow,large
+Mastiff,4.92859032277346,yellow,large
+Mastiff,3.20906362459798,yellow,large
+Mastiff,5.4261406103095,yellow,large
+Mastiff,6.37002511265525,yellow,large
+Mastiff,0.177701423793123,yellow,large
+Mastiff,6.22986112812464,yellow,large
+Bulldog,9.06139958749466,black,medium
+Bulldog,7.70399449321734,white,medium
+Bulldog,12.2079959133155,black,medium
+Bulldog,9.42150016609624,white,medium
+Bulldog,9.44534275798095,black,medium
+Bulldog,8.24843472238859,white,medium
+Bulldog,10.0065583036288,black,medium
+Bulldog,10.5311832507501,white,medium
+Bulldog,9.75195173668567,black,medium
+Bulldog,9.74214818882673,white,medium
+Bulldog,10.5982246281233,black,medium
+Bulldog,10.0365984236453,white,medium
+Bulldog,7.69987733832367,black,medium
+Bulldog,9.14120730594183,white,medium
+Bulldog,11.7000059533564,black,medium
+Bulldog,9.57034101631326,white,medium
+Bulldog,8.76517196789293,black,medium
+Bulldog,10.2188547680683,white,medium
+Bulldog,8.58697787216335,black,medium
+Bulldog,13.0859516331087,white,medium
+Bulldog,10.7016034403475,black,medium
+Bulldog,12.3452411481914,white,medium
+Bulldog,9.93325293897693,black,medium
+Bulldog,10.7228879913125,white,medium
+Bulldog,12.0911512770038,black,medium
+Bulldog,10.2064247848312,white,medium
+Bulldog,10.6635911152901,black,medium
+Bulldog,6.86288237052218,white,medium
+Bulldog,10.8805398883853,black,medium
+Bulldog,13.763742644649,white,medium
+Bulldog,12.6982125303833,black,medium
+Bulldog,6.72983445684421,white,medium
+Bulldog,8.56893453565505,black,medium
+Bulldog,8.16701135423713,white,medium
+Bulldog,5.27794611064971,black,medium
+Bulldog,13.056900002985,white,medium
+Bulldog,8.74042555228904,black,medium
+Bulldog,7.8638159571647,white,medium
+Bulldog,12.4897196484123,black,medium
+Bulldog,10.919752292131,white,medium
+Bulldog,10.3354116566385,black,medium
+Bulldog,9.44999395478172,white,medium
+Bulldog,10.9846452360908,black,medium
+Bulldog,12.6795091421775,white,medium
+Bulldog,9.04651155139604,black,medium
+Bulldog,7.006408926904,white,medium
+Bulldog,7.59715205870189,black,medium
+Bulldog,9.18507794358488,white,medium
+Bulldog,8.10450380930864,black,medium
+Bulldog,11.7033327968203,white,medium
+Corgie,23.2347069724737,black,small
+Corgie,20.9125806889018,black,small
+Corgie,23.6510861733061,black,small
+Corgie,23.0700249054423,black,small
+Corgie,23.4677633446986,black,small
+Corgie,25.7716060333679,black,small
+Corgie,23.741333656256,black,small
+Corgie,22.1433170341982,black,small
+Corgie,26.537180215255,black,small
+Corgie,19.7671969447229,black,small
+Corgie,23.507462765309,black,small
+Corgie,27.2967573440425,black,small
+Corgie,26.5041792023194,black,small
+Corgie,25.9957335128125,black,small
+Corgie,24.7267727991786,black,small
+Corgie,23.0299539014169,black,small
+Corgie,21.5174555840548,black,small
+Corgie,29.9677958019332,black,small
+Corgie,22.7523683570627,black,small
+Corgie,26.865761665388,black,small
+Corgie,20.5845844933161,black,small
+Corgie,27.3945863705012,black,small
+Corgie,25.838387527145,black,small
+Corgie,26.9736227770207,black,small
+Corgie,26.7811789702851,black,small
+Corgie,23.2662204594568,yellow,small
+Corgie,26.428188202851,yellow,small
+Corgie,21.4370991444363,yellow,small
+Corgie,27.1530641360358,yellow,small
+Corgie,25.4040917349484,yellow,small
+Corgie,29.2662410202992,yellow,small
+Corgie,25.1221927395239,yellow,small
+Corgie,23.9847707471242,yellow,small
+Corgie,23.3256538356728,yellow,small
+Corgie,28.0834404495628,yellow,small
+Corgie,24.3235885643217,yellow,small
+Corgie,21.3051098469765,yellow,small
+Corgie,22.7252657760263,yellow,small
+Corgie,28.2565544457701,yellow,small
+Corgie,21.8527033451223,yellow,small
+Corgie,25.8711986577552,yellow,small
+Corgie,23.6572797212489,yellow,small
+Corgie,24.3434177007069,yellow,small
+Corgie,20.1836694625969,yellow,small
+Corgie,25.2245190575928,yellow,small
+Corgie,23.4342439018469,yellow,small
+Corgie,24.8052928930454,yellow,small
+Corgie,28.1541099044826,yellow,small
+Corgie,19.7735252098627,yellow,small
+Corgie,30.1976440841605,yellow,small
+German Shepard,30.9883253647794,black,large
+German Shepard,28.3383603739233,black,large
+German Shepard,31.6159746223448,black,large
+German Shepard,30.4188202717247,black,large
+German Shepard,29.4448636053772,black,large
+German Shepard,27.0634943893683,black,large
+German Shepard,30.9946461628864,black,large
+German Shepard,30.2928751925144,black,large
+German Shepard,31.2831834486381,black,large
+German Shepard,30.137952311754,black,large
+German Shepard,30.037061540051,black,large
+German Shepard,29.4591544740004,black,large
+German Shepard,29.5352886851109,black,large
+German Shepard,28.1042031533929,black,large
+German Shepard,30.5474793576162,black,large
+German Shepard,29.8606059295217,black,large
+German Shepard,29.1106742095845,black,large
+German Shepard,30.07753908789,black,large
+German Shepard,29.3708718960732,black,large
+German Shepard,33.745703644668,black,large
+German Shepard,27.2213289779151,black,large
+German Shepard,31.39441802331,black,large
+German Shepard,27.6761408216678,black,large
+German Shepard,28.1445175792138,black,large
+German Shepard,30.5876822024508,black,large
+German Shepard,30.4109456819467,yellow,large
+German Shepard,30.7928438413509,yellow,large
+German Shepard,29.6501060153608,yellow,large
+German Shepard,28.2679146757686,yellow,large
+German Shepard,28.4973031681318,yellow,large
+German Shepard,26.6803874995286,yellow,large
+German Shepard,25.0737766807153,yellow,large
+German Shepard,31.9947187228978,yellow,large
+German Shepard,32.4024843334355,yellow,large
+German Shepard,25.8220514865772,yellow,large
+German Shepard,32.0055383887086,yellow,large
+German Shepard,29.5979396266293,yellow,large
+German Shepard,30.8073131851223,yellow,large
+German Shepard,30.5767301797166,yellow,large
+German Shepard,30.0032608571662,yellow,large
+German Shepard,28.6553711895818,yellow,large
+German Shepard,31.761703921286,yellow,large
+German Shepard,28.7767055528504,yellow,large
+German Shepard,27.9422597507986,yellow,large
+German Shepard,33.9325768367041,yellow,large
+German Shepard,27.4567406663861,yellow,large
+German Shepard,30.1861024792909,yellow,large
+German Shepard,30.6141229855801,yellow,large
+German Shepard,30.019065226036,yellow,large
+German Shepard,28.6092615316639,yellow,large
+Chihuahua,19.9005874398916,black,small
+Chihuahua,13.8700509059792,black,small
+Chihuahua,14.5012853467287,black,small
+Chihuahua,14.9035431603519,black,small
+Chihuahua,16.5394603858611,black,small
+Chihuahua,18.8046820345373,black,small
+Chihuahua,11.8191520473615,black,small
+Chihuahua,16.858987868701,black,small
+Chihuahua,12.5411154007272,black,small
+Chihuahua,13.5367720835328,black,small
+Chihuahua,14.7267436823096,black,small
+Chihuahua,15.9237820473129,black,small
+Chihuahua,13.8753480776342,black,small
+Chihuahua,12.6364299625621,black,small
+Chihuahua,11.950981434197,black,small
+Chihuahua,7.12494348810618,black,small
+Chihuahua,14.3105036722188,black,small
+Chihuahua,14.2022479231851,black,small
+Chihuahua,16.0914502392084,black,small
+Chihuahua,15.3470587833396,black,small
+Chihuahua,17.2719198513948,black,small
+Chihuahua,19.5459386070146,black,small
+Chihuahua,7.0206484417963,black,small
+Chihuahua,12.9354598808594,black,small
+Chihuahua,13.7202640569792,black,small
+Chihuahua,13.7213836719062,brown,small
+Chihuahua,15.4449098284847,brown,small
+Chihuahua,22.5834283276819,brown,small
+Chihuahua,14.5697997361454,brown,small
+Chihuahua,18.0992029285274,brown,small
+Chihuahua,13.9264053201899,brown,small
+Chihuahua,17.2731654424925,brown,small
+Chihuahua,21.8962280901308,brown,small
+Chihuahua,14.7732897137423,brown,small
+Chihuahua,23.5837453880444,brown,small
+Chihuahua,10.7736299093425,brown,small
+Chihuahua,15.2293132782965,brown,small
+Chihuahua,9.6803727052095,brown,small
+Chihuahua,14.3684157349999,brown,small
+Chihuahua,14.0886370800853,brown,small
+Chihuahua,13.1645344119695,brown,small
+Chihuahua,14.5787371478463,brown,small
+Chihuahua,15.3640723230614,brown,small
+Chihuahua,17.2011185284061,brown,small
+Chihuahua,21.6782960716533,brown,small
+Chihuahua,16.7303759743601,brown,small
+Chihuahua,15.4935284665806,brown,small
+Chihuahua,17.3846757943843,brown,small
+Chihuahua,18.112789069591,brown,small
+Chihuahua,10.64196991244,brown,small
+Poodle,29.9020257288521,black,medium
+Poodle,31.7810440270356,black,medium
+Poodle,35.620862862063,black,medium
+Poodle,30.6551798318333,black,medium
+Poodle,27.9117853238007,black,medium
+Poodle,28.4200818637064,black,medium
+Poodle,30.3963213980445,black,medium
+Poodle,29.6903775004164,black,medium
+Poodle,28.1680787987603,black,medium
+Poodle,28.0451196591838,black,medium
+Poodle,33.1135184882847,black,medium
+Poodle,29.878516898753,black,medium
+Poodle,29.7765670175279,black,medium
+Poodle,27.7026668578791,black,medium
+Poodle,33.0124188071191,black,medium
+Poodle,32.0521588751362,black,medium
+Poodle,27.982282907835,black,medium
+Poodle,31.0160248914623,black,medium
+Poodle,29.637769776823,black,medium
+Poodle,27.5863683132551,black,medium
+Poodle,31.2261769216868,black,medium
+Poodle,33.2939622927884,black,medium
+Poodle,30.8322474711816,black,medium
+Poodle,30.2402297068184,black,medium
+Poodle,29.3062571195801,black,medium
+Poodle,26.6844610687649,brown,medium
+Poodle,32.1542849748675,brown,medium
+Poodle,28.5155718687728,brown,medium
+Poodle,30.3430102948054,brown,medium
+Poodle,31.2504275068436,brown,medium
+Poodle,27.7217910290204,brown,medium
+Poodle,28.963742293284,brown,medium
+Poodle,34.0776734677988,brown,medium
+Poodle,28.2714062387935,brown,medium
+Poodle,28.3777522203443,brown,medium
+Poodle,31.4596911536592,brown,medium
+Poodle,27.2350517178419,brown,medium
+Poodle,25.9044266639805,brown,medium
+Poodle,30.4828874733386,brown,medium
+Poodle,28.7018505404571,brown,medium
+Poodle,26.6691328885495,brown,medium
+Poodle,30.1612352276075,brown,medium
+Poodle,27.8684952650185,brown,medium
+Poodle,30.9568440622459,brown,medium
+Poodle,32.73794958848,brown,medium
+Poodle,26.2551421969354,brown,medium
+Poodle,31.0095623038639,brown,medium
+Poodle,31.551959399546,brown,medium
+Poodle,31.6836075909719,brown,medium
+Poodle,31.0696994930373,brown,medium
+Saint Bernard,13.6471379427757,black,large
+Saint Bernard,12.1010711295331,black,large
+Saint Bernard,16.1911156881427,black,large
+Saint Bernard,16.557433717226,black,large
+Saint Bernard,14.654330853835,black,large
+Saint Bernard,16.3141695363203,black,large
+Saint Bernard,15.8705219234293,black,large
+Saint Bernard,13.7293814729379,black,large
+Saint Bernard,18.9684145415543,black,large
+Saint Bernard,16.3216929684884,black,large
+Saint Bernard,14.8816720134737,black,large
+Saint Bernard,15.2897023617372,black,large
+Saint Bernard,15.1212804201916,black,large
+Saint Bernard,12.5658072001527,black,large
+Saint Bernard,16.862614100562,black,large
+Saint Bernard,11.2974347867941,black,large
+Saint Bernard,15.7002999825396,black,large
+Saint Bernard,15.1712182079738,black,large
+Saint Bernard,15.7352823077537,black,large
+Saint Bernard,16.7603239330366,black,large
+Saint Bernard,13.4598503696947,black,large
+Saint Bernard,8.60937295793759,black,large
+Saint Bernard,13.1240118122131,black,large
+Saint Bernard,16.8054032445681,black,large
+Saint Bernard,16.1706029199004,black,large
+Saint Bernard,15.1267188390452,yellow,large
+Saint Bernard,18.5398908641943,yellow,large
+Saint Bernard,14.1293106505316,yellow,large
+Saint Bernard,16.0594799449307,yellow,large
+Saint Bernard,15.2034130559762,yellow,large
+Saint Bernard,11.934902127555,yellow,large
+Saint Bernard,14.784923379712,yellow,large
+Saint Bernard,16.5246654361608,yellow,large
+Saint Bernard,14.5324128979508,yellow,large
+Saint Bernard,16.4213533314931,yellow,large
+Saint Bernard,14.9779457652432,yellow,large
+Saint Bernard,15.3510101605474,yellow,large
+Saint Bernard,12.9337272368493,yellow,large
+Saint Bernard,19.104933110759,yellow,large
+Saint Bernard,12.4458477895027,yellow,large
+Saint Bernard,14.3984454221217,yellow,large
+Saint Bernard,16.6340380836764,yellow,large
+Saint Bernard,14.0515461281814,yellow,large
+Saint Bernard,14.9740212116142,yellow,large
+Saint Bernard,14.6482757228555,yellow,large
+Saint Bernard,14.5568476925508,yellow,large
+Saint Bernard,13.8218855812271,yellow,large
+Saint Bernard,15.0725430796742,yellow,large
+Saint Bernard,13.4589139303115,yellow,large
+Saint Bernard,11.0422083153273,yellow,large
