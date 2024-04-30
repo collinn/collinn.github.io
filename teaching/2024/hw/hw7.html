@@ -379,9 +379,67 @@ findings here compare with the conclusions you had in Homework 6?</li>
 </div>
 <div id="question-2" class="section level2">
 <h2>Question 2</h2>
+<p>In response to several outbreaks of pertussis among newborns (in whom
+it is very serious and occasionally fatal), the CDC now recommends that
+pregnant women receive the Tdap vaccine during pregnancy. The purpose of
+this study was to investigate whether this new recommendation has any
+unintended side effects with respect to the risk of preterm birth. The
+average gestational period is approximately 40 weeks.</p>
+<pre class="r"><code>tdap &lt;- read.delim(&quot;https://github.com/IowaBiostat/data-sets/raw/main/tdap/tdap.txt&quot;)</code></pre>
+<p>This dataset contains three variables: <code>Delivery</code>,
+indicating the time of delivery in weeks since inception,
+<code>Vac</code>, an indicator for whether or not a woman received the
+Tdap vaccine during pregnancy, and <code>tVac</code>, the number of
+weeks into the pregnancy the woman received the vaccine.</p>
+<ul>
+<li><strong>Part A:</strong> First, conduct a t-test to determine if
+there is a statistically significant difference in gestational times
+between women who did and did not receive the Tdap vaccine at level
+<span class="math inline">\(\alpha = 0.05\)</span></li>
+<li><strong>Part B:</strong> Now use the <code>filter</code> function
+from <code>dplyr</code> to create a subset of this data containing
+<em>only</em> women who received the Tdap vaccine
+(<code>Vac = 1</code>). Using the subset, create a linear regression
+model investigating the relationship between when the woman received the
+Tdap vaccine and the delivery time in weeks. What impact does vaccine
+time appear to have on delivery time?</li>
+<li><strong>Part C:</strong> Find and interpret the Multiple <span class="math inline">\(R^2\)</span> value from your summary output in
+Part B. Does when a woman received a Tdap vaccine appear to be a good
+predictor of when her baby was delivered? Give your answer in terms of
+variance explained.</li>
+</ul>
 </div>
-<div id="quesiton-3" class="section level2">
-<h2>Quesiton 3</h2>
+<div id="question-3" class="section level2">
+<h2>Question 3</h2>
+<p>This question will again consider the <code>mtcars</code> dataset
+built into R</p>
+<pre class="r"><code>data(mtcars)</code></pre>
+<p>We will be investigating the relationship between the weight of a car
+(independent variable) and its miles per gallon (dependent variable). In
+addition to this, we will also be using the number of carburetors as a
+second independent variable.</p>
+<ul>
+<li><strong>Part A:</strong> Create a linear model predicting
+<code>mpg</code> with the covariates <code>wt</code> and
+<code>carb</code>. Based on the results, does it appear that the number
+of carburetors has a relationship with fuel economy (mpg)?</li>
+<li><strong>Part B:</strong> By default, <code>carb</code> is stored in
+the dataset as an <em>integer</em> value. Use the <code>mutate</code>
+function to create a new variable in the <code>mtcars</code> dataset
+called <code>carb_factor</code> that is equal to
+<code>carb_factor = fator(carb)</code>. This will turn the new variable
+into a <em>categorical</em> one instead of an integer</li>
+<li><strong>Part C:</strong> Create a new linear model, this time
+predicting <code>mpg</code> with <code>wt</code> and
+<code>carb_factor</code>. What has changed this time? Specifically, what
+do the covariates in the new model represent, and how is this different
+from what we saw in Part A? (Hint: how do the estimates for
+<code>factor_carb</code> change as the number of carbs increases?)</li>
+<li><strong>Part D:</strong> Based on your assessment in Part C, which
+of these two models do you think is more appropriate for predicting
+weight? In other words, does the number of carburetors appear to make
+more sense as a continuous variable or a categorical one?</li>
+</ul>
 <!-- ![](fig82.png) -->
 <!--   - How would you describe these datasets? Are the means different? -->
 <!--   - Do A and B both have three groups in the same sense of the word? -->
