@@ -1,4 +1,4 @@
-X,Name,City,State,Enrollment,Private,Region,Adm_Rate,ACT_median,ACT_Q1,ACT_Q3,Cost,Net_Tuition,Avg_Fac_Salary,PercentFemale,PercentWhite,PercentBlack,PercentHispanic,PercentAsian,FourYearComp_Males,FourYearComp_Females,Debt_median,Salary10yr_median
+X,Name,City,State,Enrollment,Type,Region,Adm_Rate,ACT_median,ACT_Q1,ACT_Q3,Cost,Net_Tuition,Avg_Fac_Salary,PercentFemale,PercentWhite,PercentBlack,PercentHispanic,PercentAsian,FourYearComp_Males,FourYearComp_Females,Debt_median,Salary10yr_median
 1,Abilene Christian University,Abilene,TX,3524,Private,South West,0.5696,24,21,21,48046,16177,69804,0.6118200134,0.794599990844726,0.0814000034332275,0.163500003814697,0.0286999988555908,0.411575562701,0.528301886792,16000,43000
 3,Adelphi University,Garden City,NY,5307,Private,Mid East,0.7418,25,22,22,49008,24971,111339,0.7211120765,0.666900024414062,0.178500003814697,0.129200000762939,0.0673000001907348,0.611464968153,0.699885452463,19500,58500
 4,Adrian College,Adrian,MI,1781,Private,Great Lakes,0.6481,23,19,19,51626,14136,72873,0.4221105528,0.886100006103515,0.0692000007629394,0.031800000667572,0.0121000003814697,0.232091690544,0.331983805668,18468,38600
