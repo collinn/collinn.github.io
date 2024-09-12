@@ -1785,10 +1785,10 @@ x &lt;- rnorm(50)
 
 ## Without pipe
 sqrt(var(x))</code></pre>
-<pre><code>## [1] 1.0601</code></pre>
+<pre><code>## [1] 0.90555</code></pre>
 <pre class="r"><code>## With pipe
 var(x) %&gt;% sqrt()</code></pre>
-<pre><code>## [1] 1.0601</code></pre>
+<pre><code>## [1] 0.90555</code></pre>
 </div>
 </div>
 <div id="using-tables" class="section level1">
@@ -2295,18 +2295,42 @@ support of your conclusion.</p>
 </div>
 <div id="question-4" class="section level4">
 <h4>Question 4</h4>
-<p>This question addresses the use of tables and corresponding bar
-charts.</p>
-<p>TBD</p>
-<!-- The following set of exercises involve the `UCBAdmissions` dataset collecting aggregate data on applications to graduate school at UC Berkeley for the six largest departments in 1973. Variables in this dataset include the department (A-E), the sex of the applicant, and the associated admissions decision. This data became famous in its use as evidence relating to claims of sex bias in admission practices. For this problem, we are going to investigate the veracity of these claims. -->
-<!-- Start by copying the code block below to modify the data as it is built-in in R to something we are used to working with. Then, answer the following questions. -->
-<!-- ```{r} -->
-<!-- ## Create UC Berkeley data from built-in R dataset -->
-<!-- data("UCBAdmissions") -->
-<!-- ucb <- as.data.frame(UCBAdmissions) -->
-<!-- ucb <- ucb[rep(1:nrow(ucb), times = ucb$Freq), ] -->
-<!-- ucb$Freq <- NULL -->
-<!-- ``` -->
+<p>The following question involves the <code>UCBAdmissions</code>
+dataset collecting aggregate data on applications to graduate school at
+UC Berkeley for the six largest departments in 1973. Variables in this
+dataset include the department (A-E), the sex of the applicant, and the
+associated admissions decision. This data became famous in its use as
+evidence relating to claims of sex bias in admission practices. For this
+problem, we are going to investigate the veracity of these claims.</p>
+<p>Start by copying the code block below to modify the data as it is
+built-in in R to something we are used to working with. Then, answer the
+following questions.</p>
+<pre class="r"><code>## Create UC Berkeley data from built-in R dataset
+data(&quot;UCBAdmissions&quot;)
+ucb &lt;- as.data.frame(UCBAdmissions)
+ucb &lt;- ucb[rep(1:nrow(ucb), times = ucb$Freq), ]
+ucb$Freq &lt;- NULL</code></pre>
+<p><strong>Part A</strong> Create the appropriate table to show how many
+applicants there were of each gender and whether or not they were
+admitted. State what you find in terms of the relationship between
+gender and admission status, based on an odds ratio.</p>
+<p><strong>Part B</strong> Create a frequency table showing how many
+applicants of each sex applied to each department. Which two departments
+had the greatest number of male applicants? Which had the greatest
+number of female applicants?</p>
+<p><strong>Part C</strong> Create a table of <em>proportions</em>
+showing the rate at which each department accepted and rejected
+candidates. Which two departments had the highest acceptance rate? Which
+had the lowest?</p>
+<p><strong>Part D</strong> Create a bar chart showing for each sex what
+<em>proportion</em> of them were admitted or rejected. What do you see
+from this chart?</p>
+<p><strong>Part E</strong> To the plot you made in Part D, now add
+faceting to also show the proportion of each sex accepted <em>by
+department</em>. Do the admission rates seem similar in each department,
+or are there any disparities? Based on what you have seen, what
+statements can you make about the existence of sex-based descrimination
+in admissions as Berkely?</p>
 <!-- **Part A** Create the appropriate table to illustrate the frequency of male and female applicants and whether or not their application was accepted. -->
 <!-- **Part B** Using your table from (a), compute the odds ratio of a male applicant being accepted over a female one. Does it appear that there is any evidence of sex bias? -->
 <!-- **Part C** Which departments appear to have the greatest total number of male applicants? Which departments had the greatest total number of female applicants? -->
