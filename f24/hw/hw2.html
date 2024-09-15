@@ -408,8 +408,13 @@ police &lt;- police[complete.cases(police) &amp;
 <li><p>Which five states had the greatest number of shootings between
 2015-2022?</p></li>
 <li><p>Below is a plot demonstrating the relationship between whether or
-not a body camera was being used during the shooting and whether the
-assailant was either shot or both shot and tasered. You should:</p></li>
+not a body camera was being used during the shooting (variable:
+<code>body_camera</code>) and whether the assailant was either shot or
+both shot and tasered (variable: <code>manner_of_death</code>, though
+note: in all cases the assailant was shot. The two values of this
+variable are <code>&quot;shot&quot;</code>, indicating that the assailant was
+simply shot, and <code>&quot;tasered&quot;</code> indicating that the assailant
+was first tasered before being subsequently shot). You should:</p></li>
 </ol>
 <ol style="list-style-type: decimal">
 <li>Using the dataset, create the table associated with this plot</li>
@@ -417,7 +422,7 @@ assailant was either shot or both shot and tasered. You should:</p></li>
 <li>Find the odds of being tasered when a body camera is worn</li>
 <li>Find the odds ratio of being shot when a body camera is worn. Based
 on this, does there appear to be any association between wearing a body
-camera and shooting a suspect?</li>
+camera and shooting a suspect without tasering them?</li>
 </ol>
 <p>You do not need to enumerate your answer, but you should include all
 four pieces of information. Take extra care in specifying what is your
@@ -440,10 +445,6 @@ associated with this table</li>
 <!-- ggplot(police, aes(year, fill = body_camera)) + geom_bar(position = "dodge") -->
 <!-- ggplot(police, aes(year)) + geom_bar(position = "dodge") -->
 <!-- ``` -->
-</div>
-<div id="question-3" class="section level2">
-<h2>Question 3</h2>
-<p>TBD?</p>
 </div>
 
 
