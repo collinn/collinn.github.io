@@ -1907,10 +1907,10 @@ logical vectors. The first is to <em>negate</em> them, which involves
 swapping all of the TRUE/FALSE values.</p>
 <pre class="r"><code>x &lt;- 1:5
 
-## Where is x greater than 4
+## Where is x less than 4
 x &lt; 4</code></pre>
 <pre><code>## [1]  TRUE  TRUE  TRUE FALSE FALSE</code></pre>
-<pre class="r"><code>## Where is x not greater than 4
+<pre class="r"><code>## Where is x not less than 4
 !(x &lt; 4) </code></pre>
 <pre><code>## [1] FALSE FALSE FALSE  TRUE  TRUE</code></pre>
 <p>Sometimes we need to express logical statements that are more
@@ -1980,14 +1980,17 @@ char1 &lt;- c(&quot;apple&quot;, &quot;banana&quot;, &quot;orange&quot;, &quot;k
 char2 &lt;- c(&quot;grape&quot;, &quot;starfruit&quot;, &quot;apple&quot;, &quot;grape&quot;)</code></pre>
 <ul>
 <li><p>Create a logical vector indicating where <code>x</code> is less
-than 7 <em>and</em> <code>y</code> is greater than or equal to
-14</p></li>
+than 7 <em>and</em> <code>y</code> is greater than or equal to 14.
+Verify correctness by using this logical vector to subset
+<code>z</code>: it should return the values
+<code>c(40, 50, 60)</code></p></li>
 <li><p>Create a logical vector showing all of the values from
 <code>char2</code> that <em>are not</em> in <code>char1</code>;</p></li>
 <li><p>Finally, create a logical vector where <code>x</code> is less
 than 3 <em>OR</em> where the vectors from <code>char1</code> are
 included in <code>char2</code>. Use this vector to subset
-<code>z</code></p></li>
+<code>z</code>. It should return
+<code>c(10, 20, 60, 90)</code>.</p></li>
 </ul>
 </div>
 </div>
@@ -2246,14 +2249,14 @@ of 50.</p>
                  extra = -1)
 df</code></pre>
 <pre><code>##   group     val extra
-## 1     A  4.6657    -1
-## 2     A  4.5081    -1
-## 3     A  3.4692    -1
-## 4     A  2.9624    -1
-## 5     B 49.9125    -1
-## 6     B 50.0935    -1
-## 7     B 49.2519    -1
-## 8     B 49.9178    -1</code></pre>
+## 1     A  3.6975    -1
+## 2     A  5.0815    -1
+## 3     A  5.1290    -1
+## 4     A  6.7506    -1
+## 5     B 49.9095    -1
+## 6     B 48.6858    -1
+## 7     B 50.6663    -1
+## 8     B 51.6947    -1</code></pre>
 <p>If I first group and then mutate, it will add an additional column,
 returning the mean value for each group</p>
 <pre class="r"><code>df %&gt;% group_by(group) %&gt;% 
@@ -2262,22 +2265,22 @@ returning the mean value for each group</p>
 ## # Groups:   group [2]
 ##   group   val extra meanVal
 ##   &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
-## 1 A      4.67    -1    3.90
-## 2 A      4.51    -1    3.90
-## 3 A      3.47    -1    3.90
-## 4 A      2.96    -1    3.90
-## 5 B     49.9     -1   49.8 
-## 6 B     50.1     -1   49.8 
-## 7 B     49.3     -1   49.8 
-## 8 B     49.9     -1   49.8</code></pre>
+## 1 A      3.70    -1    5.16
+## 2 A      5.08    -1    5.16
+## 3 A      5.13    -1    5.16
+## 4 A      6.75    -1    5.16
+## 5 B     49.9     -1   50.2 
+## 6 B     48.7     -1   50.2 
+## 7 B     50.7     -1   50.2 
+## 8 B     51.7     -1   50.2</code></pre>
 <p>Contrast this with the summarize function</p>
 <pre class="r"><code>df %&gt;% group_by(group) %&gt;% 
   summarize(meanVal = mean(val))</code></pre>
 <pre><code>## # A tibble: 2 × 2
 ##   group meanVal
 ##   &lt;chr&gt;   &lt;dbl&gt;
-## 1 A        3.90
-## 2 B       49.8</code></pre>
+## 1 A        5.16
+## 2 B       50.2</code></pre>
 <p>Here, the “extra” column has been removed, and all of the rows have
 been reduced down to the number of values in the grouping variable. Both
 methods have their uses, depending on the context.</p>
