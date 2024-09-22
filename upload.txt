@@ -1,1 +1,0 @@
-sftp sftp.iowa.uiowa.edu:myweb/collin
