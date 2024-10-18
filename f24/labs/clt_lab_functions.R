@@ -23,7 +23,8 @@ getSampleMean <- function(data, variable, n, samples = 1000L) {
 
 
 
-simulateConfInt <- function(n = 20, numSD = 2, sd = 5, N = 25) {
+simulateConfInt <- function(n = 20, m = 2, sd = 5, N = 25) {
+  numSD <- m
   x <- rnorm(n, 50, sd)
   sp <- numSD
   
