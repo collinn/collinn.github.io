@@ -10,8 +10,9 @@
 
 
 
+<meta name="date" content="2024-10-27" />
 
-<title>STA-209 - Applied Statistics (Fall 2024)</title>
+<title>Lab 8 – t-Distribution and Bootstrapping</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1477,889 +1478,227 @@ border-radius: 0px;
 
 
 
-<h1 class="title toc-ignore">STA-209 - Applied Statistics (Fall
-2024)</h1>
+<h1 class="title toc-ignore">Lab 8 – t-Distribution and
+Bootstrapping</h1>
+<h4 class="date">2024-10-27</h4>
 
 </div>
 
 
-<p><span class="math inline">\(~\)</span></p>
-<p>Last updated: Sun Oct 27 2024, 11:01</p>
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- |  |  |  |  | -->
-<!-- |  |  |  |  | -->
-<!-- |  |  |  |  | -->
-<div id="syllabus" class="section level1">
-<h1>Syllabus</h1>
-<p>Welcome to the course website for STA 209, Introduction to Applied
-Statistics. To begin, you can find the course syllabus linked below:</p>
-<ul>
-<li><a href="syllabus209f24.html">Click here</a> to view the course
-syllabus</li>
-</ul>
-<p>You can locate course content by scrolling, or by using the
-navigation bar in the upper left.</p>
-<p>Please note: material will not be posted until we’ve reached that
-point in the course.</p>
-<p><a href="resources/mathlab.pdf">Math lab hours</a></p>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Include the code chunk below in your Rmd document as it contains
+several functions that we will be using for this lab, including the
+<code>gh()</code> function from the CLT worksheet to help us create
+better histograms in ggplot.</p>
+<pre class="r"><code>library(ggplot2)
+library(dplyr)
+
+theme_set(theme_bw())
+
+## Better histograms
+gh &lt;- function(bins = 8) {
+  geom_histogram(color = &#39;black&#39;, fill = &#39;gray80&#39;, bins = bins)
+}
+
+## Bootstrap Function
+bootstrap &lt;- function(x, statistic, n = 1000L) {
+  bs &lt;- replicate(n, {
+    sb &lt;- sample(x, replace = TRUE)
+    statistic(sb)
+  })
+  data.frame(Sample = seq_len(n), 
+             Statistic = bs)
+}
+
+## Standard Error
+se &lt;- function(x) sd(x) / sqrt(length(x))
+
+## College dataset
+college &lt;- read.csv(&quot;https://collinn.github.io/data/college2019.csv&quot;)
+
+## Source functions
+source(&quot;https://collinn.github.io/f24/labs/clt_lab_functions.R&quot;)</code></pre>
+<p>For an illustration of how <code>gh()</code> is used, see:</p>
+<pre class="r"><code>## Default way
+p1 &lt;- ggplot(college, aes(ACT_median)) + 
+  geom_histogram(color = &#39;black&#39;, fill = &#39;gray80&#39;, bins = 15)
+
+## Superior awesome gh() way
+p2 &lt;- ggplot(college, aes(ACT_median)) + gh(bins = 15)
+
+## They are identical
+gridExtra::grid.arrange(p1, p2, nrow = 1)</code></pre>
+<p><img role="img" src="data:image/png;base64,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" width="960" style="display: block; margin: auto;" /></p>
+<p>if we know distributional parameters, we don’t need the data anymore,
+that ways quantile takes data and q norm only takes distributional
+parameters</p>
+<p>Also for introduction, introduce rt, rnorm, qt, qnorm, sample, se,
+bootstrap function</p>
 </div>
-<div id="course-materials" class="section level1">
-<h1>Course Materials</h1>
-<div id="solutions" class="section level2">
-<h2>Solutions</h2>
-<div id="homework-solutions" class="section level3">
-<h3>Homework Solutions</h3>
-<p>TBD</p>
-</div>
-<div id="lab-solutions" class="section level3">
-<h3>Lab Solutions</h3>
-<p>TBD</p>
-<div id="worksheets" class="section level4">
-<h4>Worksheets</h4>
-<ul>
-<li><a href="solutions/labs/prob1_solutions.pdf">Probability Worksheet
-1</a></li>
-<li><a href="solutions/labs/prob2_solutions.pdf">Probability Worksheet
-2</a></li>
-<li><a href="solutions/labs/prob3_solutions.pdf">Probability Worksheet
-3</a></li>
-</ul>
-</div>
-</div>
-</div>
-<div id="exam-1-content" class="section level2">
-<h2>Exam #1 Content</h2>
-<div id="week-0-intro" class="section level3">
-<h3>Week 0 (Intro)</h3>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 8/26</td>
-<td align="left">-</td>
-<td align="left">-</td>
-<td align="left">-</td>
-</tr>
-<tr class="even">
-<td align="left">Wed 8/28</td>
-<td align="left">-</td>
-<td align="left">-</td>
-<td align="left">-</td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 8/30</td>
-<td align="left"><a href="syllabus209f24.html">Syllabus</a></td>
-<td align="left">-</td>
-<td align="left">-</td>
-</tr>
-</tbody>
-</table>
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 1/22 | [Syllabus](syllabus209s24.html) | - | - | -->
-<!-- | Wed 1/24 | [Introduction](lectures/introduction.pdf) | [In-class](labs/00_markdown.html) | - | -->
-<!-- | Fri 1/26 | [Intro to R](lectures/r_intro.pdf) | [Intro R Lab](labs/01_introR.html) | [1.2, 1.3 from IMS](https://openintro-ims2.netlify.app/01-data-hello#sec-data-basics) -->
-<p><strong>Assignments and Deadlines</strong>:</p>
+<div id="r-functions" class="section level2">
+<h2>R Functions</h2>
+<p>There are a few R functions that will be helpful in constructing
+confidence intervals. In particular, we will begin with a family of
+functions responsible for finding quantiles. For each of these
+functions, we will need to provide the quantiles that we are interested
+in finding. Because we typically want our intervals in the form of
+plus/minus, we usually start with the coverage we are looking for and
+divide the difference by two. For example, to find the middle 95%, we
+know we are excluding 5% at the edges; 2.5% on the left side and 2.5% on
+the right side. This gives us the quantiles (0.025, 0.975). Similarly,
+if we wanted an 80% confidence interval, our quantiles should be (0.1,
+0.9).</p>
+<div id="distributional-quantiles" class="section level3">
+<h3>Distributional Quantiles</h3>
+<p>The <em>distributional</em> quantile functions are those that
+construct quantiles based on the distributional parameters (recall that
+distributional parameters are those that tell us everything we need to
+know about a distribution). The first of these, <code>qnorm()</code>
+finds the quantiles of a normal distribution. By default, it assumes a
+value of <code>mean = 0</code> and <code>sd = 1</code>:</p>
+<pre class="r"><code>## Quantiles for normal distribution
+qnorm(p = c(0.025, 0.975))</code></pre>
+<pre><code>## [1] -1.96  1.96</code></pre>
+<p>If I know the sample mean and standard error from my sample, I can
+plug these values in directly. Here, consider finding the quantiles
+based on the four year completion rate for males from our college
+dataset:</p>
+<pre class="r"><code>mm &lt;- mean(college$FourYearComp_Males)
+ss &lt;- se(college$FourYearComp_Males)
+
+qnorm(p = c(0.025, 0.975), mean = mm, sd = ss)</code></pre>
+<pre><code>## [1] 0.46645 0.48599</code></pre>
+<p>This is the exact same thing we would get if doing the formula by
+hand where <span class="math inline">\(C = 1.96\)</span>:</p>
+<p><span class="math display">\[
+\overline{x} \pm C \frac{\hat{\sigma}}{\sqrt{n}}
+\]</span></p>
+<pre class="r"><code>## Point estimate +/- MOE method
+mm + c(-1.96, 1.96) * ss</code></pre>
+<pre><code>## [1] 0.46645 0.48599</code></pre>
+<p>A few notes to make here:</p>
 <ol style="list-style-type: decimal">
-<li>Download <a href="http://www.r-project.org/">R</a></li>
-<li>Download <a href="http://www.rstudio.com/">R Studio</a></li>
-<li>(Windows only, maybe) Download <a href="https://cran.r-project.org/bin/windows/Rtools/rtools44/rtools.html">Rtools44</a></li>
+<li>Do not use <code>mean</code> and <code>se</code> as variable names
+when they already exist as functions. It will work, but it may confuse R
+in some cases, providing unexpected results</li>
+<li>Using <code>qnorm()</code> with the default values will give us our
+<em>critical values</em> for the margin of error method</li>
+<li>The function <code>se()</code> was defined in the starting code
+block, but it does not exist in base R. If you try to run it and it says
+‘could not find function “se”’ you need to run the code containing the
+function above. This will be true for the homework as well</li>
+<li>The trick <code>+ c(-1.96, 1.96)</code> is a shortcut to avoid
+having to write out this expression twice</li>
+</ol>
+<hr />
+<p>In the example above, the confidence interval from
+<code>qnorm()</code> and that from the margin of error method were the
+same because the size of our sample was <span class="math inline">\(n =
+1095\)</span> (the number of observations in the college dataset); in
+this case, the normal distribution and the t-distribution are very
+similar.</p>
+<p>When this is not the case, i.e., when <span class="math inline">\(n
+&lt; 30\)</span> or so, we need to use <code>qt()</code> to find the
+critical values. The only distributional parameter associated with the
+<span class="math inline">\(t\)</span> distribution is the degrees of
+freedom, <span class="math inline">\(n - 1\)</span>. We can find the
+critical values for a t-distribution in the exact same way:</p>
+<pre class="r"><code>qt(p = c(0.025, 0.975), df = 1095-1)</code></pre>
+<pre><code>## [1] -1.9621  1.9621</code></pre>
+<p>Because the <span class="math inline">\(t\)</span> distribution is
+based on the standardized values of our observation, there is no way to
+add a mean or standard deviation to the estimate. As such, confidence
+intervals with the t-distribution <em>must</em> be done using the <span class="math inline">\(\overline{x} \pm C
+\frac{\hat{\sigma}}{\sqrt{n}}\)</span> method, where <span class="math inline">\(C\)</span> represents the critical values from a t
+distribution with n-1 degrees of freedom.</p>
+<p><strong>Question 1</strong> Using the <code>qnorm()</code> function,
+find the critical values associated with an 80% confidence interval. How
+do these compare to the critical values of a 95% confidence interval?
+Explain.</p>
+<p><strong>Question 2</strong> This question will use the
+<code>hawks</code> data. The code below will load the <code>hawks</code>
+dataset which we will use for the first parts of this problem. It will
+also create <code>hawks2</code>, a randomly sampled subset of the
+data.</p>
+<pre class="r"><code>hawks &lt;- read.csv(&quot;https://collinn.github.io/data/hawks.csv&quot;)
+
+## Create subset of size n = 20
+set.seed(197)
+idx &lt;- sample(seq_len(nrow(hawks)), size = 20)
+hawks2 &lt;- hawks[idx, ]</code></pre>
+<ol style="list-style-type: lower-alpha">
+<li><p>Subset the <code>hawks</code> data using dplyr to include only
+Red-tailed hawks (<code>Species == &quot;RT&quot;</code>). How many observations
+are in this dataset?</p></li>
+<li><p>Create a histogram of the variable <code>Weight</code>. What does
+it look like? Based on your experience with the CLT lab, how well do you
+think a normal approximation will fit the sampling
+distribution?</p></li>
+<li><p>Find the sample mean and standard error for the
+<code>Weight</code> variable. Use the <code>qt()</code> function to find
+the appropriate quantiles to create a 95% confidence interval for the
+sample mean. Use these to construct a 95% confidence interval</p></li>
+<li><p>Repeat the previous step, this time using the <code>hawks2</code>
+subset. How does the sample mean in <code>hawks2</code> compare with the
+sample mean in <code>hawks</code>? How does the size of the 95%
+confidence interval compare? Does changing the size of the sample appear
+to have more of an impact on the sample mean or on the confidence
+interval?</p></li>
+</ol>
+<p><br />
+</p>
+</div>
+<div id="basic-quantile-functions" class="section level3">
+<h3>Basic Quantile Functions</h3>
+<p>Because we know everything we need to know about a distribution from
+it’s distributional parameters, there is no need to consider the data
+itself. However, when we don’t have a distribution (or it’s parameters),
+but we do have data, we can use the data itself to estimate the
+quantiles. This is done with the <code>quantile()</code> function in
+R.</p>
+<p>To illustrate how this works, let’s sample some random values using
+<code>rnorm()</code> (Random NORMal) using the mean and standard error
+from the college dataset we found above</p>
+<pre class="r"><code>## Find mean and standard error
+mm &lt;- mean(college$FourYearComp_Males)
+ss &lt;- se(college$FourYearComp_Males)
+
+## Generate 1000 random numbers with those means and se
+rand &lt;- rnorm(n = 1000, mean = mm, sd = ss)
+
+## Find the quantiles of the rand data
+quantile(x = rand, probs = c(0.025, 0.975))</code></pre>
+<pre><code>##    2.5%   97.5% 
+## 0.46622 0.48588</code></pre>
+<p>In this case, we should expect the quantiles to be pretty close: the
+observed data we have comes from a theoretical distribution that we
+know. When we don’t know the underlying distribution however, or if we
+know that it’s not normal, this will be an efficient way to create
+estimates of what the quantiles should be.</p>
+<p><strong>Question 3</strong> For this question, we are going to again
+use the <code>college</code> dataset</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>Create a histogram of the variable
+<code>FourYearComp_Males</code>, the four year graduation rate for
+males</p></li>
+<li><p>Find the mean and <em>standard deviation</em> of the variable
+<code>FourYearComp_Males</code>. Use the <code>qnorm()</code> function
+to find the the 0.025 and 0.975 quantiles.</p></li>
+<li><p>Using the <code>quantile()</code> function the 0.025 and 0.975
+quantiles of the variable <code>college$FourYearComp_Males</code>. Would
+you expect these to be similar to what you found in part (b)? Why or why
+not?</p></li>
+<li><p>Why are the quantiles you found in this problem so different than
+the ones we found in the example above using the same data? Be as
+specific as you can be.</p></li>
 </ol>
 </div>
-<div id="week-1-data-summaries-and-visualization" class="section level3">
-<h3>Week 1 (Data Summaries and Visualization)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 9/2</td>
-<td align="left"><a href="lectures/r_intro.pdf">Intro to R</a></td>
-<td align="left"><a href="labs/01_introR.html">Intro to R</a></td>
-<td align="left"><a href="resources/packages.html">Packages</a></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 9/4</td>
-<td align="left"><a href="lectures/intro_stat.pdf">Introduction to
-Statistics</a></td>
-<td align="left"><a href="labs/02_ggplot.html"><code>ggplot2</code></a></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 9/6</td>
-<td align="left"><a href="lectures/dataviz.pdf">Data Summaries –
-Visualization</a></td>
-<td align="left">Continue ggplot</td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ul>
-<li><a href="hw/hw1.html">Homework 1</a> due Fri Sept 13 at 10pm</li>
-<li><a href="labs/01_introR.html">Lab 1</a> due Fri Sept 6 at 10pm</li>
-</ul>
-<p><strong>Note:</strong> Homework should be neatly formatted with
-questions specified as headers and with your R code and written
-solutions underneath. <a href="examples/example_hw1.pdf">Here is an
-example</a> of how it should look.</p>
 </div>
-<div id="week-2-tables-and-numerical-summaries" class="section level3">
-<h3>Week 2 (Tables and Numerical Summaries)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 9/9</td>
-<td align="left"><a href="lectures/numsum.pdf">Numerical
-Summaries</a></td>
-<td align="left">Continue ggplot lab</td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 9/11</td>
-<td align="left">Numerical Summaries cont.</td>
-<td align="left"><a href="labs/03_tables.html">Table Lab</a></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 9/13</td>
-<td align="left"><a href="lectures/tables.pdf">Tables</a></td>
-<td align="left">Cont. Table Lab</td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ul>
-<li>Lab 2 due Fri Sept 13 at 10pm</li>
-<li><a href="hw/hw2.html">Homework 2</a> due Fri Sept 20 at 10pm</li>
-<li><a href="https://collinn.github.io/teaching/2023/labs/lab4.html">Bonus
-lab</a> for <code>ggplot2</code> for scales, axes, colors, and
-themes</li>
-</ul>
-</div>
-<div id="week-3-odds-and-z-scores" class="section level3">
-<h3>Week 3 (Odds and Z-Scores)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 9/16</td>
-<td align="left"><a href="lectures/odds.pdf">Odds</a></td>
-<td align="left"><a href="labs/04_dplyr.html">dplyr</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 9/18</td>
-<td align="left"><a href="lectures/correlation.pdf">Z-Scores and
-Correlation</a></td>
-<td align="left">Cont. dplyr</td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 9/20</td>
-<td align="left"><a href="lectures/slr.pdf">Regression</a></td>
-<td align="left"><a href="labs/05_regression.html">Regression and
-Correlation</a></td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<p><strong>ASSIGNED</strong></p>
-<ul>
-<li><a href="hw/hw3.html">Homework 3</a> due Friday, Sept 27 at
-10pm</li>
-</ul>
-<p><strong>DUE</strong></p>
-<ul>
-<li>Homework 2 due Friday, Sept 20 at 10pm</li>
-<li>Table lab due Wednesday, Sept 18 at 10pm</li>
-</ul>
-</div>
-<div id="week-4-regression" class="section level3">
-<h3>Week 4 (Regression)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 9/23</td>
-<td align="left"><a href="lectures/catpred.pdf">Regression (Categorical
-Predictors)</a></td>
-<td align="left">Cont. Regression Lab</td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 9/25</td>
-<td align="left"><a href="lectures/mlr.pdf">Regression
-Multivariate</a></td>
-<td align="left">Cont. Regression Lab</td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 9/27</td>
-<td align="left">Review Day</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ul>
-<li><a href="exam/topic_list_exam1.html">Exam 1 Topic List</a></li>
-<li><a href="exam/practice_exam1.pdf">Practice Exam</a> (Solutions at
-mentor sessions)</li>
-<li><a href="exam/209_midterm_review_sheet.pdf">Comprehensive Review
-Sheet</a></li>
-</ul>
-<p><strong>DUE</strong></p>
-<ul>
-<li>Homework 3 due Friday, Sept 27 at 10pm</li>
-<li>dplyr lab due Friday, Sept 27 at 10pm</li>
-<li>Regression lab due Friday, Sept 27 at 10pm</li>
-</ul>
-</div>
-</div>
-<div id="exam-2-content" class="section level2">
-<h2>Exam #2 Content</h2>
-<div id="week-5-study-design" class="section level3">
-<h3>Week 5 (Study Design)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 9/30</td>
-<td align="left">Exam 1 😎</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 10/2</td>
-<td align="left">R day</td>
-<td align="left"><a href="labs/06_practice.html">dplyr and
-ggplot</a></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 10/4</td>
-<td align="left"><a href="lectures/sampling.pdf">Study Design</a></td>
-<td align="left">cont</td>
-<td align="left"><a href="https://www.biostat.jhsph.edu/~iruczins/teaching/books/2019.openintro.statistics.pdf">Reading</a></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ul>
-<li><p><a href="exam/exam1_notes.html">Exam Notes</a></p></li>
-<li><p><a href="examples/dplyr_helpsheet.pdf">dplyr
-cheatsheet</a></p></li>
-</ul>
-<p>Extra tentative from this point on</p>
-</div>
-<div id="week-6-probability" class="section level3">
-<h3>Week 6 (Probability)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 10/7</td>
-<td align="left"><a href="lectures/prob1.pdf">Probability 1
-(Introduction)</a></td>
-<td align="left"><a href="labs/inclass_probability1.pdf">Worksheet
-1</a></td>
-<td align="left"><a href="https://www.biostat.jhsph.edu/~iruczins/teaching/books/2019.openintro.statistics.pdf">Reading
-(Sections 3.1)</a></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 10/9</td>
-<td align="left"><a href="lectures/prob2.pdf">Probability 2 (Conditional
-and Independence)</a></td>
-<td align="left"><a href="labs/inclass_probability2.pdf">Worksheet
-2</a></td>
-<td align="left"><a href="https://www.biostat.jhsph.edu/~iruczins/teaching/books/2019.openintro.statistics.pdf">Reading
-(Sections 3.1 and 3.2)</a></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 10/11</td>
-<td align="left"><a href="lectures/prob3.pdf">Probability 3
-(Bayes)</a></td>
-<td align="left"><a href="labs/inclass_probability3.pdf">Worksheet
-3</a></td>
-<td align="left"><a href="https://www.biostat.jhsph.edu/~iruczins/teaching/books/2019.openintro.statistics.pdf">Reading
-(Sections 3.2)</a></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ul>
-<li><p><a href="https://www.youtube.com/watch?v=HZGCoVF3YvM">CHECK OUT
-THIS NEAT VIDEO</a></p></li>
-<li><p>Exam 1 corrections due Friday 10/11</p></li>
-<li><p><a href="https://www.biostat.jhsph.edu/~iruczins/teaching/books/2019.openintro.statistics.pdf">Reading
-(Sections 3.1 and 3.2)</a></p></li>
-<li><p><a href="hw/hw5.html">Homework 5</a> due 10/18</p></li>
-<li><p><a href="labs/06_practice.html">Bonus <code>dplyr</code> lab</a>
-due Friday 10/11</p></li>
-</ul>
-</div>
-<div id="week-7-sampling-distributions" class="section level3">
-<h3>Week 7 (Sampling Distributions)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Final Project</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 10/14</td>
-<td align="left"><a href="lectures/sampdist.pdf">Sampling
-Distribution</a></td>
-<td align="left"><a href="https://www.zoology.ubc.ca/~whitlock/Kingfisher/SamplingNormal.htm">Fish
-1</a> and <a href="https://www.zoology.ubc.ca/~whitlock/Kingfisher/CLT.htm">Fish
-2</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 10/16</td>
-<td align="left"><a href="lectures/intervals.pdf">Normal Approximation
-and Intervals</a></td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 10/18</td>
-<td align="left"><a href="labs/07_worksheet.pdf">CLT Worksheet</a></td>
-<td align="left"><a href="labs/07_clt.html">CLT Lab Overview</a></td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ul>
-<li><a href="https://youtu.be/zeJD6dqJ5lo">CHECK OUT THIS OTHER NEAT
-VIDEO</a></li>
-<li><a href="hw/hw5.html">Homework 5</a> due 10/18</li>
-<li>CLT Worksheet, we will think of something to do with this</li>
-</ul>
-</div>
-<div id="fall-break" class="section level3">
-<h3>FALL BREAK</h3>
-<p>(yay)</p>
-<p><strong>Assignments and Deadlines</strong>:</p>
-</div>
-<div id="week-8-sampling-distributions" class="section level3">
-<h3>Week 8 (Sampling Distributions)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Final Project</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 10/28</td>
-<td align="left"><a href="lectures/tapprox.pdf">t-distribution</a></td>
-<td align="left"><a href="labs/07_clt.html">Continue last week
-lab</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 10/30</td>
-<td align="left">Bootstrapping</td>
-<td align="left"><a href="labs/08_sampdist.html">t-Dist and
-Bootstrap</a></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 11/01</td>
-<td align="left">Bootstrapping</td>
-<td align="left">Lab</td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong></p>
-<ul>
-<li>CLT lab due to the course mentor at the start of class 11/01</li>
-<li>Homework 6 due 11/08</li>
-</ul>
-</div>
-<div id="week-9-hypothesis-testing" class="section level3">
-<h3>Week 9 (Hypothesis Testing)</h3>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Final Project</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 11/4</td>
-<td align="left">Hypothesis Testing</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 11/6</td>
-<td align="left">Decision Error</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 11/8</td>
-<td align="left">Multiple Testing</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<!-- X Exam 2 😎 -->
-<p><strong>Assignments and Deadlines</strong>:</p>
-</div>
-</div>
-<div id="exam-3-content" class="section level2">
-<h2>Exam #3 Content</h2>
-<div id="week-10" class="section level3">
-<h3>Week 10</h3>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Final Project</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 11/11</td>
-<td align="left">Review Day</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 11/13</td>
-<td align="left">Exam 2</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 11/15</td>
-<td align="left">Difference Tests</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="week-11" class="section level3">
-<h3>Week 11</h3>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Final Project</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 11/18</td>
-<td align="left"><span class="math inline">\(\chi^2\)</span> test</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 11/20</td>
-<td align="left">ANOVA (possible chi2)</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 11/22</td>
-<td align="left">ANOVA + Tukey</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="week-12" class="section level3">
-<h3>Week 12</h3>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Final Project</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 11/25</td>
-<td align="left">ANOVA/Regression</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 11/27</td>
-<td align="left">Multiple Regression</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 11/29</td>
-<td align="left">Thanksgiving</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="week-13" class="section level3">
-<h3>Week 13</h3>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Final Project</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 12/2</td>
-<td align="left">Multiple Regression</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 12/4</td>
-<td align="left">Regression Extras</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 12/6</td>
-<td align="left">Regression Error</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="week-14" class="section level3">
-<h3>Week 14</h3>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Final Project</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 12/9</td>
-<td align="left">Project Work Day</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 12/11</td>
-<td align="left">Review</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 12/13</td>
-<td align="left">Final Exam, probably</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<!-- --- -->
-<!-- ### Week 3 (Numerical Summaries) -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 2/5 | [Tables](lectures/tables.pdf) | Wrap up lab | - | -->
-<!-- | Wed 2/7 | Cont. tables | [Table Lab](labs/03_tables.html) | - | -->
-<!-- | Fri 2/9 | [Numerical Summaries](lectures/numsum.pdf) | [Table Lab cont.](labs/03_tables.html) | - | -->
-<!-- **Assignments and Deadlines**:  -->
-<!-- - Lab 02 due Monday, Feb 12 at 11:59pm -->
-<!-- - Lab 03 due Monday, Feb 12 at 11:59pm -->
-<!-- - [Homework 2](hw/hw2.html) due Mon, Feb 12 at 11:59pm -->
-<!-- **Extra Practice:** -->
-<!-- Our `ggplot2` lab really only covered the basics. You can get in-depth practice if you want to trick out your graphs by going through STA-230 labs which do not require any additional knowledge than what we have already acquired: -->
-<!--   - [Extra lab 1 -- the basics](https://collinn.github.io/teaching/2023/labs/ggplot_lab3.html) -->
-<!--   - [Extra lab 2 -- the frills](https://collinn.github.io/teaching/2023/labs/lab4.html) -->
-<!-- **NOTE** Exam 1 will be February 21 -- details to follow -->
-<!-- --- -->
-<!-- ### Week 4 (Regression) -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 2/12 | [Correlation](lectures/correlation.pdf) | - | - | -->
-<!-- | Wed 2/14 | [Linear Regression](lectures/regression.pdf) | [Regression](labs/04_regression.html) | - | -->
-<!-- | Fri 2/16 | [Linear Regression (Categorical Predictor)](lectures/cat_pred.pdf) | - | - | -->
-<!-- **Assignments and Deadlines**:  -->
-<!-- - [Homework 3](hw/hw3.html) due Mon, Feb 19 at 11:59pm -->
-<!-- - [Lab 4](labs/04_regression.html) due Mon, Feb 19 at 11:59pm -->
-<!-- Practice exam posted [here](https://remiller1450.github.io/s209s24/practice_exam1.pdf). Note that you can skip/ignore questions about risk and relative risk, as well as those with multivariate regression -->
-<!-- [Here](review/exam1_review.html) is a rough sketch of the topics that may be covered. I will continue to fill in with more examples as the week progresses -->
-<!-- --- -->
-<!-- ### Week 5 (Exam Week) -->
-<!-- **EXAM REMINDERS:** -->
-<!--   - In Noyce 2022 -->
-<!--   - Bring calculator -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 2/19 | [Review Day](lectures/exam1_review.pdf) | - | - | -->
-<!-- | Wed 2/21 | Exam 😎 | - | - | -->
-<!-- | Fri 2/23 | [dplyr package](lectures/dplyr.pdf) | [dplyr](labs/05_dplyr.html) | - | -->
-<!-- **Assignments and Deadlines**:  -->
-<!-- None -->
-<!-- ## Exam \#2 Content -->
-<!-- *Assignments now due on Fridays* -->
-<!-- ### Week 6 (Confidence Intervals) -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 2/26 | [Sampling](lectures/sampling.pdf) | - | - | -->
-<!-- | Wed 2/28 | [Intervals](lectures/intervals.pdf) | [Fish](https://www.zoology.ubc.ca/~whitlock/Kingfisher/SamplingNormal.htm) | - | -->
-<!-- | Fri 3/1 | [Bootstrapping](lectures/bootstrap.pdf) | [Bootstrapping](labs/06_bootstrap.html) | [IMS Ch 12](https://openintro-ims.netlify.app/foundations-bootstrapping) | -->
-<!-- **Assignments and Deadlines**:  -->
-<!--   - [Course Suvey](https://grinnell.co1.qualtrics.com/jfe/form/SV_erI5kADKNAjHhTE) is now available to provide feedback -->
-<!--   - `dplyr` lab due Friday, March 01 at 11:59 pm -->
-<!--   - [Homework 4](hw/hw4.html) due Friday, March 08 at 11:59 pm -->
-<!--   - [Bootstrap lab](labs/06_bootstrap.html) due Friday, March 08 at 11:59 pm -->
-<!-- ### Week 7 (Normal Approximation) -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 3/4 | [Normal Approximations](lectures/normal.pdf) | - | - | -->
-<!-- | Wed 3/6 | [Proportions and $t$](lectures/proportions.pdf) | [More Fish](https://www.zoology.ubc.ca/~whitlock/Kingfisher/CLT.htm) | - | -->
-<!-- | Fri 3/8 | Review Day | Finish Lab | - | -->
-<!-- **Assignments and Deadlines**:  -->
-<!--   - [Course Suvey](https://grinnell.co1.qualtrics.com/jfe/form/SV_erI5kADKNAjHhTE) is now available to provide feedback -->
-<!--   - [Homework 4](hw/hw4.html) due Friday, March 08 at 11:59 pm -->
-<!--   - [Bootstrap lab](labs/06_bootstrap.html) due Friday, March 08 at 11:59 pm -->
-<!-- ### Week 8 (Hypothesis Testing) -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 3/11 | [Hypothesis Testing](lectures/hypo.pdf) | [Hypothesis Testing](labs/hypothesis.html) | - | -->
-<!-- | Wed 3/13 | [Hypothesis Testing cont.](lectures/hypo2.pdf) | [Final Project](exam/final_project.html) | - | -->
-<!-- | Fri 3/15 | TBD | | - | -->
-<!-- **Assignments and Deadlines**:  -->
-<!--   - No Homework assigned this week -->
-<!--   - Details for class project TBD -->
-<!-- ### SPRING BREAK -->
-<!-- ### Week 9 (Decision Error) -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 4/1 | Review | [Null Distribution](https://shiny.grinnell.edu/content/e11309e6-e0a6-4771-8bd6-dbf2ed4a376b/) |  | -->
-<!-- | Wed 4/3 | [Decision Error](lectures/error.pdf)| [Hypothesis Testing](labs/hypothesis.html) |  | -->
-<!-- | Fri 4/5 | TBD |  [Hypothesis Testing]() |  | -->
-<!-- **Assignments and Deadlines**:  -->
-<!--   - [Homework 5](hw/hw5.html) due Monday April 8 -->
-<!--   - [Practice Exam](review/practice_exam2.pdf) -->
-<!--       - [Solutions](review/practice_exam2_solutions.pdf) -->
-<!--       - [Video Walkthrough](https://grinnell.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=5eae7b48-d579-4a5d-8488-b14b01111276) -->
-<!--   - [Professor Miller Practice Exam](https://remiller1450.github.io/s209s24/practice_exam2.pdf) -->
-<!--       - [Solution to Miller's Exam](https://remiller1450.github.io/s209s24/practice_exam2_soln.pdf) -->
-<!--   - [Study Guide](review/exam2_content.pdf) -->
-<!-- ### Week 10 (Exam 2) -->
-<!-- **EXAM REMINDERS** -->
-<!-- Topics: Sampling, bootstrapping, confidence intervals, hypothesis testing, p-values, decision errors -->
-<!-- - In room Noyce 2022 -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 4/8 | [Practice](lectures/exam2_review.pdf) |  |  | -->
-<!-- | | [Solutions to slides](lectures/exam2_review_solutions.pdf) | | | -->
-<!-- | Wed 4/10 | Exam 2 😎 | |  | -->
-<!-- | Fri 4/12 | [Multiple Testing](lectures/fwer.pdf) | [Hypothesis Testing](labs/hypothesis.html) |  | -->
-<!-- **Assignments and Deadlines**:  -->
-<!-- [Review your mentors!](https://grinnell.co1.qualtrics.com/jfe/form/SV_0lF1ffbprngpaM6) -->
-<!-- ## Exam \#3 Content -->
-<!-- Multiple comparisons, difference tests, $\chi^2$, ANOVA, regression -->
-<!-- ### Week 11 ($\chi^2$ Tests) -->
-<!-- | Date | Lecture | Lab | Final Project | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 4/15 | [Difference tests](lectures/diff.pdf) | [Hypothesis Testing cont.](labs/hypothesis.html) |  | -->
-<!-- | Wed 4/17 | [$\chi^2$ Test](lectures/chisq.pdf) | | Proposal Due 5pm | -->
-<!-- | Fri 4/19 | $\chi^2$ Test |  |  | -->
-<!--   - [Homework 6](hw/hw6.html) due Wed 4/24 at 11:59pm -->
-<!--   - Lab due Monday 4/24 at 11:59pm -->
-<!-- ### Week 12 (ANOVA) -->
-<!-- | Date | Lecture | Lab | Final Project | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 4/22 | [Class Survey](https://grinnell.co1.qualtrics.com/jfe/form/SV_7OnYFflocpW0ItM) |  |  | -->
-<!-- | Wed 4/24 | [ANOVA](lectures/anova.pdf) | [ANOVA](labs/08_anova.html) |  | -->
-<!-- | Fri 4/26 | [ANOVA Cont.](lectures/anova2.pdf) | [ANOVA](labs/08_anova.html) |  | -->
-<!--   - [Apply to be Stat mentor or grader](https://grinnell.co1.qualtrics.com/jfe/form/SV_6o5nE4rTSUnesgm) -->
-<!--   - Homework 6 and Hypothesis lab due Wednesday -->
-<!--   - [Example Excel data](review/data_excel.csv) -->
-<!--   - [Link to Grinnell Qualtrics](https://grinnell.co1.qualtrics.com/homepage/ui) -->
-<!--   - [Example Qualtrics data](examples/qualtrics_example.html) -->
-<!-- ### Week 13 (Regression) -->
-<!-- | Date | Lecture | Lab | Final Project | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 4/29 | [ANOVA/Regression](lectures/slr_inference.pdf) | [Regression and Inference](labs/09_regression.html)       | | -->
-<!-- | Wed 5/1 | [Multiple Regression](lectures/mlr_inference.pdf) | | Exploratory Analysis Due 5pm  | -->
-<!-- | Fri 5/3 | [Regression Error](lectures/error.pdf) |  |  | -->
-<!--   - [ANOVA lab](labs/08_anova.html) due Monday 4/29 at 11:59pm (late submission until Wednesday) -->
-<!--   - [Regression Lab](labs/09_regression.html) due Wed 5/8 at 11:59pm -->
-<!--   - [Homework 7](hw/hw7.html) due Wed 5/8 at 11:59pm -->
-<!-- ### Week 14 (Exam 3) -->
-<!-- | Date | Lecture | Lab | Final Project | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 5/6 | Project Work Day |  |  | -->
-<!-- | Wed 5/8 | Review Day | [End of Course Evaluations](https://grinnell.smartevals.com) |  | -->
-<!-- | Fri 5/10 | Exam 3 | [Practice Exam](exam/practice_exam3.pdf) |  | -->
-<!--   - [Example Final Project Paper](examples/final_writeup.pdf) -->
-<!--     - [Associated Rmd file](examples/final_writeup.Rmd) -->
-<!--     - [Updated Rubric](exam/rubric_final_project.html) -->
-<!--   - [Cheatsheet of statistical tests in R](examples/cheatsheet.html) -->
-<!--   - [Extra Final Exam Review](examples/final_exam_review.html) -->
-<!--   - [Practice Exam Solutions (pdf)](exam/practice_exam3_solutions.pdf) -->
-<!--   - [Practice Exam Solutions (video)](https://grinnell.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=fc6d8433-cf89-4ac4-ad9c-b16a016339ab) -->
-<!-- ### Week 15 (Presentations) -->
-<!-- | Date | Lecture | Lab | Final Project | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 5/13 | |  |  | -->
-<!-- | Wed 5/15 | STA-209-05 Presentations @ 9-12 | |  | -->
-<!-- | Fri 5/17 | STA-209-03 Presentations @ 9-12 |  |  | -->
-<!-- Final report due Friday 5/17 at 5pm -->
-<!-- # Walkthroughs -->
-<!-- ## Shiny App -->
-<!-- [Null Distribution](https://shiny.grinnell.edu/content/e11309e6-e0a6-4771-8bd6-dbf2ed4a376b/) -- helpful for investigating relationship between absolute distance, standard deviation, and sample size for null distributions -->
-<!-- ## Lab Walkthroughs -->
-<!-- Posted here are videos walking through the lab content -->
-<!-- [Lab 5 -- dplyr](https://grinnell.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=3cffda0b-8b4b-4249-9bab-b1330142816b) -->
-<!-- [Lab 6 -- Bootstrapping](https://grinnell.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=92b39ea4-8969-44e2-96ef-b12c01207399) -->
-<!-- [Lab 8 -- ANOVA](https://grinnell.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=200787b6-3cf2-4069-a0b1-b169011c04ab) -->
-<!-- [Lab 9 -- Regression](https://grinnell.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=ddba7235-6c21-49b2-b13c-b169011c5aa6) -->
-<!-- ## Homework Walkthroughs -->
-<!-- [Homework 4](https://grinnell.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=7e61a75d-2272-4245-8b98-b133013a52c9&start=0) -->
-<!-- # Stat Videos on YT -->
-<!-- Here are some content creators on YouTube who I have used in the past to help me understand concepts in statistics and probability. Some of them are more organized than others (i.e., via playlists), but you could always try searching something like "[creator] central limit theorem" to find results -->
-<!--   - Khan Academy (good for everything) -->
-<!--   - Ben Lambert (good for stats) -->
-<!--   - Patrick JMT (good for math, some stats) -->
-<!--   - 3Blue1Brown (my personal favorite, especially his series on linear algebra) -->
-<!-- If you have others that you have found useful, let me know and I will add them to the list -->
-</div>
-</div>
+<div id="bootstrapping" class="section level2">
+<h2>Bootstrapping</h2>
+<p>Here we will use bootstrap function and quantile function and it’ll
+actually be super cool</p>
 </div>
 
 
@@ -2421,7 +1760,7 @@ $(document).ready(function ()  {
       scrollTo: 0
     };
     options.showAndHide = true;
-    options.smoothScroll = false;
+    options.smoothScroll = true;
 
     // tocify
     var toc = $("#TOC").tocify(options).data("toc-tocify");
