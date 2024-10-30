@@ -1641,12 +1641,7 @@ Explain.</p>
 dataset which we will use for the first parts of this problem. It will
 also create <code>hawks2</code>, a randomly sampled subset of the
 data.</p>
-<pre class="r"><code>hawks &lt;- read.csv(&quot;https://collinn.github.io/data/hawks.csv&quot;)
-
-## Create subset of size n = 20
-set.seed(197)
-idx &lt;- sample(seq_len(nrow(hawks)), size = 20)
-hawks2 &lt;- hawks[idx, ]</code></pre>
+<pre class="r"><code>hawks &lt;- read.csv(&quot;https://collinn.github.io/data/hawks.csv&quot;)</code></pre>
 <ol style="list-style-type: lower-alpha">
 <li><p>Subset the <code>hawks</code> data using dplyr to include only
 Red-tailed hawks (<code>Species == &quot;RT&quot;</code>). How many observations
@@ -1666,6 +1661,13 @@ confidence interval compare? Does changing the size of the sample appear
 to have more of an impact on the sample mean or on the confidence
 interval?</p></li>
 </ol>
+<pre class="r"><code>## First subset Hawks data with RT
+# hwk &lt;- filter(hawks, ...)
+
+## Create subset of size n = 20
+set.seed(89)
+idx &lt;- sample(seq_len(nrow(hwk)), size = 20)
+hawks2 &lt;- hwk[idx, ]</code></pre>
 </div>
 <div id="basic-quantile-functions" class="section level3">
 <h3>Basic Quantile Functions</h3>
@@ -1688,7 +1690,7 @@ rand &lt;- rnorm(n = 1000, mean = mm, sd = ss)
 ## Find the quantiles of the rand data
 quantile(x = rand, probs = c(0.025, 0.975))</code></pre>
 <pre><code>##    2.5%   97.5% 
-## 0.46622 0.48588</code></pre>
+## 0.46621 0.48549</code></pre>
 <pre class="r"><code>qnorm(c(0.025, 0.975), mean = mm, sd = ss)</code></pre>
 <pre><code>## [1] 0.46645 0.48599</code></pre>
 <p>In this case, we should expect the quantiles to be pretty close: the
@@ -1813,7 +1815,35 @@ would find using the point estimate <span class="math inline">\(\pm\)</span> mar
 answer.</p>
 <p><strong>Question 5</strong> Verify using the <code>qt()</code>
 function what you answered in Question 4.</p>
-<p><strong>Question 6</strong> TBD</p>
+<p><strong>Question 5</strong> Verify using the <code>qt()</code>
+function what you answered in Question 4.</p>
+<p><strong>Question 6</strong> This question uses the Grinnell Rain
+dataset. Typically, this dataset includes precipitation data on 121
+months; here, we will collect a sample of size <span class="math inline">\(n = 20\)</span> instead</p>
+<pre class="r"><code>## Load data
+rain &lt;- read.csv(&quot;https://collinn.github.io/data/grinnell_rain.csv&quot;)
+
+## Subset
+set.seed(10)
+idx &lt;- sample(1:nrow(rain), size = 20)
+rainsub &lt;- rain[idx, ]</code></pre>
+<p><strong>Part A</strong> Using your sample <code>rainsub</code> and
+the <code>qt()</code>, attempt to create an 80% confidence interval
+using the point estimate <span class="math inline">\(\pm\)</span> method
+(i.e., median <span class="math inline">\(\pm C \times
+\hat{\sigma}/\sqrt{n}\)</span>)</p>
+<p><strong>Part B</strong> Use the <code>bootstrap()</code> function to
+bootstrap 1,000 samples of the <code>median</code> statistic. With your
+resulting data frame, create a histogram of the sampling distribution.
+Based on this, does it seem like the confidence interval you found in
+Part A is appropriate? Why or why not?</p>
+<p><strong>Part C</strong> Use the <code>quantile()</code> function to
+create an 80% confidence interval for the median. How does this compare
+with what you found in Part A?</p>
+<p><strong>Part D</strong> Now using the full rain dataset, find the
+true median value of the population. Does it fall within the intervals
+you constructed in Part A? How about Part B? Why did it work for one and
+not the other?</p>
 </div>
 
 
