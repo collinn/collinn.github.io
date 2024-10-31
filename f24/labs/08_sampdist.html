@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-10-30" />
+<meta name="date" content="2024-10-31" />
 
 <title>Lab 8 – t-Distribution and Bootstrapping</title>
 
@@ -1480,7 +1480,7 @@ border-radius: 0px;
 
 <h1 class="title toc-ignore">Lab 8 – t-Distribution and
 Bootstrapping</h1>
-<h4 class="date">2024-10-30</h4>
+<h4 class="date">2024-10-31</h4>
 
 </div>
 
@@ -1690,7 +1690,7 @@ rand &lt;- rnorm(n = 1000, mean = mm, sd = ss)
 ## Find the quantiles of the rand data
 quantile(x = rand, probs = c(0.025, 0.975))</code></pre>
 <pre><code>##    2.5%   97.5% 
-## 0.46621 0.48549</code></pre>
+## 0.46711 0.48634</code></pre>
 <pre class="r"><code>qnorm(c(0.025, 0.975), mean = mm, sd = ss)</code></pre>
 <pre><code>## [1] 0.46645 0.48599</code></pre>
 <p>In this case, we should expect the quantiles to be pretty close: the
@@ -1813,8 +1813,6 @@ bootstrapped sampling distribution above, do you think that the 95%
 confidence interval constructed with bootstrapping should match what we
 would find using the point estimate <span class="math inline">\(\pm\)</span> margin of error method? Explain your
 answer.</p>
-<p><strong>Question 5</strong> Verify using the <code>qt()</code>
-function what you answered in Question 4.</p>
 <p><strong>Question 5</strong> Verify using the <code>qt()</code>
 function what you answered in Question 4.</p>
 <p><strong>Question 6</strong> This question uses the Grinnell Rain
