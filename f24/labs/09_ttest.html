@@ -10,8 +10,9 @@
 
 
 
+<meta name="date" content="2024-11-03" />
 
-<title>STA-209 - Applied Statistics (Fall 2024)</title>
+<title>Lab 9 – Hypothesis Testing</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1477,905 +1478,133 @@ border-radius: 0px;
 
 
 
-<h1 class="title toc-ignore">STA-209 - Applied Statistics (Fall
-2024)</h1>
+<h1 class="title toc-ignore">Lab 9 – Hypothesis Testing</h1>
+<h4 class="date">2024-11-03</h4>
 
 </div>
 
 
-<p><span class="math inline">\(~\)</span></p>
-<p>Last updated: Sun Nov 3 2024, 13:39</p>
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- |  |  |  |  | -->
-<!-- |  |  |  |  | -->
-<!-- |  |  |  |  | -->
-<div id="syllabus" class="section level1">
-<h1>Syllabus</h1>
-<p>Welcome to the course website for STA 209, Introduction to Applied
-Statistics. To begin, you can find the course syllabus linked below:</p>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>This lab will introduce the idea of hypothesis testing with a
+particular type of test known as a <span class="math inline">\(t\)</span>-test. By t-test, we simply mean
+performing a hypothesis test in which we construct a test statistic,
+<span class="math inline">\(t\)</span> that follows a
+t-distribution.</p>
+</div>
+<div id="testing-means" class="section level2">
+<h2>Testing means</h2>
+<p>In R, we can create perform hypothesis testing and create standard
+confidence intervals based on the <span class="math inline">\(t\)</span>-distribution using the function
+<code>t.test()</code>. While the <code>t.test()</code> function will
+take a number of useful arguments that we will use in the future, for
+now we only concern ourselves with three:</p>
 <ul>
-<li><a href="syllabus209f24.html">Click here</a> to view the course
-syllabus</li>
+<li><code>x</code>, a numeric vector we wish to construct a confidence
+interval for</li>
+<li><code>mu</code>, a single number indicating the null hypothesis</li>
+<li><code>conf.level</code> which gives the confidence interval for a
+specified <span class="math inline">\(\alpha\)</span> (i.e., our
+confidence interval is <span class="math inline">\(1 -
+\alpha\)</span>)</li>
 </ul>
-<p>You can locate course content by scrolling, or by using the
-navigation bar in the upper left.</p>
-<p>Please note: material will not be posted until we’ve reached that
-point in the course.</p>
-<p><a href="resources/mathlab.pdf">Math lab hours</a></p>
-</div>
-<div id="course-materials" class="section level1">
-<h1>Course Materials</h1>
-<div id="solutions" class="section level2">
-<h2>Solutions</h2>
-<div id="homework-solutions" class="section level3">
-<h3>Homework Solutions</h3>
-<ul>
-<li><a href="solutions/hw/hw5_sol.pdf">Homework 5 (Probability)</a></li>
-</ul>
-</div>
-<div id="lab-solutions" class="section level3">
-<h3>Lab Solutions</h3>
-<p>TBD</p>
-<div id="worksheets" class="section level4">
-<h4>Worksheets</h4>
-<ul>
-<li><a href="solutions/labs/prob1_solutions.pdf">Probability Worksheet
-1</a></li>
-<li><a href="solutions/labs/prob2_solutions.pdf">Probability Worksheet
-2</a></li>
-<li><a href="solutions/labs/prob3_solutions.pdf">Probability Worksheet
-3</a></li>
-</ul>
-</div>
-</div>
-</div>
-<div id="exam-1-content" class="section level2">
-<h2>Exam #1 Content</h2>
-<div id="week-0-intro" class="section level3">
-<h3>Week 0 (Intro)</h3>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 8/26</td>
-<td align="left">-</td>
-<td align="left">-</td>
-<td align="left">-</td>
-</tr>
-<tr class="even">
-<td align="left">Wed 8/28</td>
-<td align="left">-</td>
-<td align="left">-</td>
-<td align="left">-</td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 8/30</td>
-<td align="left"><a href="syllabus209f24.html">Syllabus</a></td>
-<td align="left">-</td>
-<td align="left">-</td>
-</tr>
-</tbody>
-</table>
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 1/22 | [Syllabus](syllabus209s24.html) | - | - | -->
-<!-- | Wed 1/24 | [Introduction](lectures/introduction.pdf) | [In-class](labs/00_markdown.html) | - | -->
-<!-- | Fri 1/26 | [Intro to R](lectures/r_intro.pdf) | [Intro R Lab](labs/01_introR.html) | [1.2, 1.3 from IMS](https://openintro-ims2.netlify.app/01-data-hello#sec-data-basics) -->
-<p><strong>Assignments and Deadlines</strong>:</p>
+<p>The output of the <code>t.test()</code> function will include a
+collection of useful information, ranging from the point estimate for
+the mean value of <code>x</code>, as well as a confidence interval for
+this value. For example, consider the built-in dataset
+<code>mtcars</code> in R. Here, we use <code>t.test()</code> to find a
+90% confidence interval for average miles per gallon:</p>
+<pre class="r"><code>t.test(mtcars$mpg, conf.level = 0.9)</code></pre>
+<pre><code>## 
+##  One Sample t-test
+## 
+## data:  mtcars$mpg
+## t = 18.9, df = 31, p-value &lt;0.0000000000000002
+## alternative hypothesis: true mean is not equal to 0
+## 90 percent confidence interval:
+##  18.284 21.897
+## sample estimates:
+## mean of x 
+##    20.091</code></pre>
+<p>From the output, you should note a few things:</p>
 <ol style="list-style-type: decimal">
-<li>Download <a href="http://www.r-project.org/">R</a></li>
-<li>Download <a href="http://www.rstudio.com/">R Studio</a></li>
-<li>(Windows only, maybe) Download <a href="https://cran.r-project.org/bin/windows/Rtools/rtools44/rtools.html">Rtools44</a></li>
+<li><p>At the bottom of the output, we see our point estimate, <span class="math inline">\(\overline{x} = 20.09\)</span></p></li>
+<li><p>Just above the point estimate, we see our estimate of the 90%
+confidence interval, here <span class="math inline">\((18.24,
+21.89)\)</span></p></li>
+<li><p>All of the information above this is related to <em>hypothesis
+testing</em>. This includes:</p>
+<ul>
+<li>A <span class="math inline">\(t\)</span>-statistic, equal to <span class="math inline">\(t = 18.9\)</span></li>
+<li>Degrees of freedom equal to <span class="math inline">\(df =
+31\)</span></li>
+<li>A <span class="math inline">\(p\)</span>-value of <span class="math inline">\(p &lt; 2 \times 10^{-15}\)</span></li>
+</ul></li>
 </ol>
-</div>
-<div id="week-1-data-summaries-and-visualization" class="section level3">
-<h3>Week 1 (Data Summaries and Visualization)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 9/2</td>
-<td align="left"><a href="lectures/r_intro.pdf">Intro to R</a></td>
-<td align="left"><a href="labs/01_introR.html">Intro to R</a></td>
-<td align="left"><a href="resources/packages.html">Packages</a></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 9/4</td>
-<td align="left"><a href="lectures/intro_stat.pdf">Introduction to
-Statistics</a></td>
-<td align="left"><a href="labs/02_ggplot.html"><code>ggplot2</code></a></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 9/6</td>
-<td align="left"><a href="lectures/dataviz.pdf">Data Summaries –
-Visualization</a></td>
-<td align="left">Continue ggplot</td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
+<p>However, as we were not conducting any hypothesis test in this
+particular example, this information can be ignored.</p>
+<p>By default, the <code>t.test()</code> function assumes a null
+hypothesis of <span class="math inline">\(H_0: \mu_0 = 0\)</span>. As
+our t-statistic is computed as</p>
+<p><span class="math display">\[
+t = \frac{\overline{x} - \mu_0}{\hat{\sigma}/\sqrt{n}}
+\]</span> this gives rise to the computed statistic <span class="math inline">\(t = 18.9\)</span> that we saw in the output (and
+was subsequently used to compute the p-value).</p>
+<p>To see a more realistic example, suppose we wanted to investigate the
+hypothesis that the average miles per gallon was equal to 16 mpg. That
+is, suppose we have <span class="math inline">\(H_0: \mu_0 =
+18\)</span>. We could evaluate this hypothesis using the
+<code>t.test</code> function with the <code>mu</code> argument:</p>
+<pre class="r"><code>t.test(x = mtcars$mpg, 
+       mu = 18, 
+       conf.level = 0.9)</code></pre>
+<pre><code>## 
+##  One Sample t-test
+## 
+## data:  mtcars$mpg
+## t = 1.96, df = 31, p-value = 0.059
+## alternative hypothesis: true mean is not equal to 18
+## 90 percent confidence interval:
+##  18.284 21.897
+## sample estimates:
+## mean of x 
+##    20.091</code></pre>
+<p>In this example, note that our point estimate did not change, nor did
+our 90% confidence interval. What did change, however, was the
+calculated t-statistic as well as the p-value.</p>
+<p><strong>Question 1:</strong> Explain why both the t-statistic and the
+p-value changed in our second call of <code>t.test()</code> while the
+point estimate and the confidence interval stayed the same.</p>
+<p><strong>Question 2:</strong> Using the subsets of the data below,
+find and report 95% confidence intervals for total enrollment at public
+and private colleges.</p>
+<pre class="r"><code>library(dplyr)
+college &lt;- read.csv(&quot;https://collinn.github.io/data/college2019.csv&quot;)
+
+col_priv &lt;- filter(college, Type == &quot;Private&quot;)
+col_pub &lt;- filter(college, Type == &quot;Public&quot;)</code></pre>
+<p><strong>Question 3:</strong> Below is code to recreate the two
+subsets of the hawk data containing only Red-tailed hawks</p>
+<pre class="r"><code>## RT Hawk data
+hawks &lt;- read.csv(&quot;https://collinn.github.io/data/hawks.csv&quot;)
+hawks &lt;- filter(hawks, Species == &quot;RT&quot;)
+
+## Subset of RT Hawk data
+set.seed(89)
+idx &lt;- sample(seq_len(nrow(hawks)), size = 20)
+hawks2 &lt;- hawks[idx, ]</code></pre>
 <ul>
-<li><a href="hw/hw1.html">Homework 1</a> due Fri Sept 13 at 10pm</li>
-<li><a href="labs/01_introR.html">Lab 1</a> due Fri Sept 6 at 10pm</li>
+<li><p><strong>Part A:</strong> Find the mean body weight for Red-tailed
+hawks in both the <code>hawks</code> and <code>hawks2</code> datasets.
+How do they compare?</p></li>
+<li><p><strong>Part B:</strong> Using the average weight of the Cooper’s
+hawks, perform a t-test on each dataset to test the hypothesis that
+<span class="math inline">\(\mu_0 = 1050\)</span>. If you were testing
+at the <span class="math inline">\(\alpha = 0.05\)</span> level, which
+would you conclude?</p></li>
+<li><p><strong>Part C:</strong> Explain why the conclusions you came to
+were different in Part C.</p></li>
 </ul>
-<p><strong>Note:</strong> Homework should be neatly formatted with
-questions specified as headers and with your R code and written
-solutions underneath. <a href="examples/example_hw1.pdf">Here is an
-example</a> of how it should look.</p>
-</div>
-<div id="week-2-tables-and-numerical-summaries" class="section level3">
-<h3>Week 2 (Tables and Numerical Summaries)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 9/9</td>
-<td align="left"><a href="lectures/numsum.pdf">Numerical
-Summaries</a></td>
-<td align="left">Continue ggplot lab</td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 9/11</td>
-<td align="left">Numerical Summaries cont.</td>
-<td align="left"><a href="labs/03_tables.html">Table Lab</a></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 9/13</td>
-<td align="left"><a href="lectures/tables.pdf">Tables</a></td>
-<td align="left">Cont. Table Lab</td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ul>
-<li>Lab 2 due Fri Sept 13 at 10pm</li>
-<li><a href="hw/hw2.html">Homework 2</a> due Fri Sept 20 at 10pm</li>
-<li><a href="https://collinn.github.io/teaching/2023/labs/lab4.html">Bonus
-lab</a> for <code>ggplot2</code> for scales, axes, colors, and
-themes</li>
-</ul>
-</div>
-<div id="week-3-odds-and-z-scores" class="section level3">
-<h3>Week 3 (Odds and Z-Scores)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 9/16</td>
-<td align="left"><a href="lectures/odds.pdf">Odds</a></td>
-<td align="left"><a href="labs/04_dplyr.html">dplyr</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 9/18</td>
-<td align="left"><a href="lectures/correlation.pdf">Z-Scores and
-Correlation</a></td>
-<td align="left">Cont. dplyr</td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 9/20</td>
-<td align="left"><a href="lectures/slr.pdf">Regression</a></td>
-<td align="left"><a href="labs/05_regression.html">Regression and
-Correlation</a></td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<p><strong>ASSIGNED</strong></p>
-<ul>
-<li><a href="hw/hw3.html">Homework 3</a> due Friday, Sept 27 at
-10pm</li>
-</ul>
-<p><strong>DUE</strong></p>
-<ul>
-<li>Homework 2 due Friday, Sept 20 at 10pm</li>
-<li>Table lab due Wednesday, Sept 18 at 10pm</li>
-</ul>
-</div>
-<div id="week-4-regression" class="section level3">
-<h3>Week 4 (Regression)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 9/23</td>
-<td align="left"><a href="lectures/catpred.pdf">Regression (Categorical
-Predictors)</a></td>
-<td align="left">Cont. Regression Lab</td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 9/25</td>
-<td align="left"><a href="lectures/mlr.pdf">Regression
-Multivariate</a></td>
-<td align="left">Cont. Regression Lab</td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 9/27</td>
-<td align="left">Review Day</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ul>
-<li><a href="exam/topic_list_exam1.html">Exam 1 Topic List</a></li>
-<li><a href="exam/practice_exam1.pdf">Practice Exam</a> (Solutions at
-mentor sessions)</li>
-<li><a href="exam/209_midterm_review_sheet.pdf">Comprehensive Review
-Sheet</a></li>
-</ul>
-<p><strong>DUE</strong></p>
-<ul>
-<li>Homework 3 due Friday, Sept 27 at 10pm</li>
-<li>dplyr lab due Friday, Sept 27 at 10pm</li>
-<li>Regression lab due Friday, Sept 27 at 10pm</li>
-</ul>
-</div>
-</div>
-<div id="exam-2-content" class="section level2">
-<h2>Exam #2 Content</h2>
-<div id="week-5-study-design" class="section level3">
-<h3>Week 5 (Study Design)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 9/30</td>
-<td align="left">Exam 1 😎</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 10/2</td>
-<td align="left">R day</td>
-<td align="left"><a href="labs/06_practice.html">dplyr and
-ggplot</a></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 10/4</td>
-<td align="left"><a href="lectures/sampling.pdf">Study Design</a></td>
-<td align="left">cont</td>
-<td align="left"><a href="https://www.biostat.jhsph.edu/~iruczins/teaching/books/2019.openintro.statistics.pdf">Reading</a></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ul>
-<li><p><a href="exam/exam1_notes.html">Exam Notes</a></p></li>
-<li><p><a href="examples/dplyr_helpsheet.pdf">dplyr
-cheatsheet</a></p></li>
-</ul>
-<p>Extra tentative from this point on</p>
-</div>
-<div id="week-6-probability" class="section level3">
-<h3>Week 6 (Probability)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 10/7</td>
-<td align="left"><a href="lectures/prob1.pdf">Probability 1
-(Introduction)</a></td>
-<td align="left"><a href="labs/inclass_probability1.pdf">Worksheet
-1</a></td>
-<td align="left"><a href="https://www.biostat.jhsph.edu/~iruczins/teaching/books/2019.openintro.statistics.pdf">Reading
-(Sections 3.1)</a></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 10/9</td>
-<td align="left"><a href="lectures/prob2.pdf">Probability 2 (Conditional
-and Independence)</a></td>
-<td align="left"><a href="labs/inclass_probability2.pdf">Worksheet
-2</a></td>
-<td align="left"><a href="https://www.biostat.jhsph.edu/~iruczins/teaching/books/2019.openintro.statistics.pdf">Reading
-(Sections 3.1 and 3.2)</a></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 10/11</td>
-<td align="left"><a href="lectures/prob3.pdf">Probability 3
-(Bayes)</a></td>
-<td align="left"><a href="labs/inclass_probability3.pdf">Worksheet
-3</a></td>
-<td align="left"><a href="https://www.biostat.jhsph.edu/~iruczins/teaching/books/2019.openintro.statistics.pdf">Reading
-(Sections 3.2)</a></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ul>
-<li><p><a href="https://www.youtube.com/watch?v=HZGCoVF3YvM">CHECK OUT
-THIS NEAT VIDEO</a></p></li>
-<li><p>Exam 1 corrections due Friday 10/11</p></li>
-<li><p><a href="https://www.biostat.jhsph.edu/~iruczins/teaching/books/2019.openintro.statistics.pdf">Reading
-(Sections 3.1 and 3.2)</a></p></li>
-<li><p><a href="hw/hw5.html">Homework 5</a> due 10/18</p></li>
-<li><p><a href="labs/06_practice.html">Bonus <code>dplyr</code> lab</a>
-due Friday 10/11</p></li>
-</ul>
-</div>
-<div id="week-7-sampling-distributions" class="section level3">
-<h3>Week 7 (Sampling Distributions)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Final Project</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 10/14</td>
-<td align="left"><a href="lectures/sampdist.pdf">Sampling
-Distribution</a></td>
-<td align="left"><a href="https://www.zoology.ubc.ca/~whitlock/Kingfisher/SamplingNormal.htm">Fish
-1</a> and <a href="https://www.zoology.ubc.ca/~whitlock/Kingfisher/CLT.htm">Fish
-2</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 10/16</td>
-<td align="left"><a href="lectures/intervals.pdf">Normal Approximation
-and Intervals</a></td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 10/18</td>
-<td align="left"><a href="labs/07_worksheet.pdf">CLT Worksheet</a></td>
-<td align="left"><a href="labs/07_clt.html">CLT Lab Overview</a></td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ul>
-<li><a href="https://youtu.be/zeJD6dqJ5lo">CHECK OUT THIS OTHER NEAT
-VIDEO</a></li>
-<li><a href="hw/hw5.html">Homework 5</a> due 10/18</li>
-<li>CLT Worksheet, we will think of something to do with this</li>
-</ul>
-</div>
-<div id="fall-break" class="section level3">
-<h3>FALL BREAK</h3>
-<p>(yay)</p>
-<p><strong>Assignments and Deadlines</strong>:</p>
-</div>
-<div id="week-8-sampling-distributions" class="section level3">
-<h3>Week 8 (Sampling Distributions)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Final Project</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 10/28</td>
-<td align="left"><a href="lectures/tapprox.pdf">t-distribution</a></td>
-<td align="left"><a href="labs/07_clt.html">Continue last week
-lab</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 10/30</td>
-<td align="left"><a href="lectures/tapprox.pdf">t-distribution</a></td>
-<td align="left"><a href="labs/08_sampdist.html">t-Dist and
-Bootstrap</a></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 11/01</td>
-<td align="left"><a href="lectures/bootstrap.pdf">Bootstrapping</a></td>
-<td align="left">Lab</td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong></p>
-<ul>
-<li>CLT lab due to the course mentor at the start of class 11/01</li>
-<li><a href="hw/hw6.html">Homework 6</a> due 11/08 at 10pm</li>
-<li><a href="labs/08_sampdist.html">Lab 8</a> due 11/06 at 10pm</li>
-</ul>
-</div>
-<div id="week-9-hypothesis-testing" class="section level3">
-<h3>Week 9 (Hypothesis Testing)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Final Project</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 11/4</td>
-<td align="left"><a href="lectures/hypothesis.pdf">Hypothesis
-Testing</a></td>
-<td align="left"><a href="labs/09_ttest.html">Hypothesis
-Testing</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 11/6</td>
-<td align="left">Decision Error</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 11/8</td>
-<td align="left">Multiple Testing</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<!-- X Exam 2 😎 -->
-<p><strong>Assignments and Deadlines</strong>:</p>
-</div>
-</div>
-<div id="exam-3-content" class="section level2">
-<h2>Exam #3 Content</h2>
-<div id="week-10" class="section level3">
-<h3>Week 10</h3>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Final Project</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 11/11</td>
-<td align="left">??</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 11/13</td>
-<td align="left">??</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 11/15</td>
-<td align="left">??</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<!-- | Date | Lecture | Lab | Final Project | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 11/11 | Review Day |  |  | -->
-<!-- | Wed 11/13| Exam 2 |  |  | -->
-<!-- | Fri 11/15 | Difference Tests |  |  | -->
-</div>
-<div id="week-11" class="section level3">
-<h3>Week 11</h3>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Final Project</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 11/18</td>
-<td align="left"><span class="math inline">\(\chi^2\)</span> test</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 11/20</td>
-<td align="left">ANOVA (possible chi2)</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 11/22</td>
-<td align="left">ANOVA + Tukey</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="week-12" class="section level3">
-<h3>Week 12</h3>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Final Project</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 11/25</td>
-<td align="left">ANOVA/Regression</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 11/27</td>
-<td align="left">Multiple Regression</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 11/29</td>
-<td align="left">Thanksgiving</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="week-13" class="section level3">
-<h3>Week 13</h3>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Final Project</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 12/2</td>
-<td align="left">Multiple Regression</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 12/4</td>
-<td align="left">Regression Extras</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 12/6</td>
-<td align="left">Regression Error</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="week-14" class="section level3">
-<h3>Week 14</h3>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Final Project</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 12/9</td>
-<td align="left">Project Work Day</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 12/11</td>
-<td align="left">Review</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 12/13</td>
-<td align="left">Final Exam, probably</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<!-- --- -->
-<!-- ### Week 3 (Numerical Summaries) -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 2/5 | [Tables](lectures/tables.pdf) | Wrap up lab | - | -->
-<!-- | Wed 2/7 | Cont. tables | [Table Lab](labs/03_tables.html) | - | -->
-<!-- | Fri 2/9 | [Numerical Summaries](lectures/numsum.pdf) | [Table Lab cont.](labs/03_tables.html) | - | -->
-<!-- **Assignments and Deadlines**:  -->
-<!-- - Lab 02 due Monday, Feb 12 at 11:59pm -->
-<!-- - Lab 03 due Monday, Feb 12 at 11:59pm -->
-<!-- - [Homework 2](hw/hw2.html) due Mon, Feb 12 at 11:59pm -->
-<!-- **Extra Practice:** -->
-<!-- Our `ggplot2` lab really only covered the basics. You can get in-depth practice if you want to trick out your graphs by going through STA-230 labs which do not require any additional knowledge than what we have already acquired: -->
-<!--   - [Extra lab 1 -- the basics](https://collinn.github.io/teaching/2023/labs/ggplot_lab3.html) -->
-<!--   - [Extra lab 2 -- the frills](https://collinn.github.io/teaching/2023/labs/lab4.html) -->
-<!-- **NOTE** Exam 1 will be February 21 -- details to follow -->
-<!-- --- -->
-<!-- ### Week 4 (Regression) -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 2/12 | [Correlation](lectures/correlation.pdf) | - | - | -->
-<!-- | Wed 2/14 | [Linear Regression](lectures/regression.pdf) | [Regression](labs/04_regression.html) | - | -->
-<!-- | Fri 2/16 | [Linear Regression (Categorical Predictor)](lectures/cat_pred.pdf) | - | - | -->
-<!-- **Assignments and Deadlines**:  -->
-<!-- - [Homework 3](hw/hw3.html) due Mon, Feb 19 at 11:59pm -->
-<!-- - [Lab 4](labs/04_regression.html) due Mon, Feb 19 at 11:59pm -->
-<!-- Practice exam posted [here](https://remiller1450.github.io/s209s24/practice_exam1.pdf). Note that you can skip/ignore questions about risk and relative risk, as well as those with multivariate regression -->
-<!-- [Here](review/exam1_review.html) is a rough sketch of the topics that may be covered. I will continue to fill in with more examples as the week progresses -->
-<!-- --- -->
-<!-- ### Week 5 (Exam Week) -->
-<!-- **EXAM REMINDERS:** -->
-<!--   - In Noyce 2022 -->
-<!--   - Bring calculator -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 2/19 | [Review Day](lectures/exam1_review.pdf) | - | - | -->
-<!-- | Wed 2/21 | Exam 😎 | - | - | -->
-<!-- | Fri 2/23 | [dplyr package](lectures/dplyr.pdf) | [dplyr](labs/05_dplyr.html) | - | -->
-<!-- **Assignments and Deadlines**:  -->
-<!-- None -->
-<!-- ## Exam \#2 Content -->
-<!-- *Assignments now due on Fridays* -->
-<!-- ### Week 6 (Confidence Intervals) -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 2/26 | [Sampling](lectures/sampling.pdf) | - | - | -->
-<!-- | Wed 2/28 | [Intervals](lectures/intervals.pdf) | [Fish](https://www.zoology.ubc.ca/~whitlock/Kingfisher/SamplingNormal.htm) | - | -->
-<!-- | Fri 3/1 | [Bootstrapping](lectures/bootstrap.pdf) | [Bootstrapping](labs/06_bootstrap.html) | [IMS Ch 12](https://openintro-ims.netlify.app/foundations-bootstrapping) | -->
-<!-- **Assignments and Deadlines**:  -->
-<!--   - [Course Suvey](https://grinnell.co1.qualtrics.com/jfe/form/SV_erI5kADKNAjHhTE) is now available to provide feedback -->
-<!--   - `dplyr` lab due Friday, March 01 at 11:59 pm -->
-<!--   - [Homework 4](hw/hw4.html) due Friday, March 08 at 11:59 pm -->
-<!--   - [Bootstrap lab](labs/06_bootstrap.html) due Friday, March 08 at 11:59 pm -->
-<!-- ### Week 7 (Normal Approximation) -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 3/4 | [Normal Approximations](lectures/normal.pdf) | - | - | -->
-<!-- | Wed 3/6 | [Proportions and $t$](lectures/proportions.pdf) | [More Fish](https://www.zoology.ubc.ca/~whitlock/Kingfisher/CLT.htm) | - | -->
-<!-- | Fri 3/8 | Review Day | Finish Lab | - | -->
-<!-- **Assignments and Deadlines**:  -->
-<!--   - [Course Suvey](https://grinnell.co1.qualtrics.com/jfe/form/SV_erI5kADKNAjHhTE) is now available to provide feedback -->
-<!--   - [Homework 4](hw/hw4.html) due Friday, March 08 at 11:59 pm -->
-<!--   - [Bootstrap lab](labs/06_bootstrap.html) due Friday, March 08 at 11:59 pm -->
-<!-- ### Week 8 (Hypothesis Testing) -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 3/11 | [Hypothesis Testing](lectures/hypo.pdf) | [Hypothesis Testing](labs/hypothesis.html) | - | -->
-<!-- | Wed 3/13 | [Hypothesis Testing cont.](lectures/hypo2.pdf) | [Final Project](exam/final_project.html) | - | -->
-<!-- | Fri 3/15 | TBD | | - | -->
-<!-- **Assignments and Deadlines**:  -->
-<!--   - No Homework assigned this week -->
-<!--   - Details for class project TBD -->
-<!-- ### SPRING BREAK -->
-<!-- ### Week 9 (Decision Error) -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 4/1 | Review | [Null Distribution](https://shiny.grinnell.edu/content/e11309e6-e0a6-4771-8bd6-dbf2ed4a376b/) |  | -->
-<!-- | Wed 4/3 | [Decision Error](lectures/error.pdf)| [Hypothesis Testing](labs/hypothesis.html) |  | -->
-<!-- | Fri 4/5 | TBD |  [Hypothesis Testing]() |  | -->
-<!-- **Assignments and Deadlines**:  -->
-<!--   - [Homework 5](hw/hw5.html) due Monday April 8 -->
-<!--   - [Practice Exam](review/practice_exam2.pdf) -->
-<!--       - [Solutions](review/practice_exam2_solutions.pdf) -->
-<!--       - [Video Walkthrough](https://grinnell.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=5eae7b48-d579-4a5d-8488-b14b01111276) -->
-<!--   - [Professor Miller Practice Exam](https://remiller1450.github.io/s209s24/practice_exam2.pdf) -->
-<!--       - [Solution to Miller's Exam](https://remiller1450.github.io/s209s24/practice_exam2_soln.pdf) -->
-<!--   - [Study Guide](review/exam2_content.pdf) -->
-<!-- ### Week 10 (Exam 2) -->
-<!-- **EXAM REMINDERS** -->
-<!-- Topics: Sampling, bootstrapping, confidence intervals, hypothesis testing, p-values, decision errors -->
-<!-- - In room Noyce 2022 -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 4/8 | [Practice](lectures/exam2_review.pdf) |  |  | -->
-<!-- | | [Solutions to slides](lectures/exam2_review_solutions.pdf) | | | -->
-<!-- | Wed 4/10 | Exam 2 😎 | |  | -->
-<!-- | Fri 4/12 | [Multiple Testing](lectures/fwer.pdf) | [Hypothesis Testing](labs/hypothesis.html) |  | -->
-<!-- **Assignments and Deadlines**:  -->
-<!-- [Review your mentors!](https://grinnell.co1.qualtrics.com/jfe/form/SV_0lF1ffbprngpaM6) -->
-<!-- ## Exam \#3 Content -->
-<!-- Multiple comparisons, difference tests, $\chi^2$, ANOVA, regression -->
-<!-- ### Week 11 ($\chi^2$ Tests) -->
-<!-- | Date | Lecture | Lab | Final Project | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 4/15 | [Difference tests](lectures/diff.pdf) | [Hypothesis Testing cont.](labs/hypothesis.html) |  | -->
-<!-- | Wed 4/17 | [$\chi^2$ Test](lectures/chisq.pdf) | | Proposal Due 5pm | -->
-<!-- | Fri 4/19 | $\chi^2$ Test |  |  | -->
-<!--   - [Homework 6](hw/hw6.html) due Wed 4/24 at 11:59pm -->
-<!--   - Lab due Monday 4/24 at 11:59pm -->
-<!-- ### Week 12 (ANOVA) -->
-<!-- | Date | Lecture | Lab | Final Project | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 4/22 | [Class Survey](https://grinnell.co1.qualtrics.com/jfe/form/SV_7OnYFflocpW0ItM) |  |  | -->
-<!-- | Wed 4/24 | [ANOVA](lectures/anova.pdf) | [ANOVA](labs/08_anova.html) |  | -->
-<!-- | Fri 4/26 | [ANOVA Cont.](lectures/anova2.pdf) | [ANOVA](labs/08_anova.html) |  | -->
-<!--   - [Apply to be Stat mentor or grader](https://grinnell.co1.qualtrics.com/jfe/form/SV_6o5nE4rTSUnesgm) -->
-<!--   - Homework 6 and Hypothesis lab due Wednesday -->
-<!--   - [Example Excel data](review/data_excel.csv) -->
-<!--   - [Link to Grinnell Qualtrics](https://grinnell.co1.qualtrics.com/homepage/ui) -->
-<!--   - [Example Qualtrics data](examples/qualtrics_example.html) -->
-<!-- ### Week 13 (Regression) -->
-<!-- | Date | Lecture | Lab | Final Project | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 4/29 | [ANOVA/Regression](lectures/slr_inference.pdf) | [Regression and Inference](labs/09_regression.html)       | | -->
-<!-- | Wed 5/1 | [Multiple Regression](lectures/mlr_inference.pdf) | | Exploratory Analysis Due 5pm  | -->
-<!-- | Fri 5/3 | [Regression Error](lectures/error.pdf) |  |  | -->
-<!--   - [ANOVA lab](labs/08_anova.html) due Monday 4/29 at 11:59pm (late submission until Wednesday) -->
-<!--   - [Regression Lab](labs/09_regression.html) due Wed 5/8 at 11:59pm -->
-<!--   - [Homework 7](hw/hw7.html) due Wed 5/8 at 11:59pm -->
-<!-- ### Week 14 (Exam 3) -->
-<!-- | Date | Lecture | Lab | Final Project | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 5/6 | Project Work Day |  |  | -->
-<!-- | Wed 5/8 | Review Day | [End of Course Evaluations](https://grinnell.smartevals.com) |  | -->
-<!-- | Fri 5/10 | Exam 3 | [Practice Exam](exam/practice_exam3.pdf) |  | -->
-<!--   - [Example Final Project Paper](examples/final_writeup.pdf) -->
-<!--     - [Associated Rmd file](examples/final_writeup.Rmd) -->
-<!--     - [Updated Rubric](exam/rubric_final_project.html) -->
-<!--   - [Cheatsheet of statistical tests in R](examples/cheatsheet.html) -->
-<!--   - [Extra Final Exam Review](examples/final_exam_review.html) -->
-<!--   - [Practice Exam Solutions (pdf)](exam/practice_exam3_solutions.pdf) -->
-<!--   - [Practice Exam Solutions (video)](https://grinnell.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=fc6d8433-cf89-4ac4-ad9c-b16a016339ab) -->
-<!-- ### Week 15 (Presentations) -->
-<!-- | Date | Lecture | Lab | Final Project | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Mon 5/13 | |  |  | -->
-<!-- | Wed 5/15 | STA-209-05 Presentations @ 9-12 | |  | -->
-<!-- | Fri 5/17 | STA-209-03 Presentations @ 9-12 |  |  | -->
-<!-- Final report due Friday 5/17 at 5pm -->
-<!-- # Walkthroughs -->
-<!-- ## Shiny App -->
-<!-- [Null Distribution](https://shiny.grinnell.edu/content/e11309e6-e0a6-4771-8bd6-dbf2ed4a376b/) -- helpful for investigating relationship between absolute distance, standard deviation, and sample size for null distributions -->
-<!-- ## Lab Walkthroughs -->
-<!-- Posted here are videos walking through the lab content -->
-<!-- [Lab 5 -- dplyr](https://grinnell.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=3cffda0b-8b4b-4249-9bab-b1330142816b) -->
-<!-- [Lab 6 -- Bootstrapping](https://grinnell.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=92b39ea4-8969-44e2-96ef-b12c01207399) -->
-<!-- [Lab 8 -- ANOVA](https://grinnell.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=200787b6-3cf2-4069-a0b1-b169011c04ab) -->
-<!-- [Lab 9 -- Regression](https://grinnell.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=ddba7235-6c21-49b2-b13c-b169011c5aa6) -->
-<!-- ## Homework Walkthroughs -->
-<!-- [Homework 4](https://grinnell.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=7e61a75d-2272-4245-8b98-b133013a52c9&start=0) -->
-<!-- # Stat Videos on YT -->
-<!-- Here are some content creators on YouTube who I have used in the past to help me understand concepts in statistics and probability. Some of them are more organized than others (i.e., via playlists), but you could always try searching something like "[creator] central limit theorem" to find results -->
-<!--   - Khan Academy (good for everything) -->
-<!--   - Ben Lambert (good for stats) -->
-<!--   - Patrick JMT (good for math, some stats) -->
-<!--   - 3Blue1Brown (my personal favorite, especially his series on linear algebra) -->
-<!-- If you have others that you have found useful, let me know and I will add them to the list -->
-</div>
-</div>
 </div>
 
 
@@ -2437,7 +1666,7 @@ $(document).ready(function ()  {
       scrollTo: 0
     };
     options.showAndHide = true;
-    options.smoothScroll = false;
+    options.smoothScroll = true;
 
     // tocify
     var toc = $("#TOC").tocify(options).data("toc-tocify");
