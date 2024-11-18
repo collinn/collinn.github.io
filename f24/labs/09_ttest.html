@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-11-03" />
+<meta name="date" content="2024-11-18" />
 
 <title>Lab 9 – Hypothesis Testing</title>
 
@@ -1479,7 +1479,7 @@ border-radius: 0px;
 
 
 <h1 class="title toc-ignore">Lab 9 – Hypothesis Testing</h1>
-<h4 class="date">2024-11-03</h4>
+<h4 class="date">2024-11-18</h4>
 
 </div>
 
@@ -1605,6 +1605,139 @@ would you conclude?</p></li>
 <li><p><strong>Part C:</strong> Explain why the conclusions you came to
 were different in Part C.</p></li>
 </ul>
+</div>
+<div id="two-sample-tests" class="section level2">
+<h2>Two Sample Tests</h2>
+<p>Using R to perform two sample <span class="math inline">\(t\)</span>-tests is an immediate extension from
+the one variable case in that the same function is used, along with the
+same arguments. Before, we had to be careful to specify the function
+argument <code>mu</code> to state what our null hypothesis was; in the
+two sample case, however, the default value of <code>mu = 0</code> will
+typically be what we want.</p>
+<div id="two-sample-t-test" class="section level3">
+<h3>Two Sample t-test</h3>
+<p>There are two ways to pass an argument to the <code>t.test()</code>
+function for two sample data, depending on how the data is arranged. The
+first type of data arrangement, called “long format” describe a
+situation in which one column has the group name and the other has the
+value we are interested in. In the <code>mtcars</code> dataset, for
+example, we see that the <code>am</code> column designates if the
+vehicle has automatic or manual transmission, while the
+<code>qsec</code> column gives the quarter mile time of a vehicle</p>
+<pre class="r"><code>head(mtcars)</code></pre>
+<pre><code>##                    mpg cyl disp  hp drat    wt  qsec vs am gear carb
+## Mazda RX4         21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
+## Mazda RX4 Wag     21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
+## Datsun 710        22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
+## Hornet 4 Drive    21.4   6  258 110 3.08 3.215 19.44  1  0    3    1
+## Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2
+## Valiant           18.1   6  225 105 2.76 3.460 20.22  1  0    3    1</code></pre>
+<p>To use this data in the <code>t.test()</code> function, we will use a
+formula syntax that is of the form <code>outcome ~ group</code>, along
+with an argument showin which dataset we are using:</p>
+<pre class="r"><code>t.test(qsec ~ am, data = mtcars)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  qsec by am
+## t = 1.29, df = 25.5, p-value = 0.21
+## alternative hypothesis: true difference in means between group 0 and group 1 is not equal to 0
+## 95 percent confidence interval:
+##  -0.49185  2.13817
+## sample estimates:
+## mean in group 0 mean in group 1 
+##          18.183          17.360</code></pre>
+<p>The other method is appropriate when the two values we want to
+compare each exist in their own column. For example, the college dataset
+has one column each for male and female four-year graduation rates. To
+test for a difference in these, we would pass each in separately:</p>
+<pre class="r"><code>t.test(college$FourYearComp_Males, college$FourYearComp_Females)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  college$FourYearComp_Males and college$FourYearComp_Females
+## t = -10.4, df = 2185, p-value &lt;0.0000000000000002
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.085437 -0.058291
+## sample estimates:
+## mean of x mean of y 
+##   0.47622   0.54808</code></pre>
+<p>Here, we see compelling evidence that the four year graduation rate
+for women is not equal to the four year graduation rate for men.</p>
+<p><strong>Question 4</strong> For this question, we will be using the
+sandwhich dataset which includes the number of ants found on a sandwich
+left out at a picnic according to the toppings, bread, and butter that
+was on it</p>
+<pre class="r"><code>sandwich &lt;- read.csv(&quot;https://collinn.github.io/data/sandwich.csv&quot;)</code></pre>
+<p>Perform a two sample t-test to determine if the mean value of ants on
+a sandwhich was the same for sandwiches that had butter compared to
+those that did not</p>
+<p><strong>Question 5</strong> For this question we will be using the
+hawks dataset</p>
+<pre class="r"><code>hawks &lt;- read.csv(&quot;https://collinn.github.io/data/hawks.csv&quot;)
+hawks &lt;- filter(hawks, Hallux &lt; 50)</code></pre>
+<ol style="list-style-type: decimal">
+<li>First, use <code>dplyr</code> to <code>filter</code> the datset to
+only include sharp-shinned hawks, <code>Species == &quot;SS&quot;</code></li>
+<li>Create a boxplot showing the distribution of hallux length in
+sharp-shinned hawks for each of the two sexes. What do you notice?</li>
+<li>Perform a two-sample t-test to determine if there is evidence
+suggesting a difference in average hallux (killing talon) length between
+male and female hawks. Based on this test, what would you conclude?</li>
+<li><code>filter</code> your sharp-shinned dataset again to remove
+outliers, using the criterion <code>Hallux &lt; 50</code></li>
+<li>Recreate your boxplot and repeat your test from part (3). What
+impact did outliers have on the results of your test? Why do you think
+that is?</li>
+</ol>
+</div>
+<div id="paired-testing" class="section level3">
+<h3>Paired Testing</h3>
+<p>We can implement <em>paired</em> t-tests in R by simplying setting
+the argument <code>paired = TRUE</code> in the <code>t.test()</code>
+function. Here, for example, is the data for our French language
+institute we saw in class:</p>
+<pre class="r"><code>french &lt;- read.csv(&quot;https://collinn.github.io/data/french_institute.csv&quot;)
+
+head(french)</code></pre>
+<pre><code>##   pre post
+## 1  32   34
+## 2  31   31
+## 3  29   35
+## 4  10   16
+## 5  30   33
+## 6  33   36</code></pre>
+<p>Because pre and post test scores are each contained in their own
+column, we will use the second method of passing in our arguments to the
+<code>t.test()</code> function</p>
+<pre class="r"><code>t.test(french$pre, french$post, paired = TRUE)</code></pre>
+<pre><code>## 
+##  Paired t-test
+## 
+## data:  french$pre and french$post
+## t = -3.86, df = 19, p-value = 0.001
+## alternative hypothesis: true mean difference is not equal to 0
+## 95 percent confidence interval:
+##  -3.8539 -1.1461
+## sample estimates:
+## mean difference 
+##            -2.5</code></pre>
+<p><strong>Question 6</strong> Use <code>dplyr</code> and the
+<code>mutate()</code> function to create a new variable in the
+<code>french</code> dataset called <code>diff</code>. Perform a
+one-sample t-test on this variable and compare it with the paired output
+above. How do the t-statistic, degrees of freedom, and p-values
+compare?</p>
+<p><strong>Question 7</strong> Included below is Karl Pearson’s
+Father/Son height data. Using this dataset, perform a two-sample paired
+t-test to determine if there was an average difference between father
+and son height.</p>
+<pre class="r"><code>height &lt;- read.csv(&quot;https://collinn.github.io/data/pearson.csv&quot;)</code></pre>
+</div>
+</div>
+<div id="chi2-tests" class="section level2">
+<h2><span class="math inline">\(\chi^2\)</span> Tests</h2>
 </div>
 
 
