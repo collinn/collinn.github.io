@@ -1,0 +1,258 @@
+---
+title: "Lab 9 -- Hypothesis Testing"
+output:
+  html_document:
+    toc: yes
+    toc_float:
+      collapsed: yes
+      smooth_scoll: no
+  pdf_document:
+    toc: yes
+date: "`r Sys.Date()`"
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      fig.align = 'center', 
+                      fig.width = 4, 
+                      fig.height = 4, 
+                      message = FALSE, 
+                      warning = FALSE)
+sol <- FALSE
+```
+
+```{r, echo = FALSE}
+## Functions
+sampleNormalData <- function(n, mu, sig, samples = 1000L) {
+  xbar <- replicate(samples, {
+    mean(rnorm(n, mu, sig))
+  })
+  data.frame(xbar = xbar, sample = seq_len(samples))
+}
+
+getSampleMean <- function(data, variable, n, samples = 1000L) {
+   ## Check is var name or character
+  var <- substitute(variable)
+  if (is.name(var)) {
+    var <- as.character(var)
+  }
+  
+  xbar <- replicate(samples, {
+    idx <- sample(1:nrow(data), size = n, replace = FALSE)
+    x <- data[idx, ][[var]]
+    mean(x)
+  })
+  data.frame(xbar = xbar, sample = seq_len(samples))
+}
+
+
+
+simulateConfInt <- function(n = 20, m = 2, sd = 5, N = 25) {
+  numSD <- m
+  x <- rnorm(n, 50, sd)
+  sp <- numSD
+
+  mm <- vector("numeric",  length = N)
+  vv <- vector("numeric",  length = N)
+
+  for (i in seq_len(N)) {
+    xb <- rnorm(n, 50, sd)
+    mm[i] <- mean(xb)
+    vv[i] <- sd(xb)
+  }
+
+  df <- data.frame(sim = seq_len(N), mean = mm, sd = vv / sqrt(n))
+  df <- mutate(df, ci = sign(mm - sp*sd - 50) != sign(mm + sp*sd - 50))
+
+  df$ci <- factor(df$ci, levels = c(TRUE, FALSE))
+  
+  mmin <- with(df, min(35, mean - sp*sd - 1))
+  mmax <- with(df, max(65, mean + sp*sd + 1))
+  
+  ggplot(df, aes(sim, mean, color = ci)) +
+    geom_point(size = 3) +
+    geom_hline(yintercept = 50) + ylim(mmin, mmax) +
+    geom_errorbar(width = 0.05, aes(ymin = mean - sp*sd,
+                                    ymax = mean + sp*sd)) +
+    labs(x = "Simulation", y = "Sample Mean Interval") +
+    theme(axis.text=element_blank(),
+          axis.ticks=element_blank(),
+          axis.title = element_blank(),
+          legend.position = "none") +
+    scale_color_manual(values = c(`TRUE` = "#00BFC4", `FALSE` = "#F8766D")) 
+}
+
+```
+
+## Introduction
+
+This lab will introduce the idea of hypothesis testing with a particular type of test known as a $t$-test. By t-test, we simply mean performing a hypothesis test in which we construct a test statistic, $t$ that follows a t-distribution.
+
+
+## Testing means
+
+In R, we can create perform hypothesis testing and create standard confidence intervals based on the $t$-distribution using the function `t.test()`. While the `t.test()` function will take a number of useful arguments that we will use in the future, for now we only concern ourselves with three:
+
+  - `x`, a numeric vector we wish to construct a confidence interval for
+  - `mu`, a single number indicating the null hypothesis
+  - `conf.level` which gives the confidence interval for a specified $\alpha$ (i.e., our confidence interval is $1 - \alpha$)
+  
+The output of the `t.test()` function will include a collection of useful information, ranging from the point estimate for the mean value of `x`, as well as a confidence interval for this value. For example, consider the built-in dataset `mtcars` in R. Here, we use `t.test()` to find a 90% confidence interval for average miles per gallon:
+
+```{r}
+t.test(mtcars$mpg, conf.level = 0.9)
+```
+
+From the output, you should note a few things:
+
+  1. At the bottom of the output, we see our point estimate, $\overline{x} = 20.09$
+  2. Just above the point estimate, we see our estimate of the 90% confidence interval, here $(18.24, 21.89)$
+  3. All of the information above this is related to *hypothesis testing*. This includes:
+    
+      - A $t$-statistic, equal to $t = 18.9$
+      - Degrees of freedom equal to $df = 31$
+      - A $p$-value of $p < 2 \times 10^{-15}$
+    
+However, as we were not conducting any hypothesis test in this particular example, this information can be ignored.
+    
+By default, the `t.test()` function assumes a null hypothesis of $H_0: \mu_0 = 0$. As our t-statistic is computed as 
+
+$$
+t = \frac{\overline{x} - \mu_0}{\hat{\sigma}/\sqrt{n}}
+$$
+this gives rise to the computed statistic $t = 18.9$ that we saw in the output (and was subsequently used to compute the p-value).
+
+To see a more realistic example, suppose we wanted to investigate the hypothesis that the average miles per gallon was equal to 16 mpg. That is, suppose we have $H_0: \mu_0 = 18$. We could evaluate this hypothesis using the `t.test` function with the `mu` argument:
+
+```{r}
+t.test(x = mtcars$mpg, 
+       mu = 18, 
+       conf.level = 0.9)
+```
+
+In this example, note that our point estimate did not change, nor did our 90\% confidence interval. What did change, however, was the calculated t-statistic as well as the p-value. 
+
+**Question 1:** Explain why both the t-statistic and the p-value changed in our second call of `t.test()` while the point estimate and the confidence interval stayed the same.
+
+**Question 2:** Using the subsets of the data below, find and report 95\% confidence intervals for total enrollment at public and private colleges. 
+
+```{r}
+library(dplyr)
+college <- read.csv("https://collinn.github.io/data/college2019.csv")
+
+col_priv <- filter(college, Type == "Private")
+col_pub <- filter(college, Type == "Public")
+```
+
+**Question 3:** Below is code to recreate the two subsets of the hawk data containing only Red-tailed hawks
+
+
+```{r}
+## RT Hawk data
+hawks <- read.csv("https://collinn.github.io/data/hawks.csv")
+hawks <- filter(hawks, Species == "RT")
+
+## Subset of RT Hawk data
+set.seed(89)
+idx <- sample(seq_len(nrow(hawks)), size = 20)
+hawks2 <- hawks[idx, ]
+```
+
+
+  - **Part A:** Find the mean body weight for Red-tailed hawks in both the `hawks` and `hawks2` datasets. How do they compare?
+
+  - **Part B:** Using the average weight of the Cooper's hawks, perform a t-test on each dataset to test the hypothesis that $\mu_0 = 1050$. If you were testing at the $\alpha = 0.05$ level, which would you conclude?
+  
+  - **Part C:** Explain why the conclusions you came to were different in Part C.
+
+
+## Two Sample Tests
+
+Using R to perform two sample $t$-tests is an immediate extension from the one variable case in that the same function is used, along with the same arguments. Before, we had to be careful to specify the function argument `mu` to state what our null hypothesis was; in the two sample case, however, the default value of `mu = 0` will typically be what we want. 
+
+### Two Sample t-test
+
+There are two ways to pass an argument to the `t.test()` function for two sample data, depending on how the data is arranged. The first type of data arrangement, called "long format" describe a situation in which one column has the group name and the other has the value we are interested in. In the `mtcars` dataset, for example, we see that the `am` column designates if the vehicle has automatic or manual transmission, while the `qsec` column gives the quarter mile time of a vehicle
+
+```{r}
+head(mtcars)
+```
+
+To use this data in the `t.test()` function, we will use a formula syntax that is of the form `outcome ~ group`, along with an argument showin which dataset we are using:
+
+```{r}
+t.test(qsec ~ am, data = mtcars)
+```
+
+The other method is appropriate when the two values we want to compare each exist in their own column. For example, the college dataset has one column each for male and female four-year graduation rates. To test for a difference in these, we would pass each in separately:
+
+```{r}
+t.test(college$FourYearComp_Males, college$FourYearComp_Females)
+```
+
+Here, we see compelling evidence that the four year graduation rate for women is not equal to the four year graduation rate for men.
+
+**Question 4** For this question, we will be using the sandwhich dataset which includes the number of ants found on a sandwich left out at a picnic according to the toppings, bread, and butter that was on it
+
+```{r}
+sandwich <- read.csv("https://collinn.github.io/data/sandwich.csv")
+```
+
+Perform a two sample t-test to determine if the mean value of ants on a sandwhich was the same for sandwiches that had butter compared to those that did not
+
+```{r, echo = FALSE, include = FALSE, eval = FALSE}
+t.test(Ants ~ Butter, sandwich)
+```
+
+**Question 5** For this question we will be using the hawks dataset
+
+```{r}
+hawks <- read.csv("https://collinn.github.io/data/hawks.csv")
+hawks <- filter(hawks, Hallux < 50)
+```
+
+  1. First, use `dplyr` to `filter` the datset to only include sharp-shinned hawks,  `Species == "SS"`
+  2. Create a boxplot showing the distribution of hallux length in sharp-shinned hawks for each of the two sexes. What do you notice?
+  3. Perform a two-sample t-test to determine if there is evidence suggesting a difference in average hallux (killing talon) length between male and female hawks. Based on this test, what would you conclude?
+  4. `filter` your sharp-shinned dataset again to remove outliers, using the criterion `Hallux < 50`
+  5. Recreate your boxplot and repeat your test from part (3). What impact did outliers have on the results of your test? Why do you think that is?
+
+```{r, eval = FALSE, echo = FALSE}
+hwk <- filter(hawks, Species == "SS")
+ggplot(hwk, aes(Hallux, Sex)) + geom_boxplot()
+t.test(Hallux ~ Sex, hwk)
+```
+
+
+### Paired Testing
+
+We can implement *paired* t-tests in R by simplying setting the argument `paired = TRUE` in the `t.test()` function. Here, for example, is the data for our French language institute we saw in class:
+
+```{r}
+french <- read.csv("https://collinn.github.io/data/french_institute.csv")
+
+head(french)
+```
+
+Because pre and post test scores are each contained in their own column, we will use the second method of passing in our arguments to the `t.test()` function
+
+```{r}
+t.test(french$pre, french$post, paired = TRUE)
+```
+
+
+**Question 6** Use `dplyr` and the `mutate()` function to create a new variable in the `french` dataset called `diff`. Perform a one-sample t-test on this variable and compare it with the paired output above. How do the t-statistic, degrees of freedom, and p-values compare?
+
+**Question 7** Included below is Karl Pearson's Father/Son height data. Using this dataset, perform a two-sample paired t-test to determine if there was an average difference between father and son height.
+
+```{r}
+height <- read.csv("https://collinn.github.io/data/pearson.csv")
+```
+
+```{r, echo = FALSE, eval = FALSE}
+t.test(height$Father, height$Son, paired = TRUE)
+```
+
+## $\chi^2$ Tests
