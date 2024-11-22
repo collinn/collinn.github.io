@@ -431,32 +431,24 @@ but decided each of them individually at level <span class="math inline">\(\alph
 adjustment to control the Family-Wise Error Rate at <span class="math inline">\(\alpha = 0.05\)</span>. How does this impact the
 conclusions you made in (2)?</li>
 </ol>
-</div>
-<div id="question-4" class="section level2">
-<h2>Question 4</h2>
-<p>In professional basketball games during the 2009-2010 season, when
-Kobe Bryant of the Los Angeles Lakers shot a pair of free throws, 8
-times he missed both, 152 times he made both, 33 times he made only the
-first shot, and 37 times he made only the second. Is it possible that
-the successive free throws are independent, or is there evidence to
-suggest a “hot streak” effect? The data are tabulated in the
-<code>freethrow</code> data frame below:</p>
-<pre class="r"><code># Create freethrow data (copy and paste this into your own R session)
-freethrow &lt;- matrix(c(152,33,37,8), nrow = 2, byrow = TRUE)
-rownames(freethrow) &lt;- c(&quot;Make 1st&quot;, &quot;Miss 1st&quot;)
-colnames(freethrow) &lt;- c(&quot;Make 2nd&quot;, &quot;Miss 2nd&quot;)
-print(freethrow)</code></pre>
-<pre><code>##          Make 2nd Miss 2nd
-## Make 1st      152       33
-## Miss 1st       37        8</code></pre>
-<ol style="list-style-type: decimal">
-<li>What is the null hypothesis of this experiment?</li>
-<li>Conduct a <span class="math inline">\(\chi^2\)</span> test of
-independence at level <span class="math inline">\(\alpha =
-0.05\)</span>. What conclusions would you draw from this data?</li>
-</ol>
-<p><!-- 3. Test your hypothesis again, this time investigating a difference in proportions. Do you come to the same conclusion? -->
-<!-- 4. Do you believe an independence of two categorical variables necessarily imply that there is no difference in proportion? Explain your answer. --></p>
+<!-- ## Question 4 -->
+<!-- In professional basketball games during the 2009-2010 season, when Kobe Bryant of the Los Angeles Lakers shot a pair of free throws, 8 times he missed both, 152 times he made both, 33 times he made only the first shot, and 37 times he made only the second. Is it possible that the successive free throws are independent, or is there evidence to suggest a "hot streak" effect? The data are tabulated in the `freethrow` data frame below: -->
+<!-- ```{r} -->
+<!-- # Create freethrow data (copy and paste this into your own R session) -->
+<!-- freethrow <- matrix(c(152,33,37,8), nrow = 2, byrow = TRUE) -->
+<!-- rownames(freethrow) <- c("Make 1st", "Miss 1st") -->
+<!-- colnames(freethrow) <- c("Make 2nd", "Miss 2nd") -->
+<!-- print(freethrow) -->
+<!-- ``` -->
+<!--   1. What is the null hypothesis of this experiment? -->
+<!--   2. Conduct a $\chi^2$ test of independence at level $\alpha = 0.05$. What conclusions would you draw from this data? -->
+<!--   <!-- 3. Test your hypothesis again, this time investigating a difference in proportions. Do you come to the same conclusion? -->
+<p>–&gt;
+<!--   <!-- 4. Do you believe an independence of two categorical variables necessarily imply that there is no difference in proportion? Explain your answer. -->
+–&gt;</p>
+<!-- ```{r, echo = FALSE, include = FALSE} -->
+<!-- chisq.test(freethrow) %>% summary() -->
+<!-- ``` -->
 <!-- ## Question 6 -->
 <!-- Bush Kerry and Bush Gore (pg 108 of agresti) -->
 <!-- pg 89 for sensitivty of choices for alchol? try 2? (ordinal testing maybe not) otherwise pg 87 for happiness and political affiliation -->
