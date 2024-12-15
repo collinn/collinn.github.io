@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-12-14" />
+<meta name="date" content="2024-12-15" />
 
 <title>Review Slides Solutions</title>
 
@@ -350,7 +350,7 @@ display: none;
 
 
 <h1 class="title toc-ignore">Review Slides Solutions</h1>
-<h4 class="date">2024-12-14</h4>
+<h4 class="date">2024-12-15</h4>
 
 </div>
 
@@ -416,12 +416,18 @@ take the product of the margins, divided by total</p>
 ## Placebo        25.98  72.02</code></pre>
 <p>With the following <span class="math inline">\(\chi^2\)</span>
 statistic</p>
-<pre class="r"><code>chisq.test(m)</code></pre>
+<pre class="r"><code>## correct = FALSE to get the value as we did in class
+chisq.test(m, correct = FALSE)</code></pre>
 <pre><code>## 
-##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
+##  Pearson&#39;s Chi-squared test
 ## 
 ## data:  m
-## X-squared = 0.945, df = 1, p-value = 0.33</code></pre>
+## X-squared = 1.24, df = 1, p-value = 0.27</code></pre>
+<p>Note: We didn’t discuss this (and you do not need to know this), by
+default, R allows for a “continuity correction” when calculating the
+<span class="math inline">\(\chi^2\)</span> statistic, causing it to be
+different in some cases than what you find by hand. This has been
+corrected above to remove the automatic correction.</p>
 </div>
 <div id="problem-3" class="section level2">
 <h2>Problem 3</h2>
