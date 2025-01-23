@@ -1,0 +1,26 @@
+---
+title: "Name"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      fig.align = 'center', 
+                      message = FALSE, 
+                      warning = FALSE)
+```
+
+
+### Question 1
+
+Answers
+
+```{r}
+# r code
+```
+
+Don't include things like `?rbinom` in your Rmd file or it will struggle to compile
+
+
+### Question 2
