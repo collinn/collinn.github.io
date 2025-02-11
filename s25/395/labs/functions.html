@@ -567,6 +567,17 @@ f(3,4)</code></pre>
 <p>The main components of a function are its name, its arguments, and
 its body. By default, any function in R will return as its value the
 result of the last expression.</p>
+<p>It’s worth noting that we can also specify a default value for each
+of our function arguments that will be overwritten if we pass a value in
+for it:</p>
+<pre class="r"><code>f &lt;- function(x, y = 2) {
+  sqrt(x^2 + y^2)
+}
+
+f(3) # uses y = 2 by default</code></pre>
+<pre><code>## [1] 3.6056</code></pre>
+<pre class="r"><code>f(3, 4) # overwritten with y = 4</code></pre>
+<pre><code>## [1] 5</code></pre>
 <p><strong>Question 3</strong> Write a function that, given a table,
 will return the relative risk of the first two rows. Using the Aspirin
 study, verify that the RR is 1.82</p>
@@ -574,6 +585,166 @@ study, verify that the RR is 1.82</p>
 will return the odds ratio of the first two rows. Using the Aspirin
 study, verify that <span class="math inline">\(\hat{\theta} =
 1.83\)</span></p>
+<div id="functions-data.frames-and-dplyr" class="section level4">
+<h4>Functions, data.frames, and dplyr</h4>
+<p>A somewhat unique aspect of the the R language is how it handles <a href="https://en.wikipedia.org/wiki/Scope_(computer_science)">scoping</a>.
+For example, a variable that is defined by itself in the global
+environment can be called directly</p>
+<pre class="r"><code>## Define x and then use it
+x &lt;- 2
+x^2</code></pre>
+<pre><code>## [1] 4</code></pre>
+<p>Confusion arises, however, when a variable is defined with the same
+name in multiple places. For example, consider a data.frame with a
+column named <code>x</code> for which we wish to take the mean. What is
+being returned with <code>df[[x]]</code>?</p>
+<pre class="r"><code>df &lt;- data.frame(x = 1:5, y = 21:25)
+mean(df[[x]])</code></pre>
+<pre><code>## [1] 23</code></pre>
+<p>Here, as our expression is being evaluated in the global environment,
+it first looks for <code>x</code> there. Finding that <code>x=2</code>,
+<code>df[[x]]</code> is equivalent to <code>df[[2]]</code>, giving us
+instead the mean value of the second column of <code>df</code>. If we
+wish to get the first column directly, we need to pass in a character
+string instead:</p>
+<pre class="r"><code>mean(df[[&quot;x&quot;]])</code></pre>
+<pre><code>## [1] 3</code></pre>
+<p>This can get confusing if you use the same name several times:</p>
+<pre class="r"><code>y &lt;- &quot;x&quot;
+mean(df[[y]])</code></pre>
+<pre><code>## [1] 3</code></pre>
+<p>Note that this is in direct contrast to <code>dplyr</code> which uses
+<a href="http://adv-r.had.co.nz/Computing-on-the-language.html">non-standard
+evaluation</a> to use the names of variables directly</p>
+<pre class="r"><code>library(dplyr)
+x &lt;- &quot;y&quot;
+summarize(df, mean(x))</code></pre>
+<pre><code>##   mean(x)
+## 1       3</code></pre>
+<p>This works because data.frames in R function as “mini-environments”
+where the names of the columns make up the variables in the environment.
+In the code chunk above, <code>summarize(df, mean(x))</code> is looking
+for the variable <code>x</code> <em>within</em> the data.frame
+<code>df</code> instead of checking the global environment where
+<code>x = &quot;y&quot;</code></p>
+<p>This has implications for how we interact with and subset data.frames
+inside of a function which has its own scoping rules:</p>
+<pre class="r"><code>f_dplyr &lt;- function(z) {
+  summarize(df, mean(z))
+}
+
+## It&#39;s trying to find the value of mean(&quot;y&quot;)
+x &lt;- &quot;y&quot;
+f_dplyr(x)</code></pre>
+<pre><code>##   mean(z)
+## 1      NA</code></pre>
+<pre class="r"><code>## We see that if we swap x with a number instead
+x &lt;- -99
+f_dplyr(x)</code></pre>
+<pre><code>##   mean(z)
+## 1     -99</code></pre>
+<p>If that wasn’t confusing enough, see what happens when we change the
+argument of <code>f_dplyr</code> to <code>x</code> instead of
+<code>z</code>:</p>
+<pre class="r"><code>f_dplyr_x &lt;- function(x) {
+  summarize(df, mean(x))
+}
+
+## In both cases, it is using `x` from the df environment
+f_dplyr_x(&quot;y&quot;)</code></pre>
+<pre><code>##   mean(x)
+## 1       3</code></pre>
+<pre class="r"><code>f_dplyr_x(-99)</code></pre>
+<pre><code>##   mean(x)
+## 1       3</code></pre>
+<p>This is all just to say, using <code>dplyr</code> inside of functions
+can be a recipe for total disaster. Instead, we can rely on base R
+syntax for subsetting with character vectors</p>
+<pre class="r"><code>f_base &lt;- function(x) {
+  mean(df[[x]])
+}
+
+f_base(&quot;y&quot;) # Grabs correct column</code></pre>
+<pre><code>## [1] 23</code></pre>
+<pre class="r"><code>x &lt;- &quot;y&quot;
+f_base(x) # Still grabs correct column</code></pre>
+<pre><code>## [1] 23</code></pre>
+<pre class="r"><code>f_base(99) # error because there is no column 99</code></pre>
+<pre><code>## Error in .subset2(x, i, exact = exact): subscript out of bounds</code></pre>
+<p>As a final note on scoping: when a function is called and a variable
+inside of it is used, it will first look inside a function for that
+variable. If it can’t be found, it then “moves up” a level to look in
+the environment in which the function was called; this is why we could
+use <code>df</code> inside of the functions above without passing it in
+directly. If a variable is defined inside of a function, though, it will
+use that instead. It is generally considered poor practice to use
+variables that are not defined in a function or passed in directly,
+especially as the code used becomes more complex.</p>
+<pre class="r"><code>x &lt;- 4
+
+f1 &lt;- function() {
+  x^2
+}
+
+f2 &lt;- function() {
+  x &lt;- 2
+  x^2
+}
+
+f1() ## Finds x in global env</code></pre>
+<pre><code>## [1] 16</code></pre>
+<pre class="r"><code>f2() ## Finds x in function env</code></pre>
+<pre><code>## [1] 4</code></pre>
+<p><strong>Question 5</strong> This problem will use the
+<code>tips</code> dataset:</p>
+<pre class="r"><code>tips &lt;- read.csv(&quot;https://collinn.github.io/data/tips.csv&quot;)
+head(tips)</code></pre>
+<pre><code>##   total_bill  tip    sex smoker day   time size
+## 1      16.99 1.01 Female     No Sun Dinner    2
+## 2      10.34 1.66   Male     No Sun Dinner    3
+## 3      21.01 3.50   Male     No Sun Dinner    3
+## 4      23.68 3.31   Male     No Sun Dinner    2
+## 5      24.59 3.61 Female     No Sun Dinner    4
+## 6      25.29 4.71   Male     No Sun Dinner    4</code></pre>
+<p>Modify your odds ratio function from Question 4 to take three
+arguments: a data frame, and two character vectors to specify rows and
+columns. It should generate output like this:</p>
+<pre class="r"><code>oddsratio(tips, &quot;sex&quot;, &quot;smoker&quot;)</code></pre>
+<pre><code>## [1] 1.0122</code></pre>
+<pre class="r"><code>oddsratio(tips, &quot;smoker&quot;, &quot;time&quot;)</code></pre>
+<pre><code>## [1] 0.77397</code></pre>
+<p><strong>Question 6 (Bonus)</strong> Modify the function from Question
+5 so that:</p>
+<ul>
+<li>It prints out the table associated with the odds ratio</li>
+<li>It takes an additional argument that allows you to flip the columns
+or the rows</li>
+</ul>
+<pre class="r"><code>oddsratio2(tips, &quot;time&quot;, &quot;smoker&quot;)</code></pre>
+<pre><code>##         
+##           No Yes
+##   Dinner 106  70
+##   Lunch   45  23</code></pre>
+<pre><code>## [1] 0.77397</code></pre>
+<pre class="r"><code>oddsratio2(tips, &quot;time&quot;, &quot;smoker&quot;, flipRow = TRUE)</code></pre>
+<pre><code>##         
+##           No Yes
+##   Lunch   45  23
+##   Dinner 106  70</code></pre>
+<pre><code>## [1] 1.292</code></pre>
+<pre class="r"><code>oddsratio2(tips, &quot;time&quot;, &quot;smoker&quot;, flipCol = TRUE)</code></pre>
+<pre><code>##         
+##          Yes  No
+##   Dinner  70 106
+##   Lunch   23  45</code></pre>
+<pre><code>## [1] 1.292</code></pre>
+<pre class="r"><code>oddsratio2(tips, &quot;time&quot;, &quot;smoker&quot;, flipCol = TRUE, flipRow = TRUE)</code></pre>
+<pre><code>##         
+##          Yes  No
+##   Lunch   23  45
+##   Dinner  70 106</code></pre>
+<pre><code>## [1] 0.77397</code></pre>
+</div>
 </div>
 
 
