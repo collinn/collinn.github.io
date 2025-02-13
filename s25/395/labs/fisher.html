@@ -672,39 +672,42 @@ Drug
 </tbody>
 </table>
 <p>Use the textbook to answer the following questions:</p>
-<p><strong>Question 0:</strong> List the names of the people you are
-working on this lab with.</p>
+<p><strong>Question 0:</strong> List the names of the people with whom
+you are working on this lab</p>
 <p><strong>Question 1:</strong> For a 2x2 table, if only <span class="math inline">\(n\)</span>, the total number of participants, is
 fixed, what distribution does <span class="math inline">\(n_{ij}\)</span> follow? What if both the row and
-column totals are fixed? In this case, how many degrees of freedom do we
+column totals are fixed? In the case, how many degrees of freedom do we
 have?</p>
 <p><strong>Question 2:</strong> Assuming that the row and column totals
-are fixed, what are all of the possible values that <span class="math inline">\(n_{11}\)</span> can take? On a separate piece of
-paper (or in your RMD document), write down what all of these tables
-will look like.</p>
+are fixed, what are all of the possible values that <span class="math inline">\(n_{11}\)</span> can take for the table provided?
+On a separate piece of paper (or in your RMD document), write down what
+all of these tables will look like.</p>
 <p><strong>Question 3:</strong> For 2x2 tables, assumptions of
 independence correspond with an odds ratio of <span class="math inline">\(H_0: \theta = 1\)</span>. Write out the formula
 for <span class="math inline">\(\theta\)</span> in terms of <span class="math inline">\(n_{ij}\)</span>.</p>
 <ul>
-<li>What happens when we change <span class="math inline">\(n_{11}\)</span>?</li>
+<li>What happens to <span class="math inline">\(\theta\)</span> when we
+increase <span class="math inline">\(n_{11}\)</span>? When we decrease
+it? Does this make sense in the context of the problem?</li>
 <li>In the context of our problem, state what the alternative hypothesis
 is for <span class="math inline">\(H_{A}: \theta &gt; 1\)</span>, i.e.,
-what does <span class="math inline">\(\theta &gt; 1\)</span> imply?</li>
+what does <span class="math inline">\(\theta &gt; 1\)</span> imply for
+the data we have been given?</li>
 <li>Does <span class="math inline">\(n_{11}\)</span> need to get larger
-or smaller to offer <em>more</em> evidence for <span class="math inline">\(H_A\)</span>?</li>
+or smaller to offer <em>more</em> evidence for <span class="math inline">\(H_A: \theta &gt; 1\)</span>?</li>
 </ul>
-<p><strong>Question 4:</strong> Under the null hypothesis, find the
-probability <span class="math inline">\(P(n_{11} = 3)\)</span></p>
-<p><strong>Question 5:</strong> The <span class="math inline">\(p\)</span>_value is defined as the probability of
+<p><strong>Question 4:</strong> Under <span class="math inline">\(H_0\)</span>, find the probability <span class="math inline">\(P(n_{11} = 3)\)</span> (It may be useful to create
+a function for the PMF).</p>
+<p><strong>Question 5:</strong> The <span class="math inline">\(p\)</span> value is defined as the probability of
 observing data <em>as extreme or more so</em> under the null hypothesis.
 Find directly (that is, without using <code>fisher.test</code>) the
 p-value associated with the table above for <span class="math inline">\(H_A: \theta &gt; 1\)</span>. Once you have found
 it, confirm its correctness by comparing it against the results from
 <code>fisher.test</code> using the correct alternative hypothesis.</p>
 <p><strong>Question 6:</strong> Find the p-value directly again, this
-time for <span class="math inline">\(H_A: \theta \not= 1\)</span>. How
-is this different than what we found in Question 5? Confirm its
-correctness with <code>fisher.test</code>.</p>
+time for <span class="math inline">\(H_A: \theta \not= 1\)</span>.
+Explain how you found it and how this was different than in Question 5.
+Confirm its correctness with <code>fisher.test</code>.</p>
 </div>
 
 
