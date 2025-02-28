@@ -1,0 +1,9 @@
+coffee,cancer,smoking,Freq
+yes,yes,yes,16
+no,yes,yes,4
+yes,no,yes,4
+no,no,yes,1
+yes,yes,no,12
+no,yes,no,15
+yes,no,no,108
+no,no,no,135
