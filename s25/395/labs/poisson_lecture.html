@@ -11,7 +11,7 @@
 
 
 
-<title>STA 395 - Categorical Data Analysis (Spring 2025)</title>
+<title>Loglinear Regression</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1477,301 +1477,247 @@ border-radius: 0px;
 
 
 
-<h1 class="title toc-ignore">STA 395 - Categorical Data Analysis (Spring
-2025)</h1>
+<h1 class="title toc-ignore">Loglinear Regression</h1>
 
 </div>
 
 
-<p><span class="math inline">\(~\)</span></p>
-<p>Last updated: Thu Mar 6 2025, 08:17</p>
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- |  |  |  |  | -->
-<!-- |  |  |  |  | -->
-<!-- |  |  |  |  | -->
-<div id="syllabus" class="section level1">
-<h1>Syllabus</h1>
-<p>Welcome to the course website for STA 395, Categorical Data Analysis.
-To begin, you can find the course syllabus linked below:</p>
-<ul>
-<li><a href="syllabus395s25.html">Click here</a> to view the course
-syllabus</li>
-</ul>
-<p>You can locate course content by scrolling, or by using the
-navigation bar in the upper left.</p>
+<div id="two-way-table" class="section level1">
+<h1>Two-way Table</h1>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<pre class="r"><code>library(dplyr)
+library(kableExtra)
+library(ggplot2)
+
+heaven &lt;- read.table(&quot;http://www.stat.ufl.edu/~aa/cat/data/HappyHeaven.dat&quot;, 
+                     header = TRUE)
+
+hdf &lt;- heaven[rep(1:nrow(heaven), times = heaven$count), ]
+with(hdf, table(happy, heaven))</code></pre>
+<pre><code>##         heaven
+## happy     no yes
+##   not     32 190
+##   pretty 113 611
+##   very    51 326</code></pre>
 </div>
-<div id="course-materials" class="section level1">
-<h1>Course Materials</h1>
-<div id="solutions" class="section level2">
-<h2>Solutions</h2>
+<div id="two-way-independent-model" class="section level2">
+<h2>Two-way Independent Model</h2>
+<pre class="r"><code>glm(count ~ happy + heaven, family = poisson, data = heaven) %&gt;% 
+  summary()</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = count ~ happy + heaven, family = poisson, data = heaven)
+## 
+## Coefficients:
+##             Estimate Std. Error z value             Pr(&gt;|z|)    
+## (Intercept)   3.4931     0.0941   37.13 &lt; 0.0000000000000002 ***
+## happypretty   1.1821     0.0767   15.41 &lt; 0.0000000000000002 ***
+## happyvery     0.5296     0.0846    6.26        0.00000000039 ***
+## heavenyes     1.7492     0.0774   22.60 &lt; 0.0000000000000002 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for poisson family taken to be 1)
+## 
+##     Null deviance: 1019.87238  on 5  degrees of freedom
+## Residual deviance:    0.89111  on 2  degrees of freedom
+## AIC: 49.5
+## 
+## Number of Fisher Scoring iterations: 3</code></pre>
 </div>
-<div id="exam-1-content" class="section level2">
-<h2>Exam #1 Content</h2>
-<div id="week-1-discrete-distributions" class="section level3">
-<h3>Week 1 (Discrete Distributions)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Tue 1/21</td>
-<td align="left"><a href="lectures/intro.pdf">Introduction</a></td>
-<td align="left">-</td>
-<td align="left">1.1-1.2</td>
-</tr>
-<tr class="even">
-<td align="left">Thur 1/23</td>
-<td align="left">Probability Distributions</td>
-<td align="left"><a href="labs/distributions.html">Distributions</a></td>
-<td align="left">1.1-1.2</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ol style="list-style-type: decimal">
-<li>Download <a href="http://www.r-project.org/">R</a></li>
-<li>Download <a href="http://www.rstudio.com/">R Studio</a></li>
-<li><a href="labs/template.Rmd">Lab template</a></li>
-</ol>
+<div id="two-way-saturated-model" class="section level2">
+<h2>Two-way Saturated Model</h2>
+<pre class="r"><code>glm(count ~ happy + heaven + happy:heaven, family = poisson, data = heaven) %&gt;% 
+  summary()</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = count ~ happy + heaven + happy:heaven, family = poisson, 
+##     data = heaven)
+## 
+## Coefficients:
+##                       Estimate Std. Error z value             Pr(&gt;|z|)    
+## (Intercept)             3.4657     0.1768   19.61 &lt; 0.0000000000000002 ***
+## happypretty             1.2617     0.2002    6.30         0.0000000003 ***
+## happyvery               0.4661     0.2255    2.07                0.039 *  
+## heavenyes               1.7813     0.1911    9.32 &lt; 0.0000000000000002 ***
+## happypretty:heavenyes  -0.0936     0.2168   -0.43                0.666    
+## happyvery:heavenyes     0.0738     0.2433    0.30                0.762    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for poisson family taken to be 1)
+## 
+##     Null deviance: 1019.87238285508135504642  on 5  degrees of freedom
+## Residual deviance:    0.00000000000000022204  on 0  degrees of freedom
+## AIC: 52.61
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
 </div>
-<div id="week-2-inference" class="section level3">
-<h3>Week 2 (Inference)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Tue 1/28</td>
-<td align="left"><a href="lectures/likelihood.pdf">Likelihood and
-MLE</a></td>
-<td align="left"><a href="labs/likelihood.html">Likelihood</a></td>
-<td align="left">1.3-1.4</td>
-</tr>
-<tr class="even">
-<td align="left">Thur 1/30</td>
-<td align="left"><a href="lectures/discrete.pdf">Inference for Discrete
-Data</a></td>
-<td align="left">-</td>
-<td align="left">1.3-1.4</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ul>
-<li><a href="hw/hw1.html">Homework 1</a> (Due Tuesday, Feb 11)</li>
-<li><a href="textbook/ch1_exercises.pdf">Book Scan for Chapter 1
-(Exercises only)</a></li>
-</ul>
-</div>
-<div id="week-3-tables-and-odds" class="section level3">
-<h3>Week 3 (Tables and Odds)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Tue 2/4</td>
-<td align="left">Contingency Tables</td>
-<td align="left"></td>
-<td align="left">2.1-2.2</td>
-</tr>
-<tr class="even">
-<td align="left">Thur 2/6</td>
-<td align="left"><a href="lectures/odds.pdf">Relative Risk and Odds
-Ratio</a></td>
-<td align="left"><a href="labs/functions.html">Functions</a></td>
-<td align="left">2.2-2.3</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-</div>
-<div id="week-4-inference" class="section level3">
-<h3>Week 4 (Inference)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Tue 2/11</td>
-<td align="left"><a href="lectures/chisq.pdf">Chi-square tests</a></td>
-<td align="left"><a href="labs/functions.html">Functions</a></td>
-<td align="left">2.4</td>
-</tr>
-<tr class="even">
-<td align="left">Thur 2/13</td>
-<td align="left">-</td>
-<td align="left"><a href="labs/fisher.html">Fisher Exact</a></td>
-<td align="left">2.6</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ul>
-<li><a href="hw/hw2.html">Homework 2</a> due Thursday Feb 27</li>
-<li><a href="textbook/ch2_exercises.pdf">Book scan for Chapter 2
-exercises</a></li>
-<li>Feb 27 is tentative come talk to me day</li>
-</ul>
-</div>
-<div id="week-5-threeway-tables-and-intro-glm" class="section level3">
-<h3>Week 5 (Threeway Tables and Intro GLM)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Tue 2/18</td>
-<td align="left"><a href="lectures/threeway.pdf">Threeway
-Tables</a></td>
-<td align="left"></td>
-<td align="left">2.7</td>
-</tr>
-<tr class="even">
-<td align="left">Thur 2/20</td>
-<td align="left"><a href="lectures/glm1.pdf">Components of a
-GLM</a></td>
-<td align="left"><a href="labs/glm1.html">Intro GLM</a></td>
-<td align="left">3.1-3.2</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="week-6-glm" class="section level3">
-<h3>Week 6 (GLM)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Tue 2/18</td>
-<td align="left"><a href="lectures/glm2.pdf">Statistical Inference for
-GLM</a></td>
-<td align="left"><a href="labs/deviance.html">Deviance</a></td>
-<td align="left">3.4-3.5</td>
-</tr>
-<tr class="even">
-<td align="left">Thur 2/20</td>
-<td align="left">Exam day yay 😎</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<ul>
-<li><a href="exam/exam1.html">Exam 1 Topic List</a></li>
-</ul>
-</div>
-<div id="week-7-poisson-regression" class="section level3">
-<h3>Week 7 (Poisson Regression)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Tue 3/4</td>
-<td align="left"><a href="lectures/poisson_count.pdf">Poisson for
-Contingency Tables</a></td>
-<td align="left"><a href="labs/loglinear_contingency.html">Loglinear
-Models 1</a></td>
-<td align="left">7.1</td>
-</tr>
-<tr class="even">
-<td align="left">Thur 3/6</td>
-<td align="left"><a href="labs/poisson_lecture.html">Poisson
-Models</a></td>
-<td align="left"></td>
-<td align="left">7.1</td>
-</tr>
-</tbody>
-</table>
+<div id="extending-two-way-saturated-model" class="section level2">
+<h2>Extending Two-way Saturated Model</h2>
+<pre class="r"><code>he &lt;- data.frame(happy = c(&quot;not&quot;, &quot;pretty&quot;, &quot;very&quot;), 
+                 heaven = &quot;maybe&quot;, 
+                 count = c(170, 550, 400))
+heaven2 &lt;- rbind(heaven, he)
+
+hdf &lt;- heaven2[rep(1:nrow(heaven2), times = heaven2$count), ]
+with(hdf, table(happy, heaven))</code></pre>
+<pre><code>##         heaven
+## happy    maybe  no yes
+##   not      170  32 190
+##   pretty   550 113 611
+##   very     400  51 326</code></pre>
+<pre class="r"><code>glm(count ~ happy + heaven + happy:heaven, family = poisson, data = heaven2) %&gt;% 
+  summary()</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = count ~ happy + heaven + happy:heaven, family = poisson, 
+##     data = heaven2)
+## 
+## Coefficients:
+##                       Estimate Std. Error z value            Pr(&gt;|z|)    
+## (Intercept)            5.13580    0.07670   66.96 &lt;0.0000000000000002 ***
+## happypretty            1.17412    0.08775   13.38 &lt;0.0000000000000002 ***
+## happyvery              0.85567    0.09156    9.35 &lt;0.0000000000000002 ***
+## heavenno              -1.67006    0.19270   -8.67 &lt;0.0000000000000002 ***
+## heavenyes              0.11123    0.10557    1.05               0.292    
+## happypretty:heavenno   0.08753    0.21863    0.40               0.689    
+## happyvery:heavenno    -0.38958    0.24339   -1.60               0.109    
+## happypretty:heavenyes -0.00605    0.12083   -0.05               0.960    
+## happyvery:heavenyes   -0.31579    0.12928   -2.44               0.015 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for poisson family taken to be 1)
+## 
+##     Null deviance: 1397.711780557911197320  on 8  degrees of freedom
+## Residual deviance:   -0.000000000000011102  on 0  degrees of freedom
+## AIC: 81.57
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
 </div>
 </div>
+<div id="three-way" class="section level1">
+<h1>Three-way</h1>
+<pre class="r"><code>coffee &lt;- read.csv(&quot;https://collinn.github.io/data/coffee.csv&quot;)
+cdf &lt;- coffee[rep(1:nrow(coffee), times = coffee$Freq), ]
+
+## Partial tables show no effect of smoking given cancer
+with(cdf, table(coffee, cancer, smoking))</code></pre>
+<pre><code>## , , smoking = no
+## 
+##       cancer
+## coffee  no yes
+##    no  135  15
+##    yes 108  12
+## 
+## , , smoking = yes
+## 
+##       cancer
+## coffee  no yes
+##    no    1   4
+##    yes   4  16</code></pre>
+<pre class="r"><code>## Model 0  assumes three-way independence
+(m0 &lt;- glm(Freq ~ coffee + cancer + smoking, 
+    family = poisson, data = coffee)) %&gt;% summary()</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Freq ~ coffee + cancer + smoking, family = poisson, 
+##     data = coffee)
+## 
+## Coefficients:
+##             Estimate Std. Error z value            Pr(&gt;|z|)    
+## (Intercept)   4.7813     0.0861   55.55 &lt;0.0000000000000002 ***
+## coffeeyes    -0.1018     0.1166   -0.87                0.38    
+## canceryes    -1.6633     0.1591  -10.46 &lt;0.0000000000000002 ***
+## smokingyes   -2.3795     0.2091  -11.38 &lt;0.0000000000000002 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for poisson family taken to be 1)
+## 
+##     Null deviance: 459.10  on 7  degrees of freedom
+## Residual deviance:  70.39  on 4  degrees of freedom
+## AIC: 113.7
+## 
+## Number of Fisher Scoring iterations: 6</code></pre>
+<pre class="r"><code>## Model 1 assumes all related
+(m1 &lt;- glm(Freq ~ coffee + cancer + smoking + coffee:smoking + 
+      smoking:cancer + coffee:cancer, 
+    family = poisson, data = coffee)) %&gt;% summary()</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Freq ~ coffee + cancer + smoking + coffee:smoking + 
+##     smoking:cancer + coffee:cancer, family = poisson, data = coffee)
+## 
+## Coefficients:
+##                                 Estimate          Std. Error z value
+## (Intercept)           4.9052747784384323  0.0858817527152413   57.12
+## coffeeyes            -0.2231435513142164  0.1284757718493133   -1.74
+## canceryes            -2.1972245773362498  0.2662722061256526   -8.25
+## smokingyes           -4.9052747784376960  0.6484554276202241   -7.56
+## coffeeyes:smokingyes  1.6094379124336859  0.5820609694768787    2.77
+## canceryes:smokingyes  3.5835189384557204  0.5569481055997451    6.43
+## coffeeyes:canceryes   0.0000000000000773  0.3880752350545657    0.00
+##                                  Pr(&gt;|z|)    
+## (Intercept)          &lt; 0.0000000000000002 ***
+## coffeeyes                          0.0824 .  
+## canceryes            &lt; 0.0000000000000002 ***
+## smokingyes              0.000000000000039 ***
+## coffeeyes:smokingyes               0.0057 ** 
+## canceryes:smokingyes    0.000000000124120 ***
+## coffeeyes:canceryes                1.0000    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for poisson family taken to be 1)
+## 
+##     Null deviance: 459.102399105386496103  on 7  degrees of freedom
+## Residual deviance:  -0.000000000000009992  on 1  degrees of freedom
+## AIC: 49.31
+## 
+## Number of Fisher Scoring iterations: 3</code></pre>
+<pre class="r"><code>## Model 2 removes association between coffee and cancer
+(m2 &lt;- glm(Freq ~ coffee + cancer + smoking + coffee:smoking + smoking:cancer, 
+    family = poisson, data = coffee)) %&gt;% summary()</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Freq ~ coffee + cancer + smoking + coffee:smoking + 
+##     smoking:cancer, family = poisson, data = coffee)
+## 
+## Coefficients:
+##                      Estimate Std. Error z value             Pr(&gt;|z|)    
+## (Intercept)            4.9053     0.0841   58.30 &lt; 0.0000000000000002 ***
+## coffeeyes             -0.2231     0.1225   -1.82               0.0685 .  
+## canceryes             -2.1972     0.2029  -10.83 &lt; 0.0000000000000002 ***
+## smokingyes            -4.9053     0.6059   -8.10  0.00000000000000057 ***
+## coffeeyes:smokingyes   1.6094     0.5148    3.13               0.0018 ** 
+## canceryes:smokingyes   3.5835     0.5396    6.64  0.00000000003110370 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for poisson family taken to be 1)
+## 
+##     Null deviance: 459.102399105386496103  on 7  degrees of freedom
+## Residual deviance:   0.000000000000013767  on 2  degrees of freedom
+## AIC: 47.31
+## 
+## Number of Fisher Scoring iterations: 3</code></pre>
+<pre class="r"><code>anova(m2, m1)</code></pre>
+<pre><code>## Analysis of Deviance Table
+## 
+## Model 1: Freq ~ coffee + cancer + smoking + coffee:smoking + smoking:cancer
+## Model 2: Freq ~ coffee + cancer + smoking + coffee:smoking + smoking:cancer + 
+##     coffee:cancer
+##   Resid. Df           Resid. Dev Df           Deviance Pr(&gt;Chi)
+## 1         2  0.00000000000001377                               
+## 2         1 -0.00000000000000999  1 0.0000000000000238        1</code></pre>
+</div>
+<div id="inference" class="section level1">
+<h1>Inference</h1>
+<p>Essentially, we are testing independence (mutual or conditional) by
+comparing</p>
 </div>
 
 
@@ -1833,7 +1779,7 @@ $(document).ready(function ()  {
       scrollTo: 0
     };
     options.showAndHide = true;
-    options.smoothScroll = false;
+    options.smoothScroll = true;
 
     // tocify
     var toc = $("#TOC").tocify(options).data("toc-tocify");
