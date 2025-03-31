@@ -11,7 +11,7 @@
 
 
 
-<title>STA-209 Applied Statistics (Spring 2025)</title>
+<title>Lab 8 – Confidence Intervals</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1477,540 +1477,134 @@ border-radius: 0px;
 
 
 
-<h1 class="title toc-ignore">STA-209 Applied Statistics (Spring
-2025)</h1>
+<h1 class="title toc-ignore">Lab 8 – Confidence Intervals</h1>
 
 </div>
 
 
-<p><span class="math inline">\(~\)</span></p>
-<p>Last updated: Mon Mar 31 2025, 07:50</p>
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- |  |  |  |  | -->
-<!-- |  |  |  |  | -->
-<!-- |  |  |  |  | -->
-<div id="syllabus" class="section level1">
-<h1>Syllabus</h1>
-<p>Welcome to the course website for STA 209, Introduction to Applied
-Statistics. To begin, you can find the course syllabus linked below:</p>
+<pre class="r"><code>## Copy and paste the code chunk below into the top of your R Markdown document
+library(ggplot2)
+library(dplyr)
+
+theme_set(theme_bw())
+
+## College data
+college &lt;- read.csv(&quot;https://collinn.github.io/data/college2019.csv&quot;)</code></pre>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>This lab is intended to serve as an opportunity to practice some old
+skills and learn some new ones. In particular, our goals are to practice
+using:</p>
 <ul>
-<li><a href="syllabus209s25.html">Click here</a> to view the course
-syllabus</li>
+<li><code>qnorm()</code> and <code>qt()</code></li>
+<li>Using <code>dplyr</code> to create variables for analysis</li>
+<li>Using <code>R</code> as a calculator (order of operations)</li>
 </ul>
-<p>You can locate course content by scrolling, or by using the
-navigation bar in the upper left.</p>
+<div id="quantile-functions" class="section level3">
+<h3>Quantile functions</h3>
+<p>Briefly, recall that the <code>qnorm()</code> and <code>qt()</code>
+functions are used to find the critical values associated with
+particular quantiles of a distribution.</p>
+<pre class="r"><code>## Quantiles for 80% CI for a standard normal
+qnorm(c(0.1, 0.9))</code></pre>
+<pre><code>## [1] -1.2816  1.2816</code></pre>
+<pre class="r"><code>## For t-distribution, need to include df
+qt(c(0.1, 0.9), df = 15)</code></pre>
+<pre><code>## [1] -1.3406  1.3406</code></pre>
+<p>If you understand that the critical values will always be negatives
+of each other, we can shorten this and simply ask for the positive (or
+negative) one</p>
+<pre class="r"><code>qnorm(0.95)</code></pre>
+<pre><code>## [1] 1.6449</code></pre>
+<p>This tells me my critical values for a 90% confidence interval are
+1.65 and -1.65</p>
 </div>
-<div id="course-materials" class="section level1">
-<h1>Course Materials</h1>
-<div id="solutions" class="section level2">
-<h2>Solutions</h2>
+<div id="dplyr" class="section level3">
+<h3><code>dplyr</code></h3>
+<p>The reference lab can be found <a href="https://collinn.github.io/s25/209/labs/05_dplyr.html">here</a></p>
 </div>
-<div id="exam-1-content" class="section level2">
-<h2>Exam #1 Content</h2>
-<div id="week-1-intro" class="section level3">
-<h3>Week 1 (Intro)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 1/20</td>
-<td align="left">-</td>
-<td align="left">-</td>
-<td align="left">-</td>
-</tr>
-<tr class="even">
-<td align="left">Wed 1/22</td>
-<td align="left"><a href="lectures/intro_stat.pdf">Introduction to
-Statistics</a></td>
-<td align="left">-</td>
-<td align="left"><a href="resources/packages.html">Packages</a></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 1/24</td>
-<td align="left">Introduction to R</td>
-<td align="left"><a href="labs/01_introR.html">Intro to R</a></td>
-<td align="left">-</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ol style="list-style-type: decimal">
-<li>Download <a href="https://mirror.las.iastate.edu/CRAN/">R</a></li>
-<li>Download <a href="https://posit.co/products/open-source/rstudio/">R
-Studio</a></li>
-</ol>
-</div>
-<div id="week-2-summaries" class="section level3">
-<h3>Week 2 (Summaries)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 1/27</td>
-<td align="left"><a href="lectures/dataviz.pdf">Visual
-Summaries</a></td>
-<td align="left"><a href="labs/02_ggplot.html">ggplot</a></td>
-<td align="left">-</td>
-</tr>
-<tr class="even">
-<td align="left">Wed 1/29</td>
-<td align="left"><a href="lectures/numsum.pdf">Numerical
-Summaries</a></td>
-<td align="left">ggplot</td>
-<td align="left">-</td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 1/31</td>
-<td align="left">No Class</td>
-<td align="left"><a href="labs/03_ggplot2.html">ggplot2</a></td>
-<td align="left">-</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ul>
-<li><a href="hw/hw1.html">Homework 1</a>, due Friday 2/7 at 10pm</li>
-<li>ggplot lab due Monday night 2/3 at 10pm</li>
-</ul>
-</div>
-<div id="week-3-tables-and-odds" class="section level3">
-<h3>Week 3 (Tables and Odds)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 2/3</td>
-<td align="left"><a href="lectures/variance.pdf">Variance</a></td>
-<td align="left"><a href="labs/04_tables.html">Tables</a></td>
-<td align="left">-</td>
-</tr>
-<tr class="even">
-<td align="left">Wed 2/5</td>
-<td align="left"><a href="lectures/tables.pdf">Tables</a></td>
-<td align="left">tables</td>
-<td align="left">-</td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 2/7</td>
-<td align="left"><a href="lectures/odds.pdf">Odds</a></td>
-<td align="left"><a href="labs/odds_funsheet.pdf">Odds Funsheet</a></td>
-<td align="left">-</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ul>
-<li><a href="hw/hw2.html">Homework 2</a>, due Friday 2/14 at 10pm</li>
-</ul>
-</div>
-<div id="week-4-regression" class="section level3">
-<h3>Week 4 (Regression)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 2/10</td>
-<td align="left"><a href="lectures/correlation.pdf">Z Scores and
-Correlation</a></td>
-<td align="left"><a href="labs/05_dplyr.html">dplyr</a></td>
-<td align="left">-</td>
-</tr>
-<tr class="even">
-<td align="left">Wed 2/12</td>
-<td align="left"><a href="lectures/slr.pdf">Regression</a></td>
-<td align="left">-</td>
-<td align="left">-</td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 2/14</td>
-<td align="left"><a href="lectures/catpred.pdf">Regression
-Categorical</a></td>
-<td align="left">-</td>
-<td align="left">-</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ul>
-<li>Tables lab due 2/10 at 10pm</li>
-<li>Homework 2 due Feb 14</li>
-<li><a href="hw/hw3.html">Homework 3</a> due Friday 2/21 at 10pm</li>
-</ul>
-</div>
-<div id="week-5-probability" class="section level3">
-<h3>Week 5 (Probability)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 2/17</td>
-<td align="left"><a href="lectures/prob1.pdf">Probability 1
-(Introduction)</a></td>
-<td align="left"><a href="labs/inclass_probability1.pdf">Worksheet
-1</a></td>
-<td align="left"><a href="https://www.biostat.jhsph.edu/~iruczins/teaching/books/2019.openintro.statistics.pdf">Reading
-(Sections 3.1)</a></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 2/19</td>
-<td align="left"><a href="lectures/prob2.pdf">Probability 2 (Conditional
-and Independence)</a></td>
-<td align="left"><a href="labs/inclass_probability2.pdf">Worksheet
-2</a></td>
-<td align="left"><a href="https://www.biostat.jhsph.edu/~iruczins/teaching/books/2019.openintro.statistics.pdf">Reading
-(Sections 3.1 and 3.2)</a></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 2/21</td>
-<td align="left"><a href="lectures/prob3.pdf">Probability 3
-(Bayes)</a></td>
-<td align="left"><a href="labs/inclass_probability3.pdf">Worksheet
-3</a></td>
-<td align="left"><a href="https://www.biostat.jhsph.edu/~iruczins/teaching/books/2019.openintro.statistics.pdf">Reading
-(Sections 3.2)</a></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ul>
-<li>Homework 3 due Friday 2/21</li>
-<li>No R lab this week</li>
-<li>No homework assigned this week, but <a href="hw/prob_practice.html">here</a> are a list of practice problems
-for probability</li>
-<li>Probability labs are completion, but I highly recommend you know how
-to do them</li>
-</ul>
+<div id="calculator" class="section level3">
+<h3>CalculatoR</h3>
+<p>This may be obvious, but it is worthwhile understanding convenient
+ways to use R as a calculator. For example, we saw in the lecture slides
+(and homework) that for the John’s Hopkins preterm study had 39 total
+babies, of which 31 survived at 6 months. If I wanted a confidence
+interval for this, I may be tempted to type:</p>
+<pre class="r"><code>(31/39) + qt(c(0.05, 0.95), df = 28) * sqrt((31/39) * (1 - 31/39) / 39)</code></pre>
+<pre><code>## [1] 0.68488 0.90487</code></pre>
+<p>However, this leaves tremendous room for error. More simply, we can
+take advantage of the fact that R allows us to assign variables</p>
+<pre class="r"><code>## Assign p and n
+p &lt;- 31/39
+n &lt;- 39
+
+## Standard error formula
+se &lt;- sqrt( p * (1-p) / n )
+
+## Confidence interval
+p + qt(c(0.05, 0.95), df = 28) * se</code></pre>
+<pre><code>## [1] 0.68488 0.90487</code></pre>
+<p>Note that the order of operations is preserved, according to <a href="https://en.wikipedia.org/wiki/Order_of_operations#:~:text=The%20acronym%20PEMDAS%2C%20which%20stands%20for%20Parentheses%2C,as%20%22Please%20Excuse%20My%20Dear%20Aunt%20Sally%22.">PEMDAS</a></p>
 </div>
 </div>
-<div id="exam-2-content" class="section level2">
-<h2>Exam 2 Content</h2>
-<div id="week-6-study-design" class="section level3">
-<h3>Week 6 (Study Design)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 2/24</td>
-<td align="left">Review</td>
-<td align="left">-</td>
-<td align="left">-</td>
-</tr>
-<tr class="even">
-<td align="left">Wed 2/26</td>
-<td align="left">Exam 1</td>
-<td align="left">-</td>
-<td align="left">-</td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 2/28</td>
-<td align="left"><a href="lectures/design.pdf">Study Design</a></td>
-<td align="left"><a href="labs/06_dplyr_extra.html">dplyr + ggplot2
-practice</a></td>
-<td align="left">-</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ul>
-<li><a href="exam/topic_list_exam1.html">Topic List</a></li>
-<li><a href="exam/practice_exam1.pdf">Practice Exam</a></li>
-</ul>
+<div id="problem-1" class="section level2">
+<h2>Problem 1</h2>
+<p>The following code takes a sample of size <span class="math inline">\(n = 20\)</span> from the college dataset. The
+function <code>set.seed()</code> takes an integer value that, when run,
+ensures that any random operations we perform (such as sampling) will
+take the same value each time. Here, we set our seed to be 123. Copy all
+of the code below to put into your own document</p>
+<pre class="r"><code>## Controls the randomness in the sampling step
+set.seed(123)
+
+## Sample 20 row numbers
+idx &lt;- sample(1:nrow(college), size = 20)
+
+## Only keep those rows that were sampled
+c_samp &lt;- college[idx, ]</code></pre>
+<p>Done this way, we can all be sure that we are working with an
+identical sample.</p>
+<p><strong>Part A</strong> What is the sampling distribution of <span class="math inline">\(\overline{X}\)</span> for the
+<code>ACT_median</code> variable based on the values you found in your
+sample <code>c_samp</code></p>
+<p><strong>Part B</strong> Construct a 90% confidence interval for the
+true average value of the median ACT</p>
+<p><strong>Part C</strong> Treating the full <code>college</code>
+dataset as our entire population, find the true mean value for the
+average median ACT. Use this to construct a <span class="math inline">\(t\)</span>-statistic to see how far our sample
+mean is from the true mean value.</p>
 </div>
-<div id="week-7-sampling" class="section level3">
-<h3>Week 7 (Sampling)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 3/3</td>
-<td align="left"><a href="lectures/sampdist.pdf">Sampling
-Distribution</a></td>
-<td align="left"><a href="https://www.zoology.ubc.ca/~whitlock/Kingfisher/SamplingNormal.htm">Fish
-1</a> and <a href="https://www.zoology.ubc.ca/~whitlock/Kingfisher/CLT.htm">Fish
-2</a></td>
-<td align="left">-</td>
-</tr>
-<tr class="even">
-<td align="left">Wed 3/5</td>
-<td align="left"><a href="lectures/intervals.pdf">Intervals</a></td>
-<td align="left">-</td>
-<td align="left"><a href="exam/final_project.html">Final
-Project</a></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 3/7</td>
-<td align="left"></td>
-<td align="left">-</td>
-<td align="left">-</td>
-</tr>
-</tbody>
-</table>
-<ul>
-<li><a href="https://youtu.be/zeJD6dqJ5lo">Check out this neat
-video</a></li>
-<li><a href="labs/06_dplyr_extra.html">Lab 6</a> due Friday, March
-7</li>
-<li>Exam corrections due Monday, March 24th at beginning of class</li>
-<li><a href="exam/graph.pdf">Bar Graph from Exam 1</a></li>
-<li><a href="resources/lab_walkthrough.R">R Script from Friday</a></li>
-</ul>
-</div>
-<div id="week-8-and-9" class="section level3">
-<h3>Week 8 and 9</h3>
-<p>Spring Break</p>
-</div>
-</div>
-<div id="week-10-standard-normal-and-t-distribution" class="section level2">
-<h2>Week 10 (Standard Normal and t-Distribution)</h2>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 3/24</td>
-<td align="left"><a href="lectures/clt_review.pdf">Review</a></td>
-<td align="left"><a href="labs/07_worksheet.pdf">CLT Funsheet</a></td>
-<td align="left"><a href="labs/07_clt.html">CLT Functions</a></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 3/26</td>
-<td align="left"><a href="lectures/stdnormal.pdf">Standard Normal
-Distribution</a></td>
-<td align="left"><a href="labs/07_worksheet.pdf">CLT Funsheet
-cont.</a></td>
-<td align="left">-</td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 3/28</td>
-<td align="left"><a href="lectures/tapprox.pdf">t-distribution</a></td>
-<td align="left">Lab</td>
-<td align="left">-</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ul>
-<li>Homework 4 (Exam Corrections) due 3/24 by 5pm</li>
-<li>Group assignment due 3/24 by 5pm</li>
-<li>Project topic due 3/28, 10pm</li>
-<li><a href="hw/hw5.html">Homework 5</a> due Friday, 3/28</li>
-</ul>
-</div>
-<div id="week-11-proportions-and-bootstrap" class="section level2">
-<h2>Week 11 (Proportions and Bootstrap)</h2>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 3/31</td>
-<td align="left"><a href="lectures/proportions.pdf">Proportions</a></td>
-<td align="left"><a href="labs/08_confint.html">Proportions and
-CI</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 4/2</td>
-<td align="left">Hypothesis Testing</td>
-<td align="left"></td>
-<td align="left">-</td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 4/4</td>
-<td align="left">Null Distribution Funsheet</td>
-<td align="left"></td>
-<td align="left">-</td>
-</tr>
-</tbody>
-</table>
-<ul>
-<li><a href="hw/hw6.html">Homework 6</a> due Friday, 4/4</li>
-</ul>
-</div>
-<div id="week-12-hypothesis-testing" class="section level2">
-<h2>Week 12 (Hypothesis Testing)</h2>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 4/7</td>
-<td align="left">Strength of Evidence</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 4/9</td>
-<td align="left">Bootstrap?</td>
-<td align="left"></td>
-<td align="left">-</td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 4/11</td>
-<td align="left">Bootstrap Lab?</td>
-<td align="left"></td>
-<td align="left">-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="week-13-decision-error" class="section level2">
-<h2>Week 13 (Decision Error)</h2>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 4/14</td>
-<td align="left">Review</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 4/16</td>
-<td align="left">Exam 2 😎</td>
-<td align="left"></td>
-<td align="left">-</td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 4/18</td>
-<td align="left">Decision Error</td>
-<td align="left"></td>
-<td align="left">-</td>
-</tr>
-</tbody>
-</table>
-<!-- **Assignments and Deadlines**:  -->
-<!-- 1.  -->
-</div>
+<div id="problem-2" class="section level2">
+<h2>Problem 2</h2>
+<p>Here, we will again start by taking a random sample of our college
+dataset, this time of size 50</p>
+<pre class="r"><code>## Controls the randomness in the sampling step
+set.seed(1)
+
+## Sample 20 row numbers
+idx &lt;- sample(1:nrow(college), size = 50)
+
+## Only keep those rows that were sampled
+c_samp &lt;- college[idx, ]</code></pre>
+<p>Use the sample to answer the following questions.</p>
+<p><strong>Part A</strong> First, use the appropriate dplyr function,
+along with <code>ifelse()</code> to construct a new variable called
+<code>Size</code> that takes the value “Small” for colleges with
+enrollment less than 2500 and “Large” for colleges with enrollment
+greater than or equal to 2500</p>
+<p><strong>Part B</strong> Create a table using the <code>table()</code>
+function to show the number of public and private schools that are
+considered large and small</p>
+<p><strong>Part C</strong> From your table, how many colleges in your
+sample are Private? How many are Public? What proportion of each is
+considered a large school?</p>
+<p><strong>Part D</strong> Create a confidence interval of a size of
+your choosing with the appropriate critical values that provides a range
+of reasonable values for the true difference in proportion between
+public and private schools. Based on this interval, does it seem like a
+true difference in proportions is equal to zero?</p>
+<p><strong>Part E</strong> Find the <span class="math inline">\(t\)</span>-statistic associated with the observed
+difference in proportions.</p>
 </div>
 
 
@@ -2072,7 +1666,7 @@ $(document).ready(function ()  {
       scrollTo: 0
     };
     options.showAndHide = true;
-    options.smoothScroll = false;
+    options.smoothScroll = true;
 
     // tocify
     var toc = $("#TOC").tocify(options).data("toc-tocify");
