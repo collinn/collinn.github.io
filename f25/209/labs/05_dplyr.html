@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-02-10" />
+<meta name="date" content="2025-09-15" />
 
 <title>Lab 4 – dplyr</title>
 
@@ -1703,7 +1703,7 @@ border-radius: 0px;
 
 
 <h1 class="title toc-ignore">Lab 4 – <code>dplyr</code></h1>
-<h4 class="date">2025-02-10</h4>
+<h4 class="date">2025-09-15</h4>
 
 </div>
 
@@ -1934,7 +1934,7 @@ with the numbers 1-10 where we want to take all of the numbers between 3
 and 7. Typing this directly will result in an error:</p>
 <pre class="r"><code>x &lt;- 1:10
 3 &lt; x &lt; 7</code></pre>
-<pre><code>## Error: &lt;text&gt;:2:7: unexpected &#39;&lt;&#39;
+<pre><code>## Error in parse(text = input): &lt;text&gt;:2:7: unexpected &#39;&lt;&#39;
 ## 1: x &lt;- 1:10
 ## 2: 3 &lt; x &lt;
 ##          ^</code></pre>
@@ -2290,14 +2290,14 @@ of 50.</p>
                  extra = -1)
 df</code></pre>
 <pre><code>##   group     val extra
-## 1     A  3.8731    -1
-## 2     A  4.7078    -1
-## 3     A  5.4792    -1
-## 4     A  5.2028    -1
-## 5     B 49.4511    -1
-## 6     B 49.0922    -1
-## 7     B 49.2017    -1
-## 8     B 51.1756    -1</code></pre>
+## 1     A  4.9845    -1
+## 2     A  4.7200    -1
+## 3     A  6.5014    -1
+## 4     A  4.9450    -1
+## 5     B 49.8604    -1
+## 6     B 50.2672    -1
+## 7     B 49.9964    -1
+## 8     B 50.8492    -1</code></pre>
 <p>If I first group and then mutate, it will add an additional column,
 returning the mean value for each group</p>
 <pre class="r"><code>df %&gt;% group_by(group) %&gt;% 
@@ -2306,22 +2306,22 @@ returning the mean value for each group</p>
 ## # Groups:   group [2]
 ##   group   val extra meanVal
 ##   &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
-## 1 A      3.87    -1    4.82
-## 2 A      4.71    -1    4.82
-## 3 A      5.48    -1    4.82
-## 4 A      5.20    -1    4.82
-## 5 B     49.5     -1   49.7 
-## 6 B     49.1     -1   49.7 
-## 7 B     49.2     -1   49.7 
-## 8 B     51.2     -1   49.7</code></pre>
+## 1 A      4.98    -1    5.29
+## 2 A      4.72    -1    5.29
+## 3 A      6.50    -1    5.29
+## 4 A      4.95    -1    5.29
+## 5 B     49.9     -1   50.2 
+## 6 B     50.3     -1   50.2 
+## 7 B     50.0     -1   50.2 
+## 8 B     50.8     -1   50.2</code></pre>
 <p>Contrast this with the summarize function</p>
 <pre class="r"><code>df %&gt;% group_by(group) %&gt;% 
   summarize(meanVal = mean(val))</code></pre>
 <pre><code>## # A tibble: 2 × 2
 ##   group meanVal
 ##   &lt;chr&gt;   &lt;dbl&gt;
-## 1 A        4.82
-## 2 B       49.7</code></pre>
+## 1 A        5.29
+## 2 B       50.2</code></pre>
 <p>Here, the “extra” column has been removed, and all of the rows have
 been reduced down to the number of values in the grouping variable. Both
 methods have their uses, depending on the context.</p>
