@@ -362,97 +362,82 @@ my R Markdown file will not render correctly</p>
 </div>
 <div id="question-1" class="section level2">
 <h2>Question 1</h2>
-<p>Below is the equation used to construct confidence intervals using
-critical values:</p>
+<p>Suppose we collect a sample of elephant tusks and, regarding their
+length find that in our sample of <span class="math inline">\(n =
+20\)</span> we have</p>
 <p><span class="math display">\[
-  \overline{x} \pm C \times \frac{\hat{\sigma}}{\sqrt{n}}
-  \]</span> Explain what impact each term has on the size and location
-of confidence intervals and explain how the sample size impacts the
-critical values for a given confidence interval.</p>
+\overline{x} = 128\text{cm}, \qquad \hat{\sigma} = 12\text{cm}
+\]</span></p>
+<p><strong>Part A</strong> Several means have been proposed to be the
+true mean. For each of the means provided below, compute the <span class="math inline">\(t\)</span>-statistic associated with the sample
+mean:</p>
+<ul>
+<li><span class="math inline">\(\mu_0 = 125\)</span></li>
+<li><span class="math inline">\(\mu_0 = 132\)</span></li>
+<li><span class="math inline">\(\mu_0 = 115\)</span></li>
+</ul>
+<p><strong>Part B</strong> Suppose we are wanting to test our hypothesis
+with 90% confidence. Find the critical values of the appropriate <span class="math inline">\(t\)</span>-distribution that mark the bounds of
+where 90% of our data should lie</p>
+<p><strong>Part C</strong> Which of the hypothesized means in
+<strong>Part A</strong> fell within the bounds of the 80% critical
+values? Which were outside the bounds? Justify your answer with the
+appropriate test statistics.</p>
+<p><strong>Part D</strong> Reflecting on <strong>Part C</strong>, what
+does it mean if our t-statistic falls within the bounds of our critical
+values? Does this mean that <span class="math inline">\(\mu_0\)</span>
+is likely true? Why or why not?</p>
+<p><strong>Part E</strong> Reflecting on <strong>Part D</strong>, what
+conclusions can you come to if our data is consistent with multiple
+hypotheses? Why do we say that we “fail to reject the null hypothesis”
+instead of “accepting the null hypothesis”?</p>
 </div>
 <div id="question-2" class="section level2">
 <h2>Question 2</h2>
-<p>Which of these would have a larger impact on the size of a 95%
-confidence interval when <span class="math inline">\(\hat{\sigma} =
-5\)</span> and <span class="math inline">\(n = 20\)</span>. Use
-<code>qt()</code> to find the correct critical values</p>
+<p>The Happy Planet dataset includes a number of indices of well-being
+across 143 countries. One of these indices, Life Expectancy, is
+visualized in the histogram below.</p>
+<p><img role="img" src="data:image/png;base64,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" width="384" style="display: block; margin: auto;" /></p>
+<p>We are interested in determining the <em>proportion</em> of countries
+in which the average life expectancy is greater than 70 years. To this
+end, we collected two different samples:</p>
 <ul>
-<li>Changing <span class="math inline">\(n\)</span> to <span class="math inline">\(25\)</span> (how does changing <span class="math inline">\(n\)</span> change our critical values?)</li>
-<li>Changing <span class="math inline">\(\hat{\sigma}\)</span> to <span class="math inline">\(7\)</span></li>
-<li>Changing our confidence interval from 95% to 90%</li>
+<li><strong>Sample 1:</strong> 13 countries had life expectancy greater
+than 70, 12 did not</li>
+<li><strong>Sample 2:</strong> 16 countries had life expectancy greater
+than 70, 14 did not</li>
 </ul>
+<p>Use this information to answer the following questions</p>
+<p><strong>Part A</strong> Find the estimated proportion and standard
+error for each of the samples provided. </p>
+<div style="page-break-after: always;"></div>
+<p><strong>Part B</strong> Which sample provides more evidence against
+the null hypothesis <span class="math inline">\(H_0: p_0 =
+0.725\)</span>?</p>
 </div>
 <div id="question-3" class="section level2">
 <h2>Question 3</h2>
-<p>As we have seen in class, a <span class="math inline">\(z\)</span>-statistic tells gives us a measurement
-of how an individual observation compares to the mean in units of
-standard deviation. Suppose that we collect two samples from a
-population where we know with certainty that <span class="math inline">\(\mu = 50\)</span> and <span class="math inline">\(\sigma = 3\)</span>. Suppose we then collect two
-different samples of different sizes and find the following estimates of
-the mean:</p>
+<p>This question uses the <code>penguin</code> dataset</p>
+<pre class="r"><code>penguin &lt;- read.csv(&quot;https://collinn.github.io/data/penguins.csv&quot;)</code></pre>
+<p><strong>Part A</strong> Use the appropriate dplyr functions to:</p>
 <ul>
-<li>Sample 1: <span class="math inline">\(n_1 = 15\)</span>, <span class="math inline">\(\overline{x}_1 = 48\)</span></li>
-<li>Sample 2: <span class="math inline">\(n_2 = 75\)</span>, <span class="math inline">\(\overline{x}_2 = 51\)</span></li>
+<li>Subset the dataset to include only Chinstrap penguins</li>
+<li>Create a new variable called <code>flipper_size</code> that takes
+the value <code>&quot;Large&quot;</code> if the flipper is larger than the median
+flipper length and <code>&quot;Small&quot;</code> if it flipper is smaller or less
+than the median</li>
 </ul>
-<p>Consider the distribution of <span class="math inline">\(\overline{x}_1\)</span> and <span class="math inline">\(\overline{x}_2\)</span>. Use this information to
-answer the following:</p>
-<p><strong>Part A</strong> In terms of absolute distance, which of these
-samples has a sample mean that is further from the true mean?</p>
-<p><strong>Part B</strong> Find the z-score for each of these sample
-statistics. Based on this, which sample mean appears to be the greater
-number of standard deviations away from the mean?</p>
-<p><strong>Part C</strong> When talking about <em>distance</em> from the
-mean (i.e., which is “furthest”), do we care if our statistic is
-positive or negative? Why or why not.</p>
-<p><strong>Part D</strong> Reconcile the differences you found between
-Part A and Part B. Why does the mean from Sample 2 appear to be further
-from <span class="math inline">\(\mu\)</span> than Sample 1, despite
-<span class="math inline">\(\overline{x}_2\)</span> being closer than
-<span class="math inline">\(\overline{x}_1\)</span>?</p>
-</div>
-<div id="question-4" class="section level2">
-<h2>Question 4</h2>
-<p>As we saw in class, the Central Limit Theorem tells us that, for a
-population with mean <span class="math inline">\(\mu\)</span> and
-standard deviation <span class="math inline">\(\sigma\)</span>, the
-sample mean will follow an approximately normal distribution with</p>
-<p><span class="math display">\[
-\overline{x} \sim N \left( \mu, \frac{\sigma}{\sqrt{n}} \right)
-\]</span> In fact, the CLT also applies to our estimates of
-<em>proportions</em> which, as can be seen, are a type of mean. For
-example, consider ten coin flips in which four of them result in heads.
-We understand this proportion to be</p>
-<p><span class="math display">\[
-\hat{p} = \frac{4}{10} = 0.4
-\]</span> If we were to record these values as 1s and 0s instead and
-take the mean, we would find the same</p>
-<pre class="r"><code>## Ten flips, four heads
-flips &lt;- c(0, 1, 1, 0, 0, 0, 1, 0, 0, 1)
-mean(flips)</code></pre>
-<pre><code>## [1] 0.4</code></pre>
-<p>In fact, there is a special formula for the distribution of a
-proportion, <span class="math inline">\(p\)</span>, based on the
-calculation for its variance. It can be shown that, for “large enough”
-<span class="math inline">\(n\)</span>, the CLT tells us that the
-distribution of a proportion is given as</p>
-<p><span class="math display">\[
-\hat{p} \sim N \left( p, \ \  \sqrt{\frac{p(1-p)}{n}} \right)
-\]</span> Given a sample proportion, we can use the CLT to construct a
-confidence interval for the proportion, just as we did for the sample
-mean. Use this information to answer the following problem:</p>
-<hr />
-<p>In a study conducted by Johns Hopkins University researchers
-investigated the survival of babies born prematurely. They searched
-their hospital’s medical records and found that of 39 babies born at 25
-weeks gestation (15 weeks early), 31 of these babies went on to survive
-at least 6 months.</p>
-<p><strong>Part A</strong> Using a normal approximation, construct a 95%
-confidence interval to estimate the true proportion of babies born at 25
-weeks that are expected to survive at least 6 months.</p>
-<p><strong>Part B</strong> An article on <a href="https://en.wikipedia.org/wiki/Preterm_birth#Specific_risks_for_the_preterm_neonate">Wikipedia</a>
-suggests that of babies born at 25 weeks, 72% are expected to survive at
-least 6 months. Is this estimate consistent with what we found in Part
-A?</p>
+<p>Then, create a table of the data tabulating sex and size</p>
+<p><strong>Part B</strong> What proportion of female penguins are
+considered small? What proportion are considered large?</p>
+<p><strong>Part C</strong> Construct an 80% confidence interval on the
+difference in proportion of large flippers between male and female
+penguins. Based on this, does there appear to be evidence that the
+proportion of large flippers is the same in each sex?</p>
+<p><strong>Part D</strong> Create a t-statistic for this difference in
+proportion. If <span class="math inline">\(H_0: p_1 = p_2\)</span>,
+would you reject or fail to reject <span class="math inline">\(H_0\)</span> for a Type I error rate of 5% (i.e.,
+critical values from 95% confidence)</p>
 </div>
 
 

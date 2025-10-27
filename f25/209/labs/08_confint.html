@@ -11,7 +11,7 @@
 
 
 
-<title>Lab 8 – Confidence Intervals</title>
+<title>Lab 6 – Confidence Intervals</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1477,7 +1477,7 @@ border-radius: 0px;
 
 
 
-<h1 class="title toc-ignore">Lab 8 – Confidence Intervals</h1>
+<h1 class="title toc-ignore">Lab 6 – Confidence Intervals</h1>
 
 </div>
 
@@ -1532,8 +1532,10 @@ babies, of which 31 survived at 6 months. If I wanted a confidence
 interval for this, I may be tempted to type:</p>
 <pre class="r"><code>(31/39) + qt(c(0.05, 0.95), df = 28) * sqrt((31/39) * (1 - 31/39) / 39)</code></pre>
 <pre><code>## [1] 0.68488 0.90487</code></pre>
-<p>However, this leaves tremendous room for error. More simply, we can
-take advantage of the fact that R allows us to assign variables</p>
+<p>This expression is messy, however, and can easily hide errors</p>
+<p>More simply, we can take advantage of the fact that R allows us to
+assign values to variables. This allows us to compute our expressions in
+advance</p>
 <pre class="r"><code>## Assign p and n
 p &lt;- 31/39
 n &lt;- 39
@@ -1541,8 +1543,11 @@ n &lt;- 39
 ## Standard error formula
 se &lt;- sqrt( p * (1-p) / n )
 
+## Critical values
+C &lt;- qt(c(0.05, 0.95), df = 28)
+
 ## Confidence interval
-p + qt(c(0.05, 0.95), df = 28) * se</code></pre>
+p +  C * se</code></pre>
 <pre><code>## [1] 0.68488 0.90487</code></pre>
 <p>Note that the order of operations is preserved, according to <a href="https://en.wikipedia.org/wiki/Order_of_operations#:~:text=The%20acronym%20PEMDAS%2C%20which%20stands%20for%20Parentheses%2C,as%20%22Please%20Excuse%20My%20Dear%20Aunt%20Sally%22.">PEMDAS</a></p>
 </div>
@@ -1564,9 +1569,10 @@ idx &lt;- sample(1:nrow(college), size = 20)
 c_samp &lt;- college[idx, ]</code></pre>
 <p>Done this way, we can all be sure that we are working with an
 identical sample.</p>
-<p><strong>Part A</strong> What is the sampling distribution of <span class="math inline">\(\overline{X}\)</span> for the
-<code>ACT_median</code> variable based on the values you found in your
-sample <code>c_samp</code></p>
+<p><strong>Part A</strong> Using statistics found in your sample
+<code>c_samp</code>, provide an estimate of the sampling distribution
+for <span class="math inline">\(\overline{X}\)</span> for the variable
+<code>ACT_median</code></p>
 <p><strong>Part B</strong> Construct a 90% confidence interval for the
 true average value of the median ACT</p>
 <p><strong>Part C</strong> Treating the full <code>college</code>
