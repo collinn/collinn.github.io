@@ -1,1 +1,1 @@
-[Website](https://collinn.github.io/) here. Making my life easier
+[Website](https://collinn.github.io/) here
