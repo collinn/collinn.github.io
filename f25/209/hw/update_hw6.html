@@ -1487,12 +1487,13 @@ border-radius: 0px;
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>Below are a collection of functions that will be useful for this
-homework. Create a code chunk and copy and paste them into the top. In
-particular, we will be using:</p>
+homework. Create a code chunk and copy and paste them into the top of
+your assignment. In particular, we will be using:</p>
 <ul>
 <li><code>gh()</code>, short for <code>geom_histogram()</code> that
 creates better looking graphs by default</li>
-<li><code>bootstrap()</code> which will do our bootstrapping</li>
+<li><code>bootstrap()</code> to do our bootstrapping. I will illustrate
+how this function works in the next section</li>
 </ul>
 <pre class="r"><code>library(ggplot2)
 library(dplyr)
@@ -1530,20 +1531,79 @@ gridExtra::grid.arrange(p1, p2, nrow = 1)</code></pre>
 </div>
 <div id="quantile-function" class="section level2">
 <h2>Quantile Function</h2>
+<p>Just as we were able to use <code>qt()</code> and
+<code>qnorm()</code> to get the quantiles from a <em>named
+distribution</em>, we can use the <code>quantile()</code> function to
+determine the quantiles from an actual sample. For example, consider
+finding the 5th and 95th quantiles of a normal distribution with <span class="math inline">\(\mu = 50\)</span> and <span class="math inline">\(\sigma = 15\)</span>:</p>
 <pre class="r"><code>## Quantiles from normal dist
 qnorm(c(0.05, 0.95), mean = 50, sd = 15)</code></pre>
 <pre><code>## [1] 25.327 74.673</code></pre>
+<p>Here, we input no data and use information from the distribution
+itself.</p>
+<p>Alternatively, suppose that we had a vector <code>x</code> that
+represented a sample of 1,000 observations from a normal distribution
+with <span class="math inline">\(\mu = 50\)</span> and <span class="math inline">\(\sigma = 15\)</span> (the function
+<code>rnorm()</code> stands for <strong>R</strong>andom
+<strong>NORM</strong>al). We can use the <code>quantile()</code>
+function to find the 5th and 9th quantiles of our sample, which should
+be very similar to what we found above. Note that for
+<code>quantile()</code>, the order of the arguments is flipped.</p>
 <pre class="r"><code>## Note that quantile() takes vector first, then quantiles
 x &lt;- rnorm(1000, mean = 50, sd = 15) # Randomly generate 1000 from this dist
 quantile(x, probs = c(0.05, 0.95)) # Investigate the quantiles directly</code></pre>
 <pre><code>##     5%    95% 
-## 24.600 75.047</code></pre>
+## 25.112 75.167</code></pre>
 </div>
 <div id="bootstrapping" class="section level2">
 <h2>Bootstrapping</h2>
-<p><strong>Question 6</strong> This question uses the Grinnell Rain
-dataset. Typically, this dataset includes precipitation data on 121
-months; here, we will collect a sample of size <span class="math inline">\(n = 20\)</span> instead</p>
+<p>Recall that bootstrapping involves taking repeated samples <em>with
+replacement</em> and computing statistics on each bootstrapped sample.
+This process is performed for us with the <code>bootstrap()</code>
+function provided above. <code>bootstrap()</code> takes three
+arguments:</p>
+<ol style="list-style-type: decimal">
+<li><p>The vector or variable you wish to bootstrap</p></li>
+<li><p>Which <em>statistic</em> you want to bootstrap (e.g., the mean,
+the median, the odds ratio)</p></li>
+<li><p>How many bootstrap samples you want to perform. The default is
+1000</p></li>
+</ol>
+<p>Suppose I want to bootstrap the mean of the <code>Enrollment</code>
+variable from the <code>college</code> dataset. To do this, I would
+do:</p>
+<pre class="r"><code>## The syntax dataset$variable will extract the variable from a data.frame
+boot_stats &lt;- bootstrap(college$Enrollment, statistic = mean)
+
+## The bootstrap() function returns a dataframe with a row for each bootstrap mean
+head(boot_stats)</code></pre>
+<pre><code>##   Sample Statistic
+## 1      1    6538.5
+## 2      2    6058.5
+## 3      3    5881.3
+## 4      4    6549.0
+## 5      5    6376.0
+## 6      6    6213.2</code></pre>
+<p>Using the <code>boot_stats$Statistic</code> notation, I can find the
+mean and quantiles from my bootstrapped sample:</p>
+<pre class="r"><code>## The mean
+mean(boot_stats$Statistic)</code></pre>
+<pre><code>## [1] 6250.4</code></pre>
+<pre class="r"><code>## 90% confidence interval
+quantile(boot_stats$Statistic, probs = c(0.05, 0.95))</code></pre>
+<pre><code>##     5%    95% 
+## 5848.2 6676.9</code></pre>
+<p>We will use this construct for solving Question 0.</p>
+</div>
+<div id="problems" class="section level1">
+<h1>Problems</h1>
+<div id="question-0-bootstrapping" class="section level2">
+<h2>Question 0 (Bootstrapping)</h2>
+<p>(This is the only question that will use the bootstrap and quantile
+functions)</p>
+<p>This question uses the Grinnell Rain dataset. Typically, this dataset
+includes precipitation data on 121 months; here, we will collect a
+sample of size <span class="math inline">\(n = 20\)</span> instead</p>
 <pre class="r"><code>## Load data
 rain &lt;- read.csv(&quot;https://collinn.github.io/data/grinnell_rain.csv&quot;)
 
@@ -1570,10 +1630,6 @@ true median value of the population. Does it fall within the intervals
 you constructed in Part A? How about Part B? Why did it work for one and
 not the other?</p></li>
 </ul>
-</div>
-<div id="non-bootstrap-problems" class="section level2">
-<h2>Non-bootstrap problems</h2>
-<p>Some of these come from IMS Chapter 14</p>
 </div>
 <div id="question-1" class="section level2">
 <h2>Question 1</h2>
@@ -1626,6 +1682,7 @@ Why?</p></li>
 requires strong evidence or very strong evidence of health concerns
 before revoking a restaurant’s license? Explain your reasoning.</p></li>
 </ol>
+</div>
 </div>
 
 
