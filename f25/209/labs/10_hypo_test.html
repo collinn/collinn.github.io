@@ -10,9 +10,9 @@
 
 
 
-<meta name="date" content="2025-04-23" />
+<meta name="date" content="2025-11-11" />
 
-<title>Lab 10 – Hypothesis Testing</title>
+<title>Lab 7 – Hypothesis Testing</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1702,8 +1702,8 @@ border-radius: 0px;
 
 
 
-<h1 class="title toc-ignore">Lab 10 – Hypothesis Testing</h1>
-<h4 class="date">2025-04-23</h4>
+<h1 class="title toc-ignore">Lab 7 – Hypothesis Testing</h1>
+<h4 class="date">2025-11-11</h4>
 
 </div>
 
@@ -1715,29 +1715,29 @@ particular type of test known as a <span class="math inline">\(t\)</span>-test. 
 performing a hypothesis test in which we construct a test statistic,
 <span class="math inline">\(t\)</span> that follows a
 t-distribution.</p>
+<p>This lab will introduce two R functions used in hypothesis testing:
+the <code>t.test()</code> function and <code>chisq.test()</code></p>
 </div>
 <div id="testing-single-means" class="section level2">
 <h2>Testing Single Means</h2>
 <p>In R, we can create perform hypothesis testing and create standard
 confidence intervals based on the <span class="math inline">\(t\)</span>-distribution using the function
 <code>t.test()</code>. While the <code>t.test()</code> function will
-take a number of useful arguments that we will use in the future, for
-now we only concern ourselves with three:</p>
+take a number of useful arguments, for now we only concern ourselves
+with three:</p>
 <ul>
 <li><code>x</code>, a numeric vector we wish to construct a confidence
 interval for</li>
 <li><code>mu</code>, a single number indicating the null hypothesis</li>
 <li><code>conf.level</code> which gives the confidence interval for a
-specified <span class="math inline">\(\alpha\)</span> (i.e., our
-confidence interval is <span class="math inline">\(1 -
-\alpha\)</span>)</li>
+specified <span class="math inline">\(\alpha\)</span> (our confidence
+interval is <span class="math inline">\(1 - \alpha\)</span>)</li>
 </ul>
 <p>The output of the <code>t.test()</code> function will include a
-collection of useful information, ranging from the point estimate for
-the mean value of <code>x</code>, as well as a confidence interval for
-this value. For example, consider the built-in dataset
-<code>mtcars</code> in R. Here, we use <code>t.test()</code> to find a
-90% confidence interval for average miles per gallon:</p>
+collection of useful information, including the point estimate and
+confidence interval for the variable. For example, here we use the
+built-in <code>mtcars</code> dataset along with <code>t.test()</code> to
+find a 90% confidence interval for average miles per gallon:</p>
 <pre class="r"><code>t.test(mtcars$mpg, conf.level = 0.9)</code></pre>
 <pre><code>## 
 ##  One Sample t-test
@@ -1775,7 +1775,7 @@ t = \frac{\overline{x} - \mu_0}{\hat{\sigma}/\sqrt{n}}
 \]</span> this gives rise to the computed statistic <span class="math inline">\(t = 18.9\)</span> that we saw in the output (and
 was subsequently used to compute the p-value).</p>
 <p>To see a more realistic example, suppose we wanted to investigate the
-hypothesis that the average miles per gallon was equal to 16 mpg. That
+hypothesis that the average miles per gallon was equal to 1 mpg. That
 is, suppose we have <span class="math inline">\(H_0: \mu_0 =
 18\)</span>. We could evaluate this hypothesis using the
 <code>t.test</code> function with the <code>mu</code> argument:</p>
@@ -1793,9 +1793,9 @@ is, suppose we have <span class="math inline">\(H_0: \mu_0 =
 ## sample estimates:
 ## mean of x 
 ##    20.091</code></pre>
-<p>In this example, note that our point estimate did not change, nor did
-our 90% confidence interval. What did change, however, was the
-calculated t-statistic as well as the p-value.</p>
+<p>Note that neither our point estimate or our 90% confidence interval
+changed. What did change, however, was the calculated t-statistic as
+well as the p-value.</p>
 <p><strong>Question 1:</strong> Below is code to recreate the two
 subsets of the hawk data containing only Red-tailed hawks</p>
 <pre class="r"><code>## RT Hawk data
@@ -1814,73 +1814,86 @@ what is the sample mean for weight for each sample? If you were testing
 at the <span class="math inline">\(\alpha = 0.05\)</span> level, which
 would you conclude for each test?</p></li>
 <li><p><strong>Part B:</strong> Explain why the conclusions you came to
-were different in Part C.</p></li>
+were different in Part A.</p></li>
 </ul>
 </div>
 <div id="two-sample-tests" class="section level2">
 <h2>Two Sample Tests</h2>
-<p>Using R to perform two sample <span class="math inline">\(t\)</span>-tests is an immediate extension from
-the one variable case in that the same function is used, along with the
-same arguments. Before, we had to be careful to specify the function
-argument <code>mu</code> to state what our null hypothesis was; in the
-two sample case, however, the default value of <code>mu = 0</code> will
-typically be what we want.</p>
+<p>The <code>t.test()</code> function can also be used to perform a
+two-sample <span class="math inline">\(t\)</span>-test to compare the
+difference in means between two groups. Typically the default argument
+for the null hypothesis, <code>mu = 0</code>, is what we want and we
+leave it unchanged. There are two ways that the <code>t.test()</code>
+function is used for a two-sample test, both of which we illustrate
+here.</p>
 <div id="two-sample-t-test" class="section level3">
 <h3>Two Sample t-test</h3>
-<p>There are two ways to pass an argument to the <code>t.test()</code>
-function for two-sample data, depending on how the data is arranged. The
-first type of data arrangement, called “long format” describe a
-situation in which one column has the group name and the other has the
-value we are interested in. In the <code>mtcars</code> dataset, for
-example, we see that the <code>am</code> column designates if the
-vehicle has automatic or manual transmission, while the
-<code>qsec</code> column gives the quarter mile time of a vehicle</p>
-<pre class="r"><code>head(mtcars)</code></pre>
-<pre><code>##                    mpg cyl disp  hp drat    wt  qsec vs am gear carb
-## Mazda RX4         21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
-## Mazda RX4 Wag     21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
-## Datsun 710        22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
-## Hornet 4 Drive    21.4   6  258 110 3.08 3.215 19.44  1  0    3    1
-## Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2
-## Valiant           18.1   6  225 105 2.76 3.460 20.22  1  0    3    1</code></pre>
-<p>To use this data in the <code>t.test()</code> function, we will use a
-formula syntax that is of the form <code>outcome ~ group</code>, along
-with an argument showing which dataset we are using:</p>
-<pre class="r"><code>t.test(qsec ~ am, data = mtcars)</code></pre>
+<p>The syntax for how the <code>t.test()</code> function is used depends
+on how the underlying data.frame is formatted. For example, consider two
+data frames each consisting of observations from two groups, A and B. In
+the first data.frame, each group has it’s own column, with the values of
+the observations being the rows:</p>
+<pre class="r"><code>## Each column is a group
+df1 &lt;- data.frame(A = 1:4, 
+                  B = 3:6)
+df1</code></pre>
+<pre><code>##   A B
+## 1 1 3
+## 2 2 4
+## 3 3 5
+## 4 4 6</code></pre>
+<p>In the second format, one column specifies the name of the group,
+while a second column records each of the observations. Data.frames
+formed this way are said to be in <em>long format</em>. In any event, a
+quick comparison shows that the data included in both is the same:</p>
+<pre class="r"><code>df2 &lt;- data.frame(Group = rep(c(&quot;A&quot;, &quot;B&quot;), each = 4), 
+                  Val = c(1:4, 3:6))
+df2</code></pre>
+<pre><code>##   Group Val
+## 1     A   1
+## 2     A   2
+## 3     A   3
+## 4     A   4
+## 5     B   3
+## 6     B   4
+## 7     B   5
+## 8     B   6</code></pre>
+<p>In the first case, where each group has its own column, we again use
+the <code>$</code> construction to extract the variables from the
+data.frame. We perform out test like this:</p>
+<pre class="r"><code>## Each column is a different group
+t.test(df1$A, df1$B)</code></pre>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
-## data:  qsec by am
-## t = 1.29, df = 25.5, p-value = 0.21
-## alternative hypothesis: true difference in means between group 0 and group 1 is not equal to 0
-## 95 percent confidence interval:
-##  -0.49185  2.13817
-## sample estimates:
-## mean in group 0 mean in group 1 
-##          18.183          17.360</code></pre>
-<p>We see in the output the results for a two-sample t-test, with a
-p-value of <span class="math inline">\(p = 0.21\)</span> indicating that
-there is not enough evidence to reject the hypothesis that the quarter
-second time for each transmission is the same.</p>
-<p>The other method is appropriate when the two values we want to
-compare each exist in their own column. For example, the college dataset
-has one column each for male and female four-year graduation rates. To
-test for a difference in these, we would pass each in separately:</p>
-<pre class="r"><code>college &lt;- read.csv(&quot;https://collinn.github.io/data/college2019.csv&quot;)
-t.test(college$FourYearComp_Males, college$FourYearComp_Females)</code></pre>
-<pre><code>## 
-##  Welch Two Sample t-test
-## 
-## data:  college$FourYearComp_Males and college$FourYearComp_Females
-## t = -10.4, df = 2185, p-value &lt;0.0000000000000002
+## data:  df1$A and df1$B
+## t = -2.19, df = 6, p-value = 0.071
 ## alternative hypothesis: true difference in means is not equal to 0
 ## 95 percent confidence interval:
-##  -0.085437 -0.058291
+##  -4.23371  0.23371
 ## sample estimates:
 ## mean of x mean of y 
-##   0.47622   0.54808</code></pre>
-<p>Here, we see compelling evidence that the four year graduation rate
-for women is not equal to the four year graduation rate for men.</p>
+##       2.5       4.5</code></pre>
+<p>Again, we see a computed t-statistic, a p-value, and a confidence
+interval for the true difference.</p>
+<p>The second instance using a <em>formula</em> syntax,
+<code>Val ~ Group</code>, with the values we wish to test on the left
+hand side, and the group membership on the right. Done this way, we need
+to remember to pass the data.frame in as an argument as well:</p>
+<pre class="r"><code>t.test(Val ~ Group, data = df2)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  Val by Group
+## t = -2.19, df = 6, p-value = 0.071
+## alternative hypothesis: true difference in means between group A and group B is not equal to 0
+## 95 percent confidence interval:
+##  -4.23371  0.23371
+## sample estimates:
+## mean in group A mean in group B 
+##             2.5             4.5</code></pre>
+<p>A quick inspection shows that the results of this are identical to
+those of the first.</p>
 <p><strong>Question 2</strong> For this question, we will be using the
 sandwich dataset which includes the number of ants found on a sandwich
 left out at a picnic according to the toppings, bread, and butter that
@@ -1926,7 +1939,8 @@ column, we will use the second method of passing in our arguments to the
 <code>french</code> dataset called <code>diff</code> where
 <code>diff = post - pre</code>. Perform a one-sample t-test on this
 variable and compare it with the paired output above. How do the
-t-statistic, degrees of freedom, and p-values compare?</p>
+t-statistic, degrees of freedom, and p-values compare with what we found
+above? Explain in 1-2 sentences why this is the case.</p>
 </div>
 </div>
 <div id="chi2-tests" class="section level2">
@@ -1937,11 +1951,12 @@ performed with the construction of the <span class="math inline">\(\chi^2\)</spa
 <p><span class="math display">\[
 \chi^2 = \sum_{i=1}^k \frac{(\text{Observed}_i -
 \text{Expected}_i)^2}{\text{Expected}_i}
-\]</span> where <span class="math inline">\(i = 1, \dots, k\)</span>
-iterates through each of the cells of the table and where the expected
-counts are what we should expect to see under the null hypothesis. The
-resulting test statistic follows a <span class="math inline">\(\chi^2\)</span> distribution, with degrees of
-freedom calculated to be:</p>
+\]</span></p>
+<p>where <span class="math inline">\(i = 1, \dots, k\)</span> iterates
+through each of the cells of the table and where the expected counts are
+what we should expect to see under the null hypothesis. The resulting
+test statistic follows a <span class="math inline">\(\chi^2\)</span>
+distribution, with degrees of freedom calculated to be:</p>
 <ul>
 <li>In the one categorical case, <span class="math inline">\(df =
 k-1\)</span> where <span class="math inline">\(k\)</span> is the number
@@ -1955,11 +1970,10 @@ test statistic, the degrees of freedom, and the resulting p-value under
 the null hypothesis.</p>
 <div id="goodness-of-fit-tests-1-variable" class="section level3">
 <h3>Goodness-of-fit Tests (1 Variable)</h3>
-<p>The one categorical variable cases, in the context of a <span class="math inline">\(\chi^2\)</span> test (note: you can write <span class="math inline">\(\chi^2\)</span> in rmarkdown by typing <span class="math inline">\(\text{\$\\chi^2\$}\)</span> in your document), is
-the goodness-of-fit test. To use the <code>chisq.test()</code> function,
-all we need is a vector that includes the counts of each of our
-categories, along with the proportions we should expect to see under
-then null hypothesis.</p>
+<p>For the one categorical variable cases, all we need for the
+<code>chisq.test()</code> function is a vector including the counts for
+each of our categories, along with the proportions we would expect to
+see under the null hypothesis.</p>
 <p>For example, consider again our example from class in which we wish
 to create a standardized exam with 400 questions, each question having
 multiple choice answers A-E. If we wish to create an exam in which the
@@ -1967,7 +1981,8 @@ probability of the answer for each question being equal, we would have a
 null hypothesis of the form</p>
 <p><span class="math display">\[
 H_0: p_A = p_B = p_C = p_D = p_E = 0.2
-\]</span> where the expected counts should be (under the null):</p>
+\]</span></p>
+<p>where the expected counts should be (under the null):</p>
 <table class="table" style="color: black; width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -2260,8 +2275,36 @@ chisq.test(seatbelt) # we do not need to add proportions here</code></pre>
 ## data:  seatbelt
 ## X-squared = 4324, df = 1, p-value &lt;0.0000000000000002</code></pre>
 <p>Our p-value here suggests that our observed data is <em>not</em>
-consistent with the null hypothesis, leading us to conclude that
-seat-belt adherence and fatalities are associated with one another.</p>
+consistent with the null hypothesis that the variables are independent,
+leading us to conclude that seat-belt adherence and fatalities are
+associated with.</p>
+<p>Most frequently, we will be passing a table into
+<code>chisq.test()</code>. For example, consider a table from the
+titanic dataset tabulating the number of survivors according to
+class:</p>
+<pre class="r"><code>## Create titanic data frame
+titanic &lt;- as.data.frame(Titanic)
+titanic &lt;- titanic[rep(1:nrow(titanic), times = titanic$Freq), ]
+
+## Create table with survival status based on Class
+titanic_table &lt;- with(titanic, table(Class, Survived))
+
+## Print out the table
+titanic_table</code></pre>
+<pre><code>##       Survived
+## Class   No Yes
+##   1st  122 203
+##   2nd  167 118
+##   3rd  528 178
+##   Crew 673 212</code></pre>
+<p>We can then pass this directly into <code>chisq.test()</code> to test
+for association</p>
+<pre class="r"><code>chisq.test(titanic_table)</code></pre>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  titanic_table
+## X-squared = 190, df = 3, p-value &lt;0.0000000000000002</code></pre>
 <p><strong>Question 5:</strong> This question will use the college
 dataset loaded below</p>
 <pre class="r"><code>college &lt;- read.csv(&quot;https://collinn.github.io/data/college2019.csv&quot;)</code></pre>
