@@ -1,0 +1,97 @@
+---
+title: "Homework 1"
+author: "PUT YOUR NAME HERE"
+date: "date"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Note: This is a template for homework 1. All of your homework should be submitted according to this format: single \# for chapter header, double \#\# for section header, and bold for individual question indicators. You do not need to write out the homework question, though you are welcome to. Delete this paragraph before submission
+
+# Chapter 1
+
+## Section 1.2.5
+
+**Question 4:**
+
+
+**Question 7:**
+
+
+
+**Question 8:**
+
+
+
+**Question 10:**
+
+
+
+## Section 1.4.3
+
+**Question 4:**
+
+## Section 1.5.5
+
+**Question 5:**
+
+
+
+**Question 6:**
+
+
+
+**Question 7:**
+
+# Chapter 3
+
+## Section 3.2.5
+
+
+**Question 1:**
+
+
+
+**Question 2:**
+
+
+
+**Question 3:**
+
+
+
+**Question 4:**
+
+
+
+**Question 6:**
+
+
+## Section 3.3.5
+
+
+**Question 4:**
+
+
+
+**Question 7:**
+
+
+## Section 3.5.7
+
+
+**Question 1:**
+
+
+
+**Question 2:**
+
+
+
+**Question 3:**
+
+
+**Question 6:**
