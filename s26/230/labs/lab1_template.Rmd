@@ -1,0 +1,17 @@
+---
+title: "Lab 1 -- Introduction"
+author: "Name and Partner"
+date: "2026-01-23"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Question 1
+
+## Question 2
+
+## Question 3
