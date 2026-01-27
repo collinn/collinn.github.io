@@ -44,20 +44,35 @@ p:first-of-type:hover{
 	font-size: 30px;
 }
 
+.image-container {
+  width: 25vw; /* Sets the width to 25% of the viewport width */
+  /* Other styles for the container, e.g., padding, border, etc. */
+}
+
+.image-container img {
+  max-width: 100%; /* Ensures the image doesn't exceed its container's width */
+  height: auto;    /* Maintains the image's aspect ratio */
+  display: block;  /* Helps with layout issues */
+}
+
 </style>
 
 <body>
 <h2> Collin Nolte Home </h2>
 
 <div>
-<a href="map/25/map2025.html"> MAP 2025</a>
+  <marquee direction="right" style="width: 35%;">
+    <img src="pics/greyhound.gif" height="100">
+  </marquee>
 </div>
+
+
+
+<h3> Teaching (Grinnell) </h3>
 
 <div>
 <a href="pages/clock.html">Clock</a>
 </div>
-
-<h3> Teaching (Grinnell) </h3>
 
 <h4> 2025-2026 </h4>
 
