@@ -2115,14 +2115,14 @@ of 50.</p>
                  val = c(rnorm(4, 5), rnorm(4, 50)))
 df</code></pre>
 <pre><code>##   group     val
-## 1     A  4.3629
-## 2     A  6.2692
-## 3     A  4.8789
-## 4     A  4.6909
-## 5     B 49.8781
-## 6     B 50.6935
-## 7     B 50.1048
-## 8     B 50.7071</code></pre>
+## 1     A  5.6705
+## 2     A  4.3266
+## 3     A  4.6369
+## 4     A  2.3186
+## 5     B 50.5915
+## 6     B 49.2586
+## 7     B 49.8158
+## 8     B 51.1795</code></pre>
 <p>If I first group and then mutate, it will add an additional column,
 returning the mean value for each group</p>
 <pre class="r"><code>df %&gt;% group_by(group) %&gt;% 
@@ -2131,22 +2131,22 @@ returning the mean value for each group</p>
 ## # Groups:   group [2]
 ##   group   val meanVal
 ##   &lt;chr&gt; &lt;dbl&gt;   &lt;dbl&gt;
-## 1 A      4.36    5.05
-## 2 A      6.27    5.05
-## 3 A      4.88    5.05
-## 4 A      4.69    5.05
-## 5 B     49.9    50.3 
-## 6 B     50.7    50.3 
-## 7 B     50.1    50.3 
-## 8 B     50.7    50.3</code></pre>
+## 1 A      5.67    4.24
+## 2 A      4.33    4.24
+## 3 A      4.64    4.24
+## 4 A      2.32    4.24
+## 5 B     50.6    50.2 
+## 6 B     49.3    50.2 
+## 7 B     49.8    50.2 
+## 8 B     51.2    50.2</code></pre>
 <p>Contrast this with the summarize function</p>
 <pre class="r"><code>df %&gt;% group_by(group) %&gt;% 
   summarize(meanVal = mean(val))</code></pre>
 <pre><code>## # A tibble: 2 × 2
 ##   group meanVal
 ##   &lt;chr&gt;   &lt;dbl&gt;
-## 1 A        5.05
-## 2 B       50.3</code></pre>
+## 1 A        4.24
+## 2 B       50.2</code></pre>
 <p>When summarizing, note that all of the columns not used for either
 grouping or summarizing have been removed.</p>
 <hr />
@@ -2183,7 +2183,7 @@ private schools tend to be located?</p>
 <p><strong>Question 2:</strong> Using the college dataset, create a new
 variable called <code>Size</code> that takes the value
 <code>&quot;large&quot;</code> if <code>Enrollment</code> is greater than 10000
-and <code>&quot;small&quot;</code> if <code>Enrollment</code> is less than 5000.
+and <code>&quot;small&quot;</code> if <code>Enrollment</code> is less than 10000.
 Then create an appropriate bar chart to determine which region has the
 greatest proportion of small schools.</p>
 <p><strong>Question 3:</strong> Using the college dataset, create a new
