@@ -1,0 +1,102 @@
+---
+title: "Data Wranglin'"
+author: "Name"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
+                      fig.align = 'center', fig.width = 3, fig.height = 3)
+```
+
+```{r}
+library(dplyr)
+
+survey <- read.csv("https://collinn.github.io/data/wells_survey.csv")
+```
+
+# Problem Sets
+
+**Question 1:** Sort students by division, and within division, by year.
+
+```{r}
+
+```
+
+
+---
+
+
+**Question 2:** For each division, determine the mean and standard deviation in the number of hours spent studying.
+
+```{r}
+
+```
+
+
+---
+
+**Question 3:** Calculate the median number of college applications submitted by students who play Wordle.
+
+```{r}
+
+```
+
+
+---
+
+**Question 4:** Determine the number of students who list each of the different locations as their preferred study place.
+
+```{r}
+
+```
+
+
+---
+
+**Question 5:** Identify students whose social views are more liberal than their economic views.
+
+```{r}
+
+```
+
+
+---
+
+**Question 6:** Create a data set consisting of two columns: height in centimeters and height in meters.
+
+```{r}
+
+```
+
+
+---
+
+**Question 7:** Count how many students think both that dogs should wear pants on their back legs and that hot dogs are sandwiches.
+
+```{r}
+
+```
+
+
+---
+
+**Question 8:** Create two new variables: one, a binary categorical indicating if their distance from home is less than 500 miles and a second binary categorical indicating if their primary mode of transportation is a car. Do these variables appear to be associated? What are some ways we could tell?
+
+```{r}
+library(ggplot2)
+
+## Maybe include a plot with this one
+```
+
+
+---
+
+**Question 9:** Create your own data wrangling question based on this survey data frame.
+
+```{r}
+## Create the question and solution!
+```
+
+
+---
