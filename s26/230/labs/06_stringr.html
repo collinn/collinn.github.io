@@ -2194,6 +2194,81 @@ str_subset(s, pattern = &quot;\\d{2}&quot;)</code></pre>
 <code>&quot;22two&quot;</code>. Hint: what is in front of the digits and what is
 behind them? What regular expressions can you combine to get what you
 want?</p>
+<hr />
+<p><strong>Question 7:</strong> Below is a collection of IDs pulled from
+a data base. A valid ID will consist of a single capital letter,
+followed by three numbers</p>
+<pre class="r"><code>ids &lt;- data.frame(ID = c(&quot;ID: Q781&quot;,&quot;no id&quot;,&quot;ID: B847&quot;,&quot;ID: Z12&quot;,&quot;ID: M120&quot;,
+            &quot;ID: A123&quot;, NA,&quot;ID: H064&quot;,&quot;ID: AA123&quot;,&quot;ID: R006&quot;,&quot;ID: D555&quot;,
+            &quot;ID: K410&quot;,&quot;ID: G777&quot;, &quot;ID: C019&quot;,&quot;ID: L999&quot;, &quot;NA&quot;, &quot;ID: E902&quot;,&quot;ID: J888&quot;,
+            &quot;ID: P333&quot;,&quot;ID: F301&quot;,&quot;ID: N450&quot;, &quot;ID is R569&quot;))</code></pre>
+<p>For this problem, you should</p>
+<ul>
+<li>Identify which strings contain a valid ID</li>
+<li>Modify the entries so that only the ID number is retained</li>
+<li>Replace invalid or missing IDs with <code>NA</code></li>
+</ul>
+<hr />
+<p><strong>Question 8:</strong> A collaborator has just sent you a
+data.frame like the one below recording name and demographic data on a
+list of subjects:</p>
+<pre class="r"><code>df &lt;- data.frame(Subject = c(
+    &quot;name: Alice, sex: F, age: 22&quot;,
+    &quot;name: Bob, sex: Male, age: 9&quot;,
+    &quot;name: Carol Smith, sex: Female, age: 31&quot;,
+    &quot;name: David Crockett, sex: M, age: 45&quot;,
+    &quot;name: Emily Johnson, sex: F, age: 18&quot;,
+    &quot;name: Frank, sex: Male, age: 27&quot;,
+    &quot;name: Grace Lee, sex: Female, age: 54&quot;,
+    &quot;name: Henry, sex: M, age: 6&quot;,
+    &quot;name: Isabella Martinez, sex: Female, age: 39&quot;,
+    &quot;name: Jack, sex: M, age: 72&quot;
+  ))</code></pre>
+<p>Clean this data frame so that there are three columns: name, sex, and
+age. Then, apply the appropriate data summaries to find the average age
+for each sex.</p>
+<hr />
+<p><strong>Question 9:</strong> Below is a list of emails that were
+collected from an identity harvesting site. Before we engage in
+white-collar crime, we need to verify that the email addresses we have
+are valid. A valid email will have the following properties:</p>
+<ul>
+<li>The username will contain only alphanumeric characters, dashes, or
+underscores</li>
+<li>It will contain an @ symbol</li>
+<li>The domain will only contain alphanumeric characters</li>
+<li>Domain extensions can only be 3 lowercase letters</li>
+</ul>
+<pre class="r"><code>emails &lt;- data.frame(email = c(
+  &quot;katie35@gmail.com&quot;,
+  &quot;hilary@grinnell.edu&quot;,
+  &quot;abbi12@site.org&quot;,
+  &quot;kendall7@iastate.gov&quot;,
+  &quot;brianna99@gmail.com&quot;,
+  &quot;alex@site.org&quot;,
+  &quot;megan88@grinnell.edu&quot;,
+  &quot;madison@iastate.gov&quot;,
+  &quot;jenny4@gmail.com&quot;,
+  &quot;kelly@site.org&quot;,
+  &quot;hilaryduff@gmail.com&quot;,     
+  &quot;abby@grinnell.education&quot;,  
+  &quot;kendall@iastate.gov&quot;,      
+  &quot;brianna@gmail.com&quot;,       
+  &quot;alex12@site.org&quot;,          
+  &quot;megan@grinnell.edu&quot;,       
+  &quot;madison_7@gmail.com&quot;,      
+  &quot;jenny!@site.org&quot;,           
+  &quot;noatsymbolgmail.com&quot;,      
+  &quot;kelly3@iastate.g0v&quot;        
+))</code></pre>
+<p>For this problem you should:</p>
+<ol style="list-style-type: decimal">
+<li>Retain only valid email addresses (you do not need to correct
+invalid ones)</li>
+<li>Create a column of usernames and a column of domains</li>
+<li>Create a table to determine if there are more .gov, .com, or .edu
+addresses</li>
+</ol>
 </div>
 
 
