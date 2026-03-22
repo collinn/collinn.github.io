@@ -1,3 +1,8 @@
+library(dplyr)
+library(ggplot2)
+
+theme_set(theme_bw())
+
 ## Functions
 sampleNormalData <- function(n, mu, sig, samples = 1000L) {
   xbar <- replicate(samples, {
