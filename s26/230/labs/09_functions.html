@@ -11,7 +11,7 @@
 
 
 
-<title>STA 230 Intro to Data Science (Spring 2026)</title>
+<title>Functions</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1477,221 +1477,141 @@ border-radius: 0px;
 
 
 
-<h1 class="title toc-ignore">STA 230 Intro to Data Science (Spring
-2026)</h1>
+<h1 class="title toc-ignore">Functions</h1>
 
 </div>
 
 
-<p><span class="math inline">\(~\)</span></p>
-<p>Last updated: Thu Mar 26 2026, 07:55</p>
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- |  |  |  |  | -->
-<!-- |  |  |  |  | -->
-<!-- |  |  |  |  | -->
-<div id="syllabus" class="section level1">
-<h1>Syllabus</h1>
-<p>Welcome to the course website for STA 230, Introduction to Data
-Science. To begin, you can find the course syllabus linked below:</p>
-<ul>
-<li><a href="syllabus230s26.html">Click here</a> to view the course
-syllabus</li>
-</ul>
-<p>You can locate course content by scrolling, or by using the
-navigation bar in the upper left.</p>
-<p>Ahead on your labs? Try working through the 1st Edition of <a href="http://adv-r.had.co.nz/">Advanced R</a>, an excellent resource for
-learning R as a programming language rather than simply a tool for data
-analysis</p>
-<hr />
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Functions, in their simplest definitions, can be thought of as
+pre-packaged snippets of code that assist in performing common or
+repetitive tasks. While many functions are provided by R or R packages
+(including nearly everything we have done), there are often times where
+we wish to construct our own. The goal of this lab is to introduce the
+components of functinos in R as well as illustrate how to create them
+ourselves.</p>
 </div>
-<div id="course-materials" class="section level1">
-<h1>Course Materials</h1>
-<div id="labs" class="section level2">
-<h2>Labs</h2>
-<table>
-<colgroup>
-<col width="19%" />
-<col width="16%" />
-<col width="32%" />
-<col width="32%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Slides</th>
-<th align="left">Lab</th>
-<th align="left">Due Date</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Tue 1/19</td>
-<td align="left"><a href="lectures/intro.pdf">Introduction</a></td>
-<td align="left"><a href="labs/01_introduction.html">Introduction</a></td>
-<td align="left">1/29 at 10pm</td>
-</tr>
-<tr class="even">
-<td align="left">Thur 1/21</td>
-<td align="left"></td>
-<td align="left"><a href="labs/02_ggplot.html">ggplot</a></td>
-<td align="left">(see next)</td>
-</tr>
-<tr class="odd">
-<td align="left">Tue 1/27</td>
-<td align="left"></td>
-<td align="left"><a href="labs/02_ggscales.html">ggplot2
-(cont.)</a></td>
-<td align="left">2/3 at 10pm</td>
-</tr>
-<tr class="even">
-<td align="left">Thur 1/29</td>
-<td align="left"></td>
-<td align="left"><a href="labs/03_dplyr.html">dplyr</a></td>
-<td align="left">2/5 at 10pm</td>
-</tr>
-<tr class="odd">
-<td align="left">Tue 2/3</td>
-<td align="left"></td>
-<td align="left"><a href="labs/04_tidyr.html">tidyr</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Thur 2/5</td>
-<td align="left"><a href="resources/pivot_summary.pdf">Pivot Visual
-Aid</a></td>
-<td align="left"><a href="labs/04_tidyr.html">tidyr cont.</a></td>
-<td align="left">2/10 at 10pm</td>
-</tr>
-<tr class="odd">
-<td align="left">Tue 2/10</td>
-<td align="left"><a href="lectures/joins.pdf">Joins</a></td>
-<td align="left"><a href="labs/05_joins.html">Joins</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Thur 2/12</td>
-<td align="left"></td>
-<td align="left"><a href="labs/05_joins.html">Joins</a></td>
-<td align="left">2/17 at 10pm</td>
-</tr>
-<tr class="odd">
-<td align="left">Thur 2/19</td>
-<td align="left"><a href="lectures/strings.pdf">Strings and
-Regex</a></td>
-<td align="left"><a href="labs/06_stringr.html">Strings + Regex</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Tue 2/24</td>
-<td align="left"></td>
-<td align="left">Continue Strings</td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Thur 2/26</td>
-<td align="left"></td>
-<td align="left"><a href="labs/07_dates.html">Date and Time</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Tue 3/3</td>
-<td align="left"><a href="lectures/dates.pdf">Date and Time</a></td>
-<td align="left"><a href="labs/07_dates.html">Date and Time</a></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Thur 3/5</td>
-<td align="left"></td>
-<td align="left"><a href="https://grinnell.co1.qualtrics.com/jfe/form/SV_3TQYM3QKrHMzpga">Course
-Survey!</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Spring Break</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Tue 3/24</td>
-<td align="left"><a href="lectures/files.pdf">Files and Loops</a></td>
-<td align="left"><a href="labs/08_files_loops.html">Loops and Files and
-Conditionals</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Thur 3/26</td>
-<td align="left">Functions and Functionals</td>
-<td align="left"><a href="labs/09_functions.html">Functions and
-Functionals</a></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Tue 3/31</td>
-<td align="left">Simulations</td>
-<td align="left">Simulations</td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Thur 4/2</td>
-<td align="left">Simulations 2</td>
-<td align="left">Simulations</td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<p>On deck:</p>
-<ul>
-<li>Files and directories</li>
-<li>Missing values</li>
-<li>Functions and functionals</li>
-<li>Web scrapping and API</li>
-<li>SQL</li>
-<li>Shiny</li>
-</ul>
+<div id="functions" class="section level1">
+<h1>Functions</h1>
+<p>Functions in R are similar to functions in other programming
+language, with the more important differences being beyond the scope of
+this class. In this portion of the lab, we will familiarize ourselves
+with how to create functions and use them in our own work.</p>
+<p>Functions in R primarily consist of three components:</p>
+<ol style="list-style-type: decimal">
+<li>The name of the function</li>
+<li>The arguments of the function</li>
+<li>The body of the function</li>
+</ol>
+<p>Functions in R begin with an assignment with <code>&lt;-</code> to a
+name, along with the function <code>function()</code> and any arguments
+the function will take (e.g., <code>x</code> and <code>y</code>),
+followed by the body of the function enclosed in curly brackets
+<code>{}</code>. Here, for example, is a function that computes the sum
+of squares of two inputs, <code>x</code> and <code>y</code></p>
+<pre class="r"><code>sum_of_squares &lt;- function(x, y) {
+  x^2 + y^2
+}
+
+sum_of_squares(x = 2, y = 3)</code></pre>
+<pre><code>## [1] 13</code></pre>
+<p>We can also write functions that take <em>default arguments</em>. For
+example, in the <code>sum_of_squares()</code> function, if we do not
+provide both an <code>x</code> and <code>y</code>, we will get an
+error:</p>
+<pre class="r"><code>sum_of_squares(x = 2)</code></pre>
+<pre><code>## Error in sum_of_squares(x = 2): argument &quot;y&quot; is missing, with no default</code></pre>
+<p>We can rewrite our function so that we have a default argument with
+<code>y = 3</code>. Note that the default <em>only</em> applies when an
+argument for <code>y</code> is not given; if we do supply an argument to
+<code>y</code>, the default with be ignored.</p>
+<pre class="r"><code>sum_of_squares_default &lt;- function(x, y = 3) {
+  x^2 + y^2
+}
+
+# Using the default argument
+sum_of_squares_default(x = 2)</code></pre>
+<pre><code>## [1] 13</code></pre>
+<pre class="r"><code># Providing our own
+sum_of_squares_default(x = 2, y = 10)</code></pre>
+<pre><code>## [1] 104</code></pre>
+<p>A helpful tip: we can see the code used inside of a function by
+simply typing the function name into the console without adding
+parentheses.</p>
+<pre class="r"><code>## See the code for sum_of_squares
+sum_of_squares</code></pre>
+<pre><code>## function (x, y) 
+## {
+##     x^2 + y^2
+## }
+## &lt;bytecode: 0x58361606a9f0&gt;</code></pre>
+<p><strong>Question 1:</strong> For this question, we will use two
+separate datasets. You may also consider the R functions
+<code>?table()</code> and <code>?sort()</code></p>
+<pre class="r"><code>police &lt;- read.csv(&quot;https://remiller1450.github.io/data/Police2019.csv&quot;)
+college &lt;- read.csv(&quot;https://collinn.github.io/data/college2019.csv&quot;)</code></pre>
+<p>Your goal is to write a function called <code>top_table</code> that
+takes a character vector and returns the names of the values with the
+top five occurrences. Then, verify that it works by printing out the top
+five states in both the police and college datasets. Your results should
+look like this:</p>
+<pre class="r"><code>top_table(police$state)</code></pre>
+<pre><code>## v
+##  CA  TX  FL  AZ  CO 
+## 825 496 369 259 204</code></pre>
+<pre class="r"><code>top_table(college$State)</code></pre>
+<pre><code>## v
+## PA NY CA TX OH 
+## 85 67 63 60 48</code></pre>
+<p><strong>Question 2:</strong> Modify <code>top_table</code> so that it
+takes an additional argument <code>n</code> that allows you to specify
+that you want to view the top N values in each vector. Here, for
+example, we print the top 10:</p>
+<pre class="r"><code>top_table(police$state, n = 10)</code></pre>
+<pre><code>## v
+##  CA  TX  FL  AZ  CO  GA  OK  NC  OH  WA 
+## 825 496 369 259 204 189 170 163 159 156</code></pre>
+<pre class="r"><code>top_table(college$State, n = 10)</code></pre>
+<pre><code>## v
+## PA NY CA TX OH IL NC MA MI IN 
+## 85 67 63 60 48 45 40 36 34 33</code></pre>
+<p><strong>Question 3:</strong> Write a function called
+<code>long_square</code> that takes a single numeric argument
+<code>n</code>. If the length of the vector is greater than the square
+root of the sum of all the numbers in the vector, the function should
+print <code>&quot;long!&quot;</code>. Otherwise, is should print
+<code>&quot;not long!&quot;</code>. Verify that it works for the arguments
+<code>x1</code>, <code>x2</code>, and <code>x3</code>.</p>
+<pre class="r"><code>x1 &lt;- c(1, 2, 3, 4, 5)
+x2 &lt;- c(5, 8, 10, 12)
+x3 &lt;- c(2, 5, 9, 10, 1, 1, 1)
+
+long_square(n = x1)</code></pre>
+<pre><code>## [1] &quot;long!&quot;</code></pre>
+<pre class="r"><code>long_square(n = x2)</code></pre>
+<pre><code>## [1] &quot;not long!&quot;</code></pre>
+<pre class="r"><code>long_square(n = x3)</code></pre>
+<pre><code>## [1] &quot;long!&quot;</code></pre>
+<p><strong>Question 4:</strong> Here, we are going to modify the
+<code>top_table</code> function we wrote in Question 1 once more. In
+addition to having a second argument <code>n</code> indicating the
+number of results, we now want to include a third argument
+<code>top</code> which takes either <code>TRUE</code> or
+<code>FALSE</code>. When <code>TRUE</code>, the function should return
+the top <code>n</code> rows; when <code>FALSE</code>, it should return
+the bottom <code>n</code>.</p>
+<pre class="r"><code>top_table(police$state, n = 5, top = TRUE)</code></pre>
+<pre><code>## v
+##  CA  TX  FL  AZ  CO 
+## 825 496 369 259 204</code></pre>
+<pre class="r"><code>top_table(college$State, n = 10, top = FALSE)</code></pre>
+<pre><code>## v
+## AK WY NV DE NM AZ DC ID NH RI 
+##  1  1  2  3  4  5  5  5  5  5</code></pre>
 </div>
-<div id="homework" class="section level2">
-<h2>Homework</h2>
-<table style="width:100%;">
-<colgroup>
-<col width="28%" />
-<col width="23%" />
-<col width="47%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Reading</th>
-<th align="left">Assignment</th>
-<th align="left">Due Date</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left"><a href="https://r4ds.hadley.nz/">R4DS</a>
-Introduction, Ch 1-3</td>
-<td align="left"><a href="hw/hw1.html">Homework 1</a></td>
-<td align="left">Thur 1/29 at 10pm</td>
-</tr>
-<tr class="even">
-<td align="left"><a href="https://r4ds.hadley.nz/">R4DS</a> 4, 5,
-19</td>
-<td align="left"><a href="hw/hw2.html">Homework 2</a></td>
-<td align="left">Thur 2/12 at 10pm</td>
-</tr>
-<tr class="odd">
-<td align="left"><a href="https://r4ds.hadley.nz/">R4DS</a> 12-18</td>
-<td align="left"><a href="hw/hw3.html">Homework 3</a></td>
-<td align="left">Thur 3/5 at 10pm</td>
-</tr>
-<tr class="even">
-<td align="left">None</td>
-<td align="left"><a href="hw/hw4.html">Homework 4</a></td>
-<td align="left">Thur 4/2 at 10pm</td>
-</tr>
-</tbody>
-</table>
-</div>
+<div id="lists-functionals" class="section level1">
+<h1>Lists? Functionals?</h1>
 </div>
 
 
