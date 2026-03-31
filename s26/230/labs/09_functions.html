@@ -1545,7 +1545,7 @@ sum_of_squares</code></pre>
 ## {
 ##     x^2 + y^2
 ## }
-## &lt;bytecode: 0x58361606a9f0&gt;</code></pre>
+## &lt;bytecode: 0x6430cb679ff0&gt;</code></pre>
 <p><strong>Question 1:</strong> For this question, we will use two
 separate datasets. You may also consider the R functions
 <code>?table()</code> and <code>?sort()</code></p>
@@ -1610,8 +1610,673 @@ the bottom <code>n</code>.</p>
 ## AK WY NV DE NM AZ DC ID NH RI 
 ##  1  1  2  3  4  5  5  5  5  5</code></pre>
 </div>
-<div id="lists-functionals" class="section level1">
-<h1>Lists? Functionals?</h1>
+<div id="lists" class="section level1">
+<h1>Lists</h1>
+<p>So far in R, we have primarily seen two different data types:
+<em>vectors</em>, an ordered collection of atomic items all of the same
+type (e.g., a numeric vector) and <em>data.frames</em>, tabular objects
+defined by a set number of rows and columns. In a more general
+definition, data.frames are simply collections of vectors, each required
+to be the same length.</p>
+<div id="structure-of-lists" class="section level2">
+<h2>Structure of lists</h2>
+<p>We can see this more clearly with the <code>str()</code> function
+(structure). Here, we investigate the <code>iris</code> dataset which we
+see is a collection of 4 numeric vectors and one factor (character
+vector with a set number of levels)</p>
+<pre class="r"><code>## I don&#39;t want to keep seeing a trillion bajillion rows
+iris5 &lt;- iris[1:5, ]
+
+## Here it is as a data.frame
+head(iris5)</code></pre>
+<pre><code>##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          5.1         3.5          1.4         0.2  setosa
+## 2          4.9         3.0          1.4         0.2  setosa
+## 3          4.7         3.2          1.3         0.2  setosa
+## 4          4.6         3.1          1.5         0.2  setosa
+## 5          5.0         3.6          1.4         0.2  setosa</code></pre>
+<pre class="r"><code>## Here, we see the underlying structure
+str(iris5)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    5 obs. of  5 variables:
+##  $ Sepal.Length: num  5.1 4.9 4.7 4.6 5
+##  $ Sepal.Width : num  3.5 3 3.2 3.1 3.6
+##  $ Petal.Length: num  1.4 1.4 1.3 1.5 1.4
+##  $ Petal.Width : num  0.2 0.2 0.2 0.2 0.2
+##  $ Species     : Factor w/ 3 levels &quot;setosa&quot;,&quot;versicolor&quot;,..: 1 1 1 1 1</code></pre>
+<p>As we’ve seen elsewhere, we can extract the vector from the
+data.frame using <code>$</code> notation</p>
+<pre class="r"><code>## Once extracted, this is a vector
+class(iris5$Sepal.Length)</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+<pre class="r"><code>iris5$Sepal.Length</code></pre>
+<pre><code>## [1] 5.1 4.9 4.7 4.6 5.0</code></pre>
+<p>We now introduce a third data type, the <code>list</code> object.
+Like a vector, a list is an ordered array of elements. Unlike a vector,
+however, each element of a list can be anything: it can be a number, a
+vector, a data.frame, or even another list.</p>
+<p>Typically, we are not making lists directly, but we can do so here to
+illustrate. I’ll begin by creating an empty vector and list, each of
+length 3, to see how they compare</p>
+<pre class="r"><code>## Here is my vector
+v &lt;- vector(mode = &quot;numeric&quot;, length = 3)
+v</code></pre>
+<pre><code>## [1] 0 0 0</code></pre>
+<pre class="r"><code>## And my list
+l &lt;- vector(mode = &quot;list&quot;, length = 3)
+l</code></pre>
+<pre><code>## [[1]]
+## NULL
+## 
+## [[2]]
+## NULL
+## 
+## [[3]]
+## NULL</code></pre>
+<p>The vector, as we might expect, returns a single array of 0s in
+sequence, whereas our vector has printed out 3 empty “containers”, each
+indexed with <code>[[]]</code>. By default, these containers are empty
+which is represented by the <code>NULL</code>. We can insert an item
+into the list by specifying a position and an element to insert</p>
+<pre class="r"><code>## Put 1 in the first container of the list
+l[[1]] &lt;- 1
+l</code></pre>
+<pre><code>## [[1]]
+## [1] 1
+## 
+## [[2]]
+## NULL
+## 
+## [[3]]
+## NULL</code></pre>
+<p>As mentioned, any sort of object can go into a list, including
+vectors and data.frames</p>
+<pre class="r"><code>## Let&#39;s add a vector
+l[[2]] &lt;- c(2, 4, 6, 8)
+
+## And a data.frame 
+l[[3]] &lt;- iris5
+
+## We now have a list of a length 1 vector, a length 3 vector, and a data.frame
+l</code></pre>
+<pre><code>## [[1]]
+## [1] 1
+## 
+## [[2]]
+## [1] 2 4 6 8
+## 
+## [[3]]
+##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          5.1         3.5          1.4         0.2  setosa
+## 2          4.9         3.0          1.4         0.2  setosa
+## 3          4.7         3.2          1.3         0.2  setosa
+## 4          4.6         3.1          1.5         0.2  setosa
+## 5          5.0         3.6          1.4         0.2  setosa</code></pre>
+<p>This idea of a list being a string of “containers” is a useful one.
+Specifically, we can imagine a list being a big choo-choo train; yes
+there are a series of cars attached to each other, but this is distinct
+from what is <em>inside</em> the car. When subsetting our list, we need
+to differentiate which we want. We do so by using <code>[]</code>
+(access the containers) or <code>[[]]</code> (access what is inside the
+containers)</p>
+<pre class="r"><code>## This will grab the second container, which is still a list
+l[2]</code></pre>
+<pre><code>## [[1]]
+## [1] 2 4 6 8</code></pre>
+<pre class="r"><code>## This will grab what is inside the second container
+l[[2]]</code></pre>
+<pre><code>## [1] 2 4 6 8</code></pre>
+<p>A list can also have objects associated with names. Doing so allows
+us to extract elements by name rather than position. The same rules
+apply with <code>[]</code> and <code>[[]]</code></p>
+<pre class="r"><code>names(l) &lt;- c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;)
+
+## This will be a vector
+l[[&quot;b&quot;]]</code></pre>
+<pre><code>## [1] 2 4 6 8</code></pre>
+<pre class="r"><code>## This will still be a list
+l[&#39;b&#39;]</code></pre>
+<pre><code>## $b
+## [1] 2 4 6 8</code></pre>
+<p>You can access all of the names of a list (or a vector or data frame)
+with the <code>names()</code> function:</p>
+<pre class="r"><code>## Names of list
+names(l)</code></pre>
+<pre><code>## [1] &quot;a&quot; &quot;b&quot; &quot;c&quot;</code></pre>
+<pre class="r"><code>## Names of data.frame
+names(iris)</code></pre>
+<pre><code>## [1] &quot;Sepal.Length&quot; &quot;Sepal.Width&quot;  &quot;Petal.Length&quot; &quot;Petal.Width&quot;  &quot;Species&quot;</code></pre>
+<p>There is a distinction (beyond the scope of this course) between how
+an object in R is stored internally and how it is used by a program. For
+example, we use data.frames all the time to store tabular data, access
+variables via column names, and provide numerical summaries of our data.
+Internally, however, a data.frame is simply a list</p>
+<pre class="r"><code>## How it is used in R
+class(iris5)</code></pre>
+<pre><code>## [1] &quot;data.frame&quot;</code></pre>
+<pre class="r"><code>## How it is stored internally
+typeof(iris5)</code></pre>
+<pre><code>## [1] &quot;list&quot;</code></pre>
+<p>This means we can use list subset notation on a data.frame. Recall,
+using <code>[[]]</code> will extract the object in the container, using
+<code>[]</code> will extract the container itself</p>
+<pre class="r"><code>## This will still be a data.frame (with a single column)
+iris5[2]</code></pre>
+<pre><code>##   Sepal.Width
+## 1         3.5
+## 2         3.0
+## 3         3.2
+## 4         3.1
+## 5         3.6</code></pre>
+<pre class="r"><code>class(iris5[2])</code></pre>
+<pre><code>## [1] &quot;data.frame&quot;</code></pre>
+<pre class="r"><code>## This will extract the vector
+iris5[[2]]</code></pre>
+<pre><code>## [1] 3.5 3.0 3.2 3.1 3.6</code></pre>
+<pre class="r"><code>class(iris5[[2]])</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+<p>Likewise, we can extract named elements of a list using
+<code>$</code> notation</p>
+<pre class="r"><code>l$b</code></pre>
+<pre><code>## [1] 2 4 6 8</code></pre>
+<p><strong>Question 5:</strong> Write a function that takes two
+arguments: a list, and a name. If the name is in the list, it should
+return that element of the list. If not, it should return null. (You can
+explicitly return a null object from a function with
+<code>return(NULL)</code>). Confirm that you function works like the one
+below:</p>
+<pre class="r"><code>l &lt;- list(&quot;apple&quot; = 1:5, 
+          &quot;bumblebee&quot; = letters[1:5], 
+          &quot;capybara&quot; = iris[1:5, ])
+
+name_grabber(l, &quot;capybara&quot;)</code></pre>
+<pre><code>##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          5.1         3.5          1.4         0.2  setosa
+## 2          4.9         3.0          1.4         0.2  setosa
+## 3          4.7         3.2          1.3         0.2  setosa
+## 4          4.6         3.1          1.5         0.2  setosa
+## 5          5.0         3.6          1.4         0.2  setosa</code></pre>
+<pre class="r"><code>name_grabber(l, &quot;doggo&quot;)</code></pre>
+<pre><code>## NULL</code></pre>
+<p>Lists are exceptionally useful tools in R given their flexibility in
+storing different data types. In the next few sections, we will see some
+examples of how we already use lists in statistical analysis in R
+without realizing it.</p>
+</div>
+<div id="uses-of-lists" class="section level2">
+<h2>Uses of lists</h2>
+<p>Recall from STA 209 the process of making a linear model. Here, we
+build a regression model using the iris dataset and the
+<code>lm()</code> function (linear model)</p>
+<pre class="r"><code>## Fit model
+fit &lt;- lm(Sepal.Length ~ Sepal.Width + Species, data = iris)
+
+## See the fitted coefficients
+fit</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Sepal.Length ~ Sepal.Width + Species, data = iris)
+## 
+## Coefficients:
+##       (Intercept)        Sepal.Width  Speciesversicolor   Speciesvirginica  
+##             2.251              0.804              1.459              1.947</code></pre>
+<p>Also recall that we can run a <code>summary()</code> function on this
+object to get t-statistics and p-values, along with collections of model
+diagnostics</p>
+<pre class="r"><code>summary(fit)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Sepal.Length ~ Sepal.Width + Species, data = iris)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1.3071 -0.2571 -0.0533  0.1954  1.4125 
+## 
+## Coefficients:
+##                   Estimate Std. Error t value             Pr(&gt;|t|)    
+## (Intercept)          2.251      0.370    6.09      0.0000000095681 ***
+## Sepal.Width          0.804      0.106    7.56      0.0000000000042 ***
+## Speciesversicolor    1.459      0.112   13.01 &lt; 0.0000000000000002 ***
+## Speciesvirginica     1.947      0.100   19.47 &lt; 0.0000000000000002 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.438 on 146 degrees of freedom
+## Multiple R-squared:  0.726,  Adjusted R-squared:  0.72 
+## F-statistic:  129 on 3 and 146 DF,  p-value: &lt;0.0000000000000002</code></pre>
+<p>How is all of this information stored? After running the code above,
+you should see the <code>fit</code> object in your environment; next to
+it, you should also see a description: “List of 13.”</p>
+<p>Using the <code>str()</code> function, we can take a closer look at
+how this model is structured in R</p>
+<pre class="r"><code>str(fit)</code></pre>
+<pre><code>## List of 13
+##  $ coefficients : Named num [1:4] 2.251 0.804 1.459 1.947
+##   ..- attr(*, &quot;names&quot;)= chr [1:4] &quot;(Intercept)&quot; &quot;Sepal.Width&quot; &quot;Speciesversicolor&quot; &quot;Speciesvirginica&quot;
+##  $ residuals    : Named num [1:150] 0.0361 0.2379 -0.1228 -0.1424 -0.1442 ...
+##   ..- attr(*, &quot;names&quot;)= chr [1:150] &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; ...
+##  $ effects      : Named num [1:150] -71.566 -1.188 0.279 8.525 -0.114 ...
+##   ..- attr(*, &quot;names&quot;)= chr [1:150] &quot;(Intercept)&quot; &quot;Sepal.Width&quot; &quot;Speciesversicolor&quot; &quot;Speciesvirginica&quot; ...
+##  $ rank         : int 4
+##  $ fitted.values: Named num [1:150] 5.06 4.66 4.82 4.74 5.14 ...
+##   ..- attr(*, &quot;names&quot;)= chr [1:150] &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; ...
+##  $ assign       : int [1:4] 0 1 2 2
+##  $ qr           :List of 5
+##   ..$ qr   : num [1:150, 1:4] -12.2474 0.0816 0.0816 0.0816 0.0816 ...
+##   .. ..- attr(*, &quot;dimnames&quot;)=List of 2
+##   .. .. ..$ : chr [1:150] &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; ...
+##   .. .. ..$ : chr [1:4] &quot;(Intercept)&quot; &quot;Sepal.Width&quot; &quot;Speciesversicolor&quot; &quot;Speciesvirginica&quot;
+##   .. ..- attr(*, &quot;assign&quot;)= int [1:4] 0 1 2 2
+##   .. ..- attr(*, &quot;contrasts&quot;)=List of 1
+##   .. .. ..$ Species: chr &quot;contr.treatment&quot;
+##   ..$ qraux: num [1:4] 1.08 1.02 1.05 1.11
+##   ..$ pivot: int [1:4] 1 2 3 4
+##   ..$ tol  : num 0.0000001
+##   ..$ rank : int 4
+##   ..- attr(*, &quot;class&quot;)= chr &quot;qr&quot;
+##  $ df.residual  : int 146
+##  $ contrasts    :List of 1
+##   ..$ Species: chr &quot;contr.treatment&quot;
+##  $ xlevels      :List of 1
+##   ..$ Species: chr [1:3] &quot;setosa&quot; &quot;versicolor&quot; &quot;virginica&quot;
+##  $ call         : language lm(formula = Sepal.Length ~ Sepal.Width + Species, data = iris)
+##  $ terms        :Classes &#39;terms&#39;, &#39;formula&#39;  language Sepal.Length ~ Sepal.Width + Species
+##   .. ..- attr(*, &quot;variables&quot;)= language list(Sepal.Length, Sepal.Width, Species)
+##   .. ..- attr(*, &quot;factors&quot;)= int [1:3, 1:2] 0 1 0 0 0 1
+##   .. .. ..- attr(*, &quot;dimnames&quot;)=List of 2
+##   .. .. .. ..$ : chr [1:3] &quot;Sepal.Length&quot; &quot;Sepal.Width&quot; &quot;Species&quot;
+##   .. .. .. ..$ : chr [1:2] &quot;Sepal.Width&quot; &quot;Species&quot;
+##   .. ..- attr(*, &quot;term.labels&quot;)= chr [1:2] &quot;Sepal.Width&quot; &quot;Species&quot;
+##   .. ..- attr(*, &quot;order&quot;)= int [1:2] 1 1
+##   .. ..- attr(*, &quot;intercept&quot;)= int 1
+##   .. ..- attr(*, &quot;response&quot;)= int 1
+##   .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
+##   .. ..- attr(*, &quot;predvars&quot;)= language list(Sepal.Length, Sepal.Width, Species)
+##   .. ..- attr(*, &quot;dataClasses&quot;)= Named chr [1:3] &quot;numeric&quot; &quot;numeric&quot; &quot;factor&quot;
+##   .. .. ..- attr(*, &quot;names&quot;)= chr [1:3] &quot;Sepal.Length&quot; &quot;Sepal.Width&quot; &quot;Species&quot;
+##  $ model        :&#39;data.frame&#39;:   150 obs. of  3 variables:
+##   ..$ Sepal.Length: num [1:150] 5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...
+##   ..$ Sepal.Width : num [1:150] 3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...
+##   ..$ Species     : Factor w/ 3 levels &quot;setosa&quot;,&quot;versicolor&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##   ..- attr(*, &quot;terms&quot;)=Classes &#39;terms&#39;, &#39;formula&#39;  language Sepal.Length ~ Sepal.Width + Species
+##   .. .. ..- attr(*, &quot;variables&quot;)= language list(Sepal.Length, Sepal.Width, Species)
+##   .. .. ..- attr(*, &quot;factors&quot;)= int [1:3, 1:2] 0 1 0 0 0 1
+##   .. .. .. ..- attr(*, &quot;dimnames&quot;)=List of 2
+##   .. .. .. .. ..$ : chr [1:3] &quot;Sepal.Length&quot; &quot;Sepal.Width&quot; &quot;Species&quot;
+##   .. .. .. .. ..$ : chr [1:2] &quot;Sepal.Width&quot; &quot;Species&quot;
+##   .. .. ..- attr(*, &quot;term.labels&quot;)= chr [1:2] &quot;Sepal.Width&quot; &quot;Species&quot;
+##   .. .. ..- attr(*, &quot;order&quot;)= int [1:2] 1 1
+##   .. .. ..- attr(*, &quot;intercept&quot;)= int 1
+##   .. .. ..- attr(*, &quot;response&quot;)= int 1
+##   .. .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
+##   .. .. ..- attr(*, &quot;predvars&quot;)= language list(Sepal.Length, Sepal.Width, Species)
+##   .. .. ..- attr(*, &quot;dataClasses&quot;)= Named chr [1:3] &quot;numeric&quot; &quot;numeric&quot; &quot;factor&quot;
+##   .. .. .. ..- attr(*, &quot;names&quot;)= chr [1:3] &quot;Sepal.Length&quot; &quot;Sepal.Width&quot; &quot;Species&quot;
+##  - attr(*, &quot;class&quot;)= chr &quot;lm&quot;</code></pre>
+<p>This is immensely useful, as it provides us with a way to extract
+elements from our linear model for use in our analysis. For example, we
+may wish to create a plot of the residuals to check that our residuals
+our normally distributed</p>
+<pre class="r"><code>hist(fit$residuals, breaks = 8)</code></pre>
+<p><img role="img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABUAAAAPACAMAAADDuCPrAAADAFBMVEUAAAABAQECAgIDAwMEBAQFBQUGBgYHBwcICAgJCQkKCgoLCwsMDAwNDQ0ODg4PDw8QEBARERESEhITExMUFBQVFRUWFhYXFxcYGBgZGRkaGhobGxscHBwdHR0eHh4fHx8gICAhISEiIiIjIyMkJCQlJSUmJiYnJycoKCgpKSkqKiorKyssLCwtLS0uLi4vLy8wMDAxMTEyMjIzMzM0NDQ1NTU2NjY3Nzc4ODg5OTk6Ojo7Ozs8PDw9PT0+Pj4/Pz9AQEBBQUFCQkJDQ0NERERFRUVGRkZHR0dISEhJSUlKSkpLS0tMTExNTU1OTk5PT09QUFBRUVFSUlJTU1NUVFRVVVVWVlZXV1dYWFhZWVlaWlpbW1tcXFxdXV1eXl5fX19gYGBhYWFiYmJjY2NkZGRlZWVmZmZnZ2doaGhpaWlqampra2tsbGxtbW1ubm5vb29wcHBxcXFycnJzc3N0dHR1dXV2dnZ3d3d4eHh5eXl6enp7e3t8fHx9fX1+fn5/f3+AgICBgYGCgoKDg4OEhISFhYWGhoaHh4eIiIiJiYmKioqLi4uMjIyNjY2Ojo6Pj4+QkJCRkZGSkpKTk5OUlJSVlZWWlpaXl5eYmJiZmZmampqbm5ucnJydnZ2enp6fn5+goKChoaGioqKjo6OkpKSlpaWmpqanp6eoqKipqamqqqqrq6usrKytra2urq6vr6+wsLCxsbGysrKzs7O0tLS1tbW2tra3t7e4uLi5ubm6urq7u7u8vLy9vb2+vr6/v7/AwMDBwcHCwsLDw8PExMTFxcXGxsbHx8fIyMjJycnKysrLy8vMzMzNzc3Ozs7Pz8/Q0NDR0dHS0tLT09PU1NTV1dXW1tbX19fY2NjZ2dna2trb29vc3Nzd3d3e3t7f39/g4ODh4eHi4uLj4+Pk5OTl5eXm5ubn5+fo6Ojp6enq6urr6+vs7Ozt7e3u7u7v7+/w8PDx8fHy8vLz8/P09PT19fX29vb39/f4+Pj5+fn6+vr7+/v8/Pz9/f3+/v7////isF19AAAACXBIWXMAAB2HAAAdhwGP5fFlAAAgAElEQVR4nO3de4BUZd3A8d/KLrBcFARRxAzxgoCa4SVRNDRNBKxMTbylaeINFQwQ72ZXQ0s0b1Smpr3Zm7eUTEPTzNIwQ81L5R0lTQLkRRSEnXfOmZnduZwzc86z/J5n5vH7+cM9c5h55tlzdr7Ozpw5KxkAgBFxPQEAaFQEFAAMEVAAMERAAcAQAQUAQwQUAAwRUAAwREABwBABBQBDBBQADBFQADBEQAHAEAEFAEMEFAAMEVAAMERAAcAQAQUAQwQUAAwRUAAwREABwBABBQBDBBQADBFQADBEQAHAEAEFAEMEFAAMEVAAMERAAcAQAQUAQwQUAAwRUAAwREABwBABBQBDBBQADBFQADBEQAHAEAEFAEMEFAAMEVAAMERAAcAQAQUAQwQUAAwRUAAwREABwBABBQBDBBQADBFQADBEQAHAEAEFAEMEFAAMEVAAMERAAcAQAQUAQwQUAAwRUAAwREABwBABBQBDBBQADBFQADBEQAHAEAEFAEMEFAAMEVB8hD1xz29dTwENjYDiI+wQ6eN6CmhoBNRnP5bAzR0rJocrHgsWLw+WGj0ff5+4XY+W3ntXWX9U8G3uG3PzFftKrxdXr4N5xG3MS4P1/dfVaKg/BNRnnQrorClZdyjPsHNuaQ6/n+2qrC8KaNk39MKUXcKrtex3Z6cnQkA/qgiozzoV0B2DK0xRnmGnLOkvkQEtXl8U0JJvaPU3u0m7wxd3ciYE9KOKgPrM84DeIdEBLV4fF9ADpdiW73VuJgT0o4qA+qxaQG/ZMWvPKjeu/4B+L/xufrb431XWnxN8myeGq4u/oZ+GV9loE2nZJlya0bmZxG1MAuo7AuqzagGtqf4DOi2Y4eDE64u+ofc2yC6u9/01wbvwP2vJLjc/qzJDAuo7AuqzBgjomg/Nbzst6vf3+PVF39A9weJX84cxnRZcuNh8GlUQUN8RUJ8lfw10zc3H77156zafPfFXbeHl73a8Pjgtd42195zyiU1a+g8/5paVxXex4rJRffruccPa3IuN3w1WnRQs7ZbJLJmxQ/cnc1f6weF7bNaywZADZy3M32xCcJ2jMs9MaJWuQybOC1Y9NXlo7w33OCHmqWDF3c+bMmVkMEi/KVOmrC26Ytn6wmugpd/Q94Ovd+YD+lhwYXzkxDN//tonN+6+zbjz3iyeS/nGqkje3yYP67nhJy9+uyiguwVLJ+X//avBhdGFLVixcarvGtQTAuqzxAH9+dD2vAwLr14R0HtHtK/Y5JqOAX+3aW7d/ssqAvpkv+yXJ7KXV3+7X/ttW2asCW+XC+itXfOrj1uVubg5f42zojpRefdFM5Q1RdcsWx8d0G8HX+/PB/Tfg7MmREw88+rnCrfpetyS9nuo2FhlG/P9M5py/7rx72sHNGrjVN81qCcE1GdJAzpdip2QqQzot5uKr3HkB/nx/re5sGrvLwX/LQroi2EYgg6dUjL64eENw4Bu1dK+9mvnd1yjqM8FEXffqYDeHnw9p/yTSOUTf2pg0VgjCk9CKzdW6cb8YP/2f1z/+OC/VQMatXGq7xrUEwLqs1xAt9i53UbhivKAzpVSczKZ+ydPDg+m/MTkycGh59eUXWNSbvyne3SsClNaFNDck7dsh24qu+3c4DoTylYWB3L9t8u/j6i7TxnQ0m/oH8Fi9zsiA9o+8f9uWnKng5fEbazS5H217ApVAxq5carvGtQTAuqzH5c/lnPKAzo6WOx6xu3zfn5iWMRNw9cUi95z+UfuoPMtTr7ua5/MDRF+eKftE+HygCOPGZQfuSOgvaTQoS2Drz2Ov/Kmy8eHqyYG18kHtNd+x+5SmFWvfY/dKbd0e9m3EXP3id5Eij4OdO2wcJjPbF8Z0I6JhzdtOuX+v9/+Wem4aeTGKtqYD+Zuv8Wxx348/41VC2jkxqm5a1A3CKjPkgV0Rfj079rwFvPCKzweLBb15thw7cErsotrzw6XdwpW/zJc/HR29YfHlgdUZL2Dv3Hj1Ysyb4QXHgzH+UqwuEOwlAvobsHbJvmnlzu/ll2eHS5+o+zbiLn7TgQ080jhKW/X77/cfrvSib/aJbjw4/Bfwpc+Wv4Zu7GKkrd3uPKctuz/X6bWDGj0xqm5a1A3CKjPkgX0xXDl7NxN9tkuKzzHW0dv/i98rfIT+Td3jg6vPj+Tb8VGK8K1Y8sDuslfc1f/n+as4bnl8Aj3zYKlMKAt/wrXhs/Cuvw9XA6ftR1T+l3E3X1nApqZ2bE59vif/NO60olf0FHqzIrwtY8LYzdWx8Z8Ifz3E4vuvFpAozdOzV2DukFAfZbmGWiXg366sOTGHb3JvRB3V379P8JnZt/L3i58D/283NpHywP6y8rpLNi8NKA75laHvyDvkFveJ1g+qvRmMXffuYBmftmnY4PsGPa4bOJ7FX13mUODC3vFbqyOjRk+h255Lbf677UCGr1xau4a1A0C6rOKd+FnRgU088lCSIaddte77dft6M1FYRTa36kJX/k8NJN5KLxN/oDJ3PPIjoB2K35jJ7P26V9ccNjw3J10BPQLuX8cW7S8b0RAY+6+kwHNvH5m4ZXb7Gxvq5h4W/fg0gFTcj4VXOgZu7E6NuaXCqUN7ZIkoBUbp+auQd0goD5LGNCHu7SXRJpH/XBZ7rodvTk1WNq6fZAvBhc/ncncGt6gcHzk/qUBHd5xp203H9K34w6KAnpI7t/DgE7MLUcFNObuOxvQ7MQe3q4wqdbnyie+TCq9H7exOjZmGMqvFO7hiJoBjdo4NXcN6gYB9VnCgGYe3bE4E33uDVd29Oao9mSFTg8ubp/JXB187V5YO6k0oLu1X/3lT+fH7ZU7VjR1QGPuvvMBDY4D7X3V4HByh5VP/OWIgL4Rt7E6NubWwdK5hfHPrhXQyI1Tc9egbhBQnyUNaCbztwt27jgUs8tTwarYZ6Dh64G7ZzLXh1cunAjuoJiArg6f5XX78v/8sy13DqTOPgMt3P26CWifzJKwbZuUT3xhREBfittYHRtzq2Dp+ML459QIaPTGqblrUDcIqM+SBzTrrZ8eukH+YRqWLfY10PAfPp/J3Ble97n82h1iAjoruLThP8LlbxsFNObu11VAM0+H38eSsom/H679feXoURurY2OGL5aOKVzt4NKA5t+c7who9MapuWtQNwioz1IFNOvDhyaFHyjaMrjQ0Zvw3EXtb4P/K7zK1wvH2FyeW/tS+SeRCmOOCy59Lbd8nFFAY+6+EwF9pU9WMI/cJ5HCjyj9tXzi4bvit0Ru14qN1bExw1c9u+U/9vnexqUB/WL+pgcWAhq9cWruGtQNAuqzZAH96tisQinCz2b3C5bC3pwRLC0PD8TcMX8gZpgIeTS7tEmwsEXufHThwz8qoFsEly4IF5f0NQpo3N0bBTT8ht4Lx1hUCGj44fdXyyf+5eKpPHp51i2xG6tjY14RDj059+/flPaAhh8QHZzbVm+uXwho9MapuWtQNwioz5IFdL9gaUTuePjcYTi7Bkthb3LvJ4ctkcOClzvX5obYLsjZmeHiIaszmbbzJC6g4fE5I4L3r1dOFKOAxt29UUBz31B4ANMlxb/Cd11VPvHfBpdack98XxwQXLg8dmN1bMx/5DZE+Az5iuaOgIZzknOCQ/afyh2bNDp249TcNagbBNRnyQL6g3Dllt+68w/3Xrmn5NOSP5B84BNvv5PJPJ877dxWp/9k5shcIH4VXOPF3NmUtph0/NYSG9DDw38YNuuGmbk/niGDgrWpAhpz92kDWvQNhR+y3PCJMKCLw5ctP1cx8dwxmE2n3PmPP10YHnQ/6P3YjVX0S/eo3Ay3OeHEwhn4+nfsChl61Jc/lX9LaHTsxqm5a1A3CKjPkgV0aelZh7JPg5YHqwtnFQpOZ3dV2TXyp1W7sGx1VECvL79OS3AyulQBjbv7lAEt+oZebA0Wep6yq/S8IHfOursrJp55qnvJnfa4P35jFQX0nvLvNxfQJRsVrekZ/Gd07MapuWtQNwiozxK+ifSH9UsepL3/FK79VUdvMplvlJyQ86hVueE+/Hz7qhFhBiMC2jam/Tob5n7nvymTNqAxd58yoMXf0BVlYTq0cuKZzB3FBV3/kUz8xip+2+fwjn/s0XEgff7P2IXGhecNGR27cWruGtQNAuqzpO/CP//Zjsfoel8qHJh0cEdvsk+shrVfY+B17eOtmrxebt3Oiyr/pEfewr3yt9vjhfvCrz2Xpg5o9N2nDGjJN/S9kjDtvzxi4pnM4yMLV+hy+POFlVEbq+R98+s3z/9r37lFfxOp7XuFk6cesrzjQPrIjVN716BeEFCfJT+M6ZmLJ2zZp7n7gN1O63iMtt0yZvOWDT7x89yltXefvMOAlg23Pfrm94vv4slTt+25/sjvr84cGRfQTNtPD9q6++aH3NGWWZ778xVvpA9o5N2nDWjJN/RIIV0iH5+de3e8IqCZtrtPGL5h6/DPzXypeG3lxirdmKv/94htevTZ7pw3Sv+o3Munf2bT7oMPuaf0o5wRG6f2rkG9IKBYN/YIHvUNdcL0R879XF/pcuDX7+3EHwbFRxwBhbGf/jgr/9LgsvBM7ve5nVBqh5Qfrw6kQkBhLPwLHINy7wsfEyz3/qDGLeoNAUXnEFAYmxG+aLfT/cvemZf7Qxbn1b5NfSGg6BwCCmNLtix5K1s+tdL1jNI6fdtdXE8BDY2AwtybexT38/OcMh0fNQQUnbD2+sJfJe4y7h7XkwGsI6DonBV/v+eHV9z0x/dqXxPwDgEFAEMEFAAMEVAAMERAAcAQAQUAQwQUAAwRUAAwREABwBABBQBDBBQADBFQADBEQAHAEAEFAEMEFAAMEVAAMERAAcAQAQUAQwQUAAwRUAAwREABwBABBQBDBBQADBFQADBEQAHAEAEFAEMEFAAMEVAAMERAAcAQAQUAQwQUAAwRUAAwREABwBABBQBDBBQADBFQADBEQAHAEAEFAEMEFAAMEVAAMERAAcAQAQUAQwQUAAwRUAAwREABwBABBQBDBBQADBFQADBEQAHAEAEFAEMEFAAMEVAAMERAAcCQekBXvP78/KdfWa59NwBgnWpA37pq/OAmCQ0ae8VCzbsCAOsUA7r0jGYp1nLiO3p3BgDW6QX05SFBNVuHjhl30Pi9h/UMLgx5Qe3eAMA6tYCuGiEy8MIn1+Qvtj176TYiw1Zq3R0AWKcW0KtEJiwrWbPqVJHZWncHANapBXS0DCx/utk2SkZp3R0AWKcW0H5yUsW62dJf6+4AwDq1gLbK9Ip1N0qr1t0BgHVqAR0qYyrWTZatte4OAKxTC+hUkVvLVs3vEfFrPQA0KrWAvtQqzdMXFa1YeklPaXlK6+4AwDq9A+nnNIk07z71ytvuffC+O645a5/uInKZ2r0BgHWKH+W8pZ+U6n2D3p0BgHWaJxNZcvHwonxue/5ixfsCAOuUT2f32txZMycfd8qMWXe/qntHAGBd/ZxQ+aFJFSZ+8lnXswKAWPUT0M9JhKNczwoAYtkJ6MI7r7/zxRrXef26CvvKLCvTAwATmgF96rzDwq8v7Rc+m/zk42kHmCrfX+eTAoB1RS+gay9aT7YLFm7okf99vMu0tnRDEFAA9UwvoJOyydwx+/W5biKbfOncE3bMXr4m3RAEFEA9Uwvon5qk17X/l13YVWTKimDNrRtKr3QHMxFQAPVMLaCHSdOjwdcFIuPzq24XOT3VGAQUQD1TC+gIGRt+/ZHIQ4V1u8jwVGMQUAD1TPGEytPCr5eI/Lew7hTpnWoMAurUyiUN4/9cbyt8RKkFdHOZFH7NPgN9s7DuZALaQF7sEfXRhvrU5aHa3w+w7qkF9EAZtDr4Ol9kbmHdSBmWagwC6tLvpHn9BtFVrnW9tfDRpBbQ20RODg/7HC6j1uZW3cqbSI3kd7LbMw3iUAIKN9QCunYvkf3+ml14pEUm5Q5j6iMtf081BgF1iYACtegdSP/6liIy7MRv/OgUkY8dP2vKp7IXL0k3BAF1iYACtSh+Fv6d8WWv9Lem/CASAXWKgAK1qJ6N6cGDit7I7XP8a2lvT0BdIqBALcqns1v56E/OmzLp+NPOnvPH1elvTUBdIqBALfVzQuUIBNQlAgrUQkARg4ACtRBQxCCgQC0EFDEIKFALAUUMAgrUQkARg4ACtRBQxCCgQC0EFDEIKFALAUUMAgrUQkARg4ACtRBQxCCgQC0EFDEIKFALAUUMAgrUQkARg4ACtRBQxCCgQC0EFDEIKFALAUUMAgrUQkARg4ACtRBQxCCgQC0EFDEIKFALAUUMAgrUQkARg4ACtRBQxCCgQC0EFDEIKFALAUUMAgrUQkARg4ACtRBQxCCgQC0EFDEIKFALAUUMAgrUQkARg4ACtRBQxCCgQC0EFDEIKFALAUUMAgrUQkARg4ACtRBQxCCgQC0EFDEIKFALAUUMAgrUQkARg4ACtRBQxCCgQC0EFDEIKFALAUUMAgrUQkARg4ACtRBQxCCgQC0EFDEIKFALAUUMAgrUQkARg4ACtRBQxCCgQC0EFDEIKFALAUUMAgrUQkARo4EC+inp0bdRjFrresdiHSKgiNFAAR0iDWSJ6x2LdYiAIkZDBXTGow2iNwH1CgFFjIYK6IWup5DU+gTUKwQUMQioBgLqFwKKGARUAwH1CwFFDAKqgYD6hYAiBgHVQED9QkARg4BqIKB+IaCIQUA1EFC/EFDEIKAaCKhfCChiEFANBNQvBBQxCKgGAuoX9YCueP35+U+/stzotgTUJQKqgYD6RTWgb101fnBT7gwKg8ZesTD17QmoSwRUAwH1i2JAl57RXHIWmpYT30k5AgF1iYBqIKB+0Qvoy+E5xlqHjhl30Pi9h/UMLgx5Id0QBNQlAqqBgPpFLaCrRogMvPDJNfmLbc9euo3IsJWpxiCgLhFQDQTUL2oBvUpkwrKSNatOFZmdagwC6hIB1UBA/aIW0NEysPzpZtsoGZVqDALqEgHVQED9ohbQfnJSxbrZ0j/VGATUJQKqgYD6RS2grTK9Yt2N0ppqDALqEgHVQED9ohbQoTKmYt1k2TrVGATUJQKqgYD6RS2gU0VuLVs1v0fEr/XVxyCg7hBQDQTUL2oBfalVmqcvKlqx9JKe0vJUqjEIqEsEVAMB9YvegfRzmkSad5965W33PnjfHdectU93Ebks3RAE1CUCqoGA+kXxo5y39JNSvW9IOQIBdYmAaiCgftE8mciSi4cX5XPb8xenHYCAukRANRBQvyifzu61ubNmTj7ulBmz7n615lWvq7CvzNKdHqogoBoIqF/q54TKn5MIh7ue1UcYAdVAQP1SPwF9eFKF7eVi17P6CCOgGgioX6wEdMUDP7t5nsFJ6XkN1CUCqoGA+kUtoI899kx+6d1Tu4bnUz7irbRjEFCXCKgGAuoXtYCK7JxbeGhQ4QXNvhzG1EgIqAYC6hf1gC7eWGS9PU847/Ctswn9WboxCKhLBFQDAfWLekCPENltQbCw9uqessF/U41BQF0ioBoIqF+0A/qmyGZL86uuFflWqjEIqEsEVAMB9Yt2QH8u0v7KZ9tQ2T3VGATUJQKqgYD6RTugl4k8177uCNko1RgE1CUCqoGA+kU7oNeJfNC+7mzpmmoMAuoSAdVAQP2iHdDfi7zevu5o+ViqMQioSwRUAwH1i3ZAVwyQHxZWrdxU9ks1BgF1iYBqIKB+UQxor4Nn/uSRty6Xfgvzq6aIXJlqDALqEgHVQED9ohjQnFaRLd8PVjz+eZGB6T4QT0BdIqAaCKhf9P6o3IHDuhUiGpxJ+dHs1+ZfpxyDgDpEQDUQUL9ono1p7WsPXDf9oO17hAH9o8iAO1MOQEBdIqAaCKhfLJzOru2NNdn/PjH28nfT3pKAukRANRBQv9TPCZUjEFCXCKgGAuoXAooYBFQDAfULAUUMAqqBgPqFgCIGAdVAQP1CQBGDgGogoH4hoIhBQDUQUL8QUMQgoBoIqF8IKGIQUA0E1C8EFDEIqAYC6hcCihgEVAMB9QsBRQwCqoGA+oWAIgYB1UBA/UJAEYOAaiCgfiGgiEFANRBQvxBQxCCgGgioXwgoYhBQDQTULwQUMQioBgLqFwKKGARUAwH1CwFFDAKqgYD6hYAiBgHVQED9QkARg4BqIKB+IaCIQUA1EFC/EFDEIKAaCKhfCChiEFANBNQvBBQxCKgGAuoXAooYBFQDAfULAUUMAqqBgPqFgCIGAdVAQP1CQBGDgGogoH4hoIhBQDUQUL8QUMQgoBoIqF8IKGIQUA0E1C8EFDEIqAYC6hcCihgEVAMB9QsBRQwCqoGA+oWAIgYB1UBA/UJAEYOAaiCgfiGgiEFANRBQvxBQxCCgGgioXwgoYhBQDQTULwQUMQioBgLqFwKKGARUAwH1CwFFDAKqgYD6hYAiBgHVQED9QkARg4BqIKB+IaCIQUA1EFC/EFDEIKAaCKhfCChiEFANBNQvBBQxCKgGAuoXAooYBFQDAfULAUUMAqqBgPqFgCIGAdVAQP1CQBGDgGogoH4hoIhBQDUQUL8QUMQgoBoIqF8IKGIQUA0E1C8EFDEIqAYC6hcCihgEVAMB9QsBRQwCqoGA+oWAIgYB1UBA/UJAEYOAaiCgflEP6IrXn5//9CvLjW5LQF0ioBoIqF9UA/rWVeMHN0lo0NgrFqa+PQF1iYBqIKB+UQzo0jOapVjLie+kHIGAukRANRBQv+gF9OUhQTVbh44Zd9D4vYf1DC4MeSHdEATUJQKqgYD6RS2gq0aIDLzwyTX5i23PXrqNyLCVqcYgoC4RUA0E1C9qAb1KZMKykjWrThWZnWoMAuoSAdVAQP2iFtDRMrD86WbbKBmVagwC6hIB1UBA/aIW0H5yUsW62dI/1RgE1CUCqoGA+kUtoK0yvWLdjdKaagwC6hIB1UBA/aIW0KEypmLdZNk61RgE1CUCqoGA+kUtoFNFbi1bNb9HxK/11ccgoO4QUA0E1C9qAX2pVZqnLypasfSSntLyVKoxCKhLBFQDAfWL3oH0c5pEmnefeuVt9z543x3XnLVPdxG5LN0QBNQlAqqBgPpF8aOct/STUr1vSDkCAXWJgGogoH7RPJnIkouHF+Vz2/MXpx2AgLpEQDUQUL8on87utbmzZk4+7pQZs+5+tdZVV/3tiXJHEFCHCKgGAuqX+jmh8tES4SuuZ/URRkA1EFC/1E9A5+xUYWOZ4XpWH2EEVAMB9YutgB577P+mvxGvgbpEQDUQUL/YCqjIzPQ3IqAuEVANBNQvBBQxCKgGAuoXtYDOKyUyMfyaagwC6hIB1UBA/aIW0Kj31LNSjUFAXSKgGgioX9QC2pWANjgCqoGA+kUtoE8OE+ly3LQCkV3Dr6nGIKAuEVANBNQvem8irTxFZND97ffDm0iNhoBqIKB+0XwX/p6Npen0/B9GIqANh4BqIKB+UT2M6e0JIts+kbsfAtpoCKgGAuoX5eNAr+4hLd8M/jY8AW04BFQDAfWL9oH0z48UGfUiAW1ABFQDAfWL+ieRVp+1nvScQ0AbDwHVQED9YuGjnA9tLjKBgDYcAqqBgPrFxmfhl04MDqEnoA2GgGogoH6xczKRn61PQBsOAdVAQP1i6WxM777xxrvpb0VAXSKgGgioX+rnjPQRCKhLBFQDAfULAUUMAqqBgPqFgCIGAdVAQP1CQBGDgGogoH4hoIhBQDUQUL8QUMQgoBoIqF8IKGIQUA0E1C8RAX3D/ixiEFCXCKgGAuqXiICu95kbltufSBQC6hIB1UBA/RIRUBHpccS9a+zPpQIBdYmAaiCgfokI6B5Nwbk/Np76V/uzKUNAXSKgGgioX6LeRHrlO9uHf4J4+Hdetz6fEgTUJQKqgYD6JeZd+GfOHhwktGnv6w3OAbLOEFCXCKgGAuqX2MOY2h6dPCBoaOth93xoc0LFCKhLBFQDAfVLteNAP/ztl3sHDR1w+nxr8ylBQF0ioBoIqF+qH0g//4zm8NVQGXHLWksTKkZAXSKgGgioX+IDuvaRKZuH8dw8fDn04NUWZ5VHQF0ioBoIqF9iAvrhvJM3ydXzzD+3tT1wRIvIZXYnFiCgLhFQDQTUL1EBXTX3uH65en7tsfyqv3eXYTanlUNAXSKgGgioXyICeuT6YT0/3l7PwP7Sy9qc2hFQlwioBgLql+iPcsrHpz1eunKC7GFnQsUIqEsEVAMB9UtUQAeX1zPrT799xsJsyhBQlwioBgLql4iA/sX+LGIQUJcIqAYC6pe4w5jCwz7f+4/FmUQgoC4RUA0E1C+RAV15yU47BF8XNG33DWef48wQULcIqAYC6peogL4xVGTbYGGBiOz6muUZFSGgLhFQDQTULxEBXbuTSMtRwdLbh68vsrftKXUgoC4RUA0E1C8RAb1JZM9F+eX/7Cdyq9UJFSOgLhFQDQTULxEBHSd9FrdfWLaRfMnidEoRUJcIqAYC6peIgG4qXy66dLxsb20y5QioSwRUAwH1S0RAu8r5RZcuklZrkylHQF0ioBoIqF8iArpxyS/tE2WAtcmUI6AuEVANBNQvEQH9jAxc0X5h5WbyaXuzKUNAXSKgGgioXyICeq3IQW2FC0eKXG5zPiUIqEsEVAMB9UtEQFcPFdnx1vezSx/eN0pks/esT6qAgLpEQDUQUL9EfRLp+Y2Cv2i8yU6Du2S/9qw8M5M1BNQlAqqBgPol8rPwiyZ1kbzP/9P2jIoQUJcIqAYC6peYszE9N3nHvk09tzr69zbnUoGAukRANRBQv1T/s8aOEVCXCKgGAuoXAooYBFQDAfULAUUMAqqBgPolMqBv/uxrk4vYnlM7AuoSAdVAQP0SFdDbN5AS1idVQEBdIqAaCKhfIur4clchoCCgKgioXyLqeJzIyLkLF3ewP6s8AuoSAdVAQP0SEdDt5WPuPr1ZgoC6REA1EFC/RAS0VS6wP49IBNQlAqqBgPqlMqDvifzYwUSiEFCXCKgGAuqXyuWwrJgAACAASURBVICuWE+mOZhIFALqEgHVQED9EvEr/GgZsdr+RKIQUJcIqAYC6peIgP6lq5zaVrnaAQLqEgHVQED9EnWQ59wNZde5b1ufSiUC6hIB1UBA/RIR0AkTPhEcPt+rf4H9WeURUJcIqAYC6peIgEo5+7PKI6AuEVANBNQvUW8ilbM/qzwC6hIB1UBA/cLp7BCDgGogoH4hoIhBQDUQUL8QUMQgoBoIqF/iAvrOfTf/ZHHG8eGgBNQlAqqBgPolOqD3jGwSkQWZaRPnWZ5PCQLqEgHVQED9EhXQthNyhy8tyEwWOaeTz0JXvP78/KdfWW50WwLqEgHVQED9EhXQ80Wa9jojCOhl2SeiM8wHf+uq8YObcjEeNPaKhalvT0BdIqAaCKhfov6kRxcZ9GBwPP2CTGb+QOn6quHQS89oLjkev+XEd1KOQEBdIqAaCKhfIgI6VeSBTD6gmQVNcrrZyC8PCarZOnTMuIPG7z2sZ3BhyAvphiCgLhFQDQTULxEB3UX2DP8lDGhmnOxlNPCqESIDL3xyTf5i27OXbiMybGWqMQioSwRUAwH1S0RAN8w958wH9GzZxGjgq0QmLCtZs+pUkdmpxiCgLhFQDQTULxEB7SHTw3/JBfQCaTUaeLQMLH+62TZKRqUag4C6REA1EFC/RAR0Kzkg/JdcQL8gWxgN3E9Oqlg3W9KdGo+AukRANRBQv0QE9KvS9blMIaBPd5OjjQZuzT2PLXFjymezBNQlAqqBgPolIqCPiuz0Zj6gCzcT+a3RwENlTMW6ybJ1qjEIqEsEVAMB9UvUgfRHi2x40cMi9/3lOwNExpkNPFXk1rJV83tE/FpffQwC6g4B1UBA/RIV0A8OLDr8fbdlEddI4KVWaZ6+qGjF0kt6SstTqcYgoC4RUA0E1C/RJxO5a6t8Pgdev9Z05DlNIs27T73ytnsfvO+Oa87ap3t2uMvSDUFAXSKgGgioX2JOZ7fqrmmHjT10yi9XdGLoW/qV/W2l3jekHIGAukRANRBQv2ieUHnJxcOL8rnt+YvTDkBAXSKgGgioX5TPSP/a3FkzJx93yoxZd5uckoSAukRANRBQv9TPn/S4qG+F7qYnMsE6QEA1EFC/RAT0h+XszGRqxd+jzzrZzn0jAgHVQED9EhHQioqtg7v58NV/vVfrOu8uKXcyv8I7REA1EFC/1AxoU3Oz6dgf/PX67/wy6OY/v9RFpPnTf047AK+BukRANRBQv0QE9I8FD99wRk/pcbvp0A98LAhw//szLw/Mtbj5ojW1b1WMgLpEQDUQUL/U+P38zdGy3lyzkX+S/2tI3Z/7gkjryN16Z5evTDcEAXWJgGogoH6p9QLnm/1lU6MPIy3ZUGTX838wsbfs0iQnr8xk2q7tLX3THQpKQF0ioBoIqF9qvkN0osgzJgOfJzIz+IvI87qI7JNb9QuRc1ONQUBdIqAaCKhfagb0OpHnTAYeK9t8GC4cI3JPft0O8qlUYxBQlwioBgLql5oB/YF0WWUy8BCZlFuYI/Jift2xnJG+gRBQDQTULzUDur9saTRwq1yUW5grUjgE9GxpSTUGAXWJgGogoH6pEdC13zY9o/II+Wpu4Y99+nyQX3ekDEw1BgF1iYBqIKB+iQjovh327C8iZocxHSwbv1+2as3WsmuqMQioSwRUAwH1S+2Pch5hNvAPRL7yYemqy0W+nmoMAuoSAdVAQP0SEdD+RTbd/1rDgVePEBn+9RvbD/xc+/xXm6T7S6nGIKAuEVANBNQveqeze6xv8Pz1j/lLC3oGl65INwQBdYmAaiCgflE8H+h/jmvqCOhj2Xz2+EnKEQioSwRUAwH1i+oJlZf9+fqF+cXHP/7Z7/0n7e0JqEsEVAMB9Uv9nJE+AgF1iYBqIKB+iQjodtGm2p8cAXWJgGogoH5Jckb6nIvsT46AukRANRBQv0QEdOaM8B3z7lv2Cr5sXHgGer/9yRFQlwioBgLql6jXQK8UGXT5m22ZzL+v3kw2esz6nNoRUJcIqAYC6peIgP6jVXZbmV9+f5QMeNvqhIoRUJcIqAYC6peIgJ4m67/VfuHf68vZFqdTioC6REA1EFC/RAR0qBxQdGmcjLA2mXIE1CUCqoGA+iUioD3kzKJL06W3tcmUI6AuEVANBNQvEQHtU/IMdIL0sjaZcgTUJQKqgYD6JSKgI6XP0vYLyzaUYRanU4qAukRANRBQv0QE9Osi4wp/ybjtQJEpVidUjIC6REA1EFC/RAT0v/1Fdn84XHxkT5Gu/7Q8pQ4E1CUCqoGA+iXqQPr7uonIoDFH7r1Z8FGk2dbn1I6AukRANRBQv0SejemxPdo/Ab/ZTbZnVISAukRANRBQv8Sczu7X+wYfhB+wxyXlfxjOKgLqEgHVQED9Ens+0DVv/+NdmxOJQkBdIqAaCKhfOKEyYhBQDQTUL3EBfee+m3+yONNmdS4VCKhLBFQDAfVLdEDvGdkkIgsy0ybOszyfEgTUJQKqgYD6JSqgbSfk3oFfkJksco7DZ6EE1CUCqoGA+iUqoOeLNO11RhDQy7JPRGdYn1M7AuoSAdVAQP0SEdCXu8igB4M/jbQgk5k/ULq+an9WeQTUJQKqgYD6JSKgU0UeyOQDmlnQJKfbnlPRTAioOwRUAwH1S0RAd5E9w38JA5oZJ3vZnVERAuoSAdVAQP0SEdANc8858wE9WzaxO6MiBNQlAqqBgPol8oz008N/yQX0Amm1O6MiBNQlAqqBgPolIqBb5c5Inw/oF2QLuzMqQkBdIqAaCKhfIgL6Ven6XKYQ0Ke7ydG259SOgLpEQDUQUL9EBPRRkZ3ezAd04WYiv7U/qzwC6hIB1UBA/RJ1IP3RIhte9LDIfX/5zgCRcdbn1I6AukRANRBQv0QF9IMDpcNuy6zPqR0BdYmAaiCgfok+mchdW+XzOfD6tZFXsIOAukRANRBQv8Sczm7VXdMOG3volF+usDubMgTUJQKqgYD6pTKg78ybt8jBRKIQUJcIqAYC6pfKgK5okksdTCQKAXWJgGogoH6J+BV+cznN/jwiEVCXCKgGAuqXiICeK1s5/VucHQioSwRUAwH1S0RA3/t07sPw7hFQlwioBgLql6h34VccK6N+s8jxH5QLEFCXCKgGAuqXiIBOnDhxoIh0G7RZnv1Z5RFQlwioBgLql4iASjn7s8ojoC4RUA0E1C8Rddy5nP1Z5RFQlwioBgLqF3dPLxMgoC4RUA0E1C8lAT3vvNtczSMSAXWJgGogoH4pCajIsa7mEYmAukRANRBQv8QEtLn5OAeTKUdAXSKgGgioX2ICWh/PRQmoSwRUAwH1CwFFDAKqgYD6hYAiBgHVQED9QkARg4BqIKB+IaCIQUA1EFC/EFDEIKAaCKhfCChiEFANBNQvBBQxCKgGAuoXAooYBFQDAfULAUUMAqqBgPqlLKAbbJvTsZTlam4E1CkCqoGA+qUsoJFczY2AOkVANRBQvxBQxCCgGgioX0rq+Go0V3MjoE4RUA0E1C/qTy9XvP78/KdfWW50WwLqEgHVQED9ohrQt64aP7gp9zLAoLFXLEx9ewLqEgHVQED9ohjQpWc0l7yU2nLiOylHIKAuEVANBNQvegF9eUhQzdahY8YdNH7vYT2DC0NeSDcEAXWJgGogoH5RC+iqESIDL3xyTf5i27OXbiMybGWqMQioSwRUAwH1i1pArxKZsKxkzapTRWanGoOAukRANRBQv6gFdLQMLH+62TZKRqUag4C6REA1EFC/qAW0n5xUsW629E81BgF1iYBqIKB+UQtoq0yvWHejtKYag4C6REA1EFC/qAV0qIypWDdZtk41BgF1iYBqIKB+UQvoVJFby1bN7xHxa331MQioOwRUAwH1i1pAX2qV5umLilYsvaSntDyVagwC6hIB1UBA/aJ3IP2cJpHm3adeedu9D953xzVn7dNdRC5LNwQBdYmAaiCgflH8KOct/cpOi9f7hpQjEFCXCKgGAuoXzZOJLLl4eFE+tz1/cdoBCKhLBFQDAfWL8unsXps7a+bk406ZMetuk7OKElCXCKgGAuoXd6ebL/eLfStsLue6ntVHGAHVQED9Uj8B/VLUXxM52vWsPsIIqAYC6hfVgH74lzv/VPzC54sLFsRfefm835U7OO3b9liHCKgGAuoXxYC2Xblh9jlk08Edx36OSfkH6ngN1CUCqoGA+kUvoO98Nv9reLdfFVYR0EZCQDUQUL/oBfSo7LPPXSYdtZnIerfnVxHQRkJANRBQv6gF9BGRgfdnv676dpP0+3duHQFtJARUAwH1i1pAjxGZl1u6QuSg3BIBbSQEVAMB9YtaQD8lexUWx4n8PlwgoI2EgGogoH5RC2gfmVJYfKmbjGwLFghoJvPfJxrF1QRUAQH1i1pAe8vM9uVzRcLziBDQTGZE1OcF6hQBXfcIqF/UArqNfKZ9ecVm0u+tDAEN9JVthzeGjQmoAgLqF8U3kZp+037hVyJjPySggb7yqOvHcEJnElAFBNQvagG9T6Rr+xH0mUNEjnyfgGYIqAoCCkf0DqQ/SER2ODX/YfZl24lsNWt7AkpANRBQOKIX0KWfCd6H6J6/tGR07n2JVEMQUJcIqAYC6hfFk4l8OGe7joBmVk7vS0AzBFQFAYUjuucD/cddN3VceO/6k/ffKtXNCahLBFQDAfVL/ZxQOQIBdYmAaiCgfiGglhFQBQQUjhBQywioAgIKRwioZQRUAQGFIwTUMgKqgIDCEQJqGQFVQEDhCAG1jIAqIKBwhIBaRkAVEFA4QkAtI6AKCCgcIaCWEVAFBBSOEFDLCKgCAgpHCKhlBFQBAYUjBNQyAqqAgMIRAmoZAVVAQOEIAbWMgCogoHCEgFpGQBUQUDhCQC0joAoIKBwhoJYRUAUEFI4QUMsIqAICCkcIqGUEVAEBhSME1DICqoCAwhECahkBVUBA4QgBtYyAKiCgcISAWkZAFRBQOEJALSOgCggoHCGglhFQBQQUjhBQywioAgIKRwioZQRUAQGFIwTUMgKqgIDCEQJqGQFV0FABffKlRrHW9YOlARBQywioggYKaBdpHCe5frA0AAJqGQFV0EABbZJNN2sMG8m+rh8sDYCAWkZAFTRUQBtl//+IgCZAQC0joAoIqAICmgQBtYyAKiCgCghoEgTUMgKqgIAqIKBJEFDLCKgCAqqAgCZBQC0joAoIqAICmgQBtYyAKiCgCghoEgTUMgKqgIAqIKBJEFDLCKgCAqqAgCZBQC0joAoIqAICmgQBtYyAKiCgCghoEgTUMgKqgIAqIKBJEFDLCKgCAqqAgCZBQC0joAoIqAICmgQBtYyAKiCgCghoEgTUMgKqgIAqIKBJEFDLCKgCAqqAgCZBQC0joAoIqAICmgQBtYyAKiCgCghoEgTUMgKqgIAqIKBJEFDLCKgCAqqAgCZBQC0joAoIqAICmgQBtYyAKiCgCghoEgTUMgKqgIAqIKBJEFDLCKgCAqqAgCZBQC0joAoIqAICmgQBtYyAKiCgCghoEgTUMgKqgIAqIKBJEFDLCKgCAqqAgCahHtAVrz8//+lXlhvdloC6REA1EFC/qAb0ravGD26S0KCxVyxMfXsC6hIB1UBA/aIY0KVnNEuxlhPfSTkCAXWJgGogoH7RC+jLQ4Jqtg4dM+6g8XsP6xlcGPJCuiEIqEsEVAMB9YtaQFeNEBl44ZNr8hfbnr10G5FhK1ONQUBdIqAaCKhf1AJ6lciEZSVrVp0qMjvVGATUJQKqgYD6RS2go2Vg+dPNtlEyKtUYBNQlAqqBgPpFLaD95KSKdbOlf6oxCKhLBFQDAfWLWkBbZXrFuhulNdUYBNQlAqqBgPpFLaBDZUzFusmydaoxCKhLBFQDAfWLWkCnitxatmp+j4hf66uPQUDdIaAaCKhf1AL6Uqs0T19UtGLpJT2l5alUYxBQlwioBgLqF70D6ec0iTTvPvXK2+598L47rjlrn+4iclm6IQioSwRUAwH1i+JHOW/pJ6V635ByBALqEgHVQED9onkykSUXDy/K57bnL047AAF1iYBqIKB+UT6d3WtzZ82cfNwpM2bd/arBrQmoSwRUAwH1S/2cUPnJsyrsIt92Pat1joAqIKAKCGgS9RPQCRLhMNezWucIqAICqoCAJlE/AX3uuxVGy3ddz2qdI6AKCKgCAppE/QQ0Aq+BukRANRBQvxBQywioAgKqgIAmQUAtI6AKCKgCApoEAbWMgCogoAoIaBJaAV37VrRUgxBQlwioBgLqF62Avhp1UFJWqkEIqEsEVAMB9YtWQBf1IaCRCKgCAqqAgCah9hro6l8Py/Zyi7FlUo1BQF0ioBoIqF8U30RaMVpkZqdGIKAuEVANBNQvmu/CP0BAKxFQBQRUAQFNQvUwpk0IaAUCqoCAKiCgSagGdBwBrUBAFRBQBQQ0CdWAzh4zp1O3J6AuEVANBNQvfBLJMgKqgIAqIKBJEFDLCKgCAqqAgCZBQC0joAoIqAICmgQBtYyAKiCgCghoEgTUMgKqgIAqIKBJEFDLCKgCAqqAgCZBQC0joAoIqAICmgQBtYyAKiCgCghoEgTUMgKqgIAqIKBJEFDLCKgCAqqAgCZBQC0joAoIqAICmgQBtYyAKiCgCghoEgTUMgKqgIAqIKBJEFDLCKgCAqqAgCZBQC0joAoIqAICmgQBtYyAKiCgCghoEgTUMgKqgIAqIKBJEFDLCKgCAqqAgCZBQC0joAoIqAICmgQBtYyAKiCgCghoEgTUMgKqgIAqIKBJEFDLCKgCAqqAgCZBQC0joAoIqAICmgQBtYyAKiCgCghoEgTUMgKqgIAqIKBJEFDLCKgCAqqAgCZBQC0joAoIqAICmgQBtYyAKiCgCghoEgTUMgKqgIAqIKBJEFDLCKgCAqqAgCZBQC0joAoIqAICmgQBtYyAKiCgCghoEgTUMgKqgIAqIKBJEFDLCKgCAqqAgCZBQC0joAoIqAICmgQBtYyAKiCgCghoEgTUMgKqgIAqIKBJEFDLCKgCAqqAgCZBQC0joAoIqAICmgQBtYyAKiCgCghoEgTUMgKqgIAqIKBJEFDLCKgCAqqAgCZBQC0joAoIqAICmgQBtYyAKiCgCghoEgTUMgKqgIAqIKBJEFDLCKgCAqqAgCZBQC0joAoIqAICmgQBtYyAKiCgCghoEgTUMgKqgIAqIKBJEFDLCKgCAqqAgCZBQC0joAoIqAICmgQBtYyAKiCgCr4vrUMaxXbPuno8E1DLCKgCAqrgTGkg17l6PBNQywioAgKq4Ez55L0NYpxc6+rxTEAtI6AKCKiCBtr/hxLQSATUpQZ6ABFQBQ20/wloNALqUgM9gAioggba/wQ0GgF1qYEeQARUQQPtfwIajYC61EAPIAKqoIH2PwGNRkBdaqAHEAFV0ED7n4BGI6AuNdADiIAqaKD9T0CjEVCXGugBREAVNND+J6DRCKhLDfQAIqAKGmj/E9BoBNSlBnoAEVAFDbT/CWg0AupSAz2ACKiCBtr/BDQaAXWpgR5ABFRBA+1/AhqNgLrUQA8gAqqggfY/AY1GQF1qoAcQAVXQQPufgEYjoC410AOIgCpooP1PQKMRUJca6AFEQBU00P4noNESB/Te4a7/pkBi6/EAWvcIqIIG2v8ENFrigE5y/RcF0uABtM4RUAUNtP8JaLQUAT3d9V8VSIoHkAICqqCB9r/PAV3x+vPzn35ludFtUwSUB9A610APIAKqoIH2v68Bfeuq8YObcr+3Dhp7xcLUtyegLjXQA4iAKmig/e9nQJee0Vzy2l/Lie+kHIGAutRADyACqqCB9r+XAX15SFDN1qFjxh00fu9hPYMLQ15INwQBdamBHkAEVEED7X8fA7pqhMjAC59ck7/Y9uyl24gMW5lqDALqUgM9gAioggba/z4G9CqRCctK1qw6VWR2qjEIqEsN9AAioAoaaP/7GNDRMrD86WbbKBkVf4PFv/plufFyabI7mySHXNYgmuSbrqeQ0ATZ2vUUkhrA/l/3Gmj/7+ZhQPvJSRXrZkv/+Bt8Meqg86OT3dlJqke+A6hvPzLMVKepBbRVplesu1Fa42/w60MrfHbIY8nu7InDKm9cp0YOdz2DpL44ZE/XU0hq38EHup5CUux/DV9eZJipTlML6FAZU7FusmytdXcAYJ1aQKeK3Fq2an6PiF/rAaBRqQX0pVZpnl78xHrpJT2l5SmtuwMA6/QOpJ/TJNK8+9Qrb7v3wfvuuOasfbqLyGVq9wYA1il+lPOWfmXvlPW+Qe/OAMA6zZOJLLl4eFE+tz1/seJ9AYB1yqeze23urJmTjztlxqy7X9W9IwCwrq5PqAwA9YyAAoAhAgoAhggoABgioABgiIACgCECCgCGCCgAGCKgAGCIgAKAIQIKAIYIKAAYIqAAYMiPgF7c+rEhDWKDXq5nkNTg1o1cTyGpTbqz/9e5Rtr/ve53lR4/ArqrxT+gCqDeTHGVHj8COkm+9VKD2ECedD2FhG6SPVxPIamJ7P91r6H2/3Wu0uNLQJ1twLT6yhLXU0jod7Kv6ykkxf5XwP5PgoBaxgNIAftfAfs/CQJqGQ8gBex/Bez/JAioZTyAFLD/FbD/kyCglvEAUsD+V8D+T4KAWsYDSAH7XwH7PwkCahkPIAXsfwXs/yQIqGU8gBSw/xWw/5MgoJbxAFLA/lfA/k+CgFrGA0gB+18B+z8JAmoZDyAF7H8F7P8kCKhlPIAUsP8VsP+TIKCW8QBSwP5XwP5PgoBaxgNIAftfAfs/CQJqGQ8gBex/Bez/JAioZTyAFLD/FbD/kyCglvEAUsD+V8D+T8KPgE6TX7ieQlKDu610PYWE/iIHu55CUux/Bez/JPwI6PJ71rieQlLPP+F6Bon97i3XM0iK/a+B/Z+AHwEFAAcIKAAYIqAAYIiAAoAhAgoAhggoABgioABgiIACgCECCgCGCCgAGCKgAGCIgAKAIQIKAIYIKAAYIqAAYIiAAoAhAgoAhggoABgioABgiIACgCECCgCGCCgAGCKgAGCIgAKAoQYP6KJX17qeQlINNFV8VDXQD2mdTLWxA/phH3mrcu1U6fCY/UlFi55qJvPSmdv26L/nVatszydO7HzqaatW2Whsz05olB/STP089Bs7oHdL1FY8sA5/NGOmmpnTmpvniJetzyhS/HzqaKtW2Whsz85okB/SQL089Bs6oCuGR27FYdJr54Jn7M8qUsxUb2kS2WvaiZuIDFlqf1KVqsynfrZqlUmyPTujQX5IA3Xz0G/kgP5+T4naimu7ycEOZlNVzFSX9Jcuv8h+XTle5Az7s6pQZT71s1WrTJLt2RkN8kMaqJ+HfsMG9IoJm4ZP1Cu34msiMx1MKF78VC8WmRYuLNtEmiNffbKrynzqZ6tWmSTb01jj/JDW10O/YQM6Jv9KR+VWfEDkJw4mFC9+qiOkeVFu6UKRqy1PK0KV+dTPVq0ySbanscb5Ia2vh37DBnTOzKwtorbidSKPOJhQvNipZv+HuXt+8UmR8ZanVanafOpmq1aZJNvTXMP8kNbZQ79hAxoaG7UVp2dXrnhozvd/scjBjGJFTXWuyNT84ppWGWx5RpWqzadutmqVSbI9O6kRfkjz6uWh72FAD5LW2QOCp/hNR/3XwZxiRE11lsiVheWh0vSe3RlVqjafutmqVSbJ9uykRvghzauXh76HAd2+41CwjR9yMKloUVOdKfKrwvIYkYV2Z1Sp2nzqZqtWmSTbs5Ma4Yc0r14e+v4FtK2HSL8rX3//2esHiQxa7mJaUaKmOlnk3sLyOJHn7c6oUpX51M9WrTJJtmcnNcIPaV69PPT9C+gbIkNeD5eW7iZyqvU5xYia6nEiDxaWDxKZb3dGlarMp362apVJsj07qRF+SPPq5aHvX0DXLF78fn7xb+tJ1xWWpxQnaqqniNxXWB4v8rTdGVWqMp/62apVJsn27KRG+CHNq5eHfiMFdGb+5Y3F7WsiXwgpsqfIA+rTipJsqjNE7igs7y3yip25lSmaasL5ONuqoSqTrIvtWaQhtmexuv0hrVQvD32/A3qCyM/UpxUl2VRniVxTWB4m8q6lyZUqmmrC+TjbqqEqk6yL7VmkIbZnsbr9Ia1ULw/9Rgros3fmdJxVq9ZWPE/kZvVpRUk21V+LnJVfbOspm9qaXKmiqSacj7OtGqoyybrYnkUaYnsWq9sf0kr18tBvpIBWitqKT/zx0fblw0XmWZ1QvKipviKyT37xWZH9Lc+oUpX51M9WrTJJtmcnNcIPaV69PPT9C2h23eP5xbVbS0s9HyGS2Va6508QdpnIbMszihA/nzraqlU2GtuzcxrihzSnXh76/gX0cpHP5xevFjnC8oxiRf5sni/yvXBh9TbS/LrtKVWKn08dbdUqG43t2TkN8UOaUy8PfX8CuuTOO+8MDmJ4d4DI1GChbU4v6VsPp98KRU01s7i39Hoi+7XtNJFJzqbWoXI+dbhV4yfJ9uykhvghzamXh74/AX1MRN4IFu5oFhl0zDlHbZtd8VNnUysXOdXM9SI9Trvxit1FtnjH2dSKVMynHrdq/CTZnp3TGD+koXp56HsY0Mxdm+SPzFn/JmczqxA91cys5txUt62Tj8iVz6cut2r8JNmendIgP6SBenno+xjQzPIr9x3Utd9u31gcdzsHYqaaWTBpy+79PvWDejnJTfl86nOrxk+S7dkZjfJDmqmfh35jBxQAHCKgAGCIgAKAIQIKAIYIKAAYIqAAYIiAAoAhAgoAhggoABgioABgiIACgCECCgCGCCgAGCKgAGCIgAKAIQIKAIYIKAAYIqAAYIiAAoAhAgoAhggoABgioABgiIACgCECCgCGCCgAGCKgAGCIgAKAIQIKAIYIKAAYIqAAYIiAAoAhAgoAhggoABgioABgiIACgCECCgCGCCgAGCKgAGCIgAKAIQIKAIYIKAAYIqAAYIiAAoAhAgoAhggoABgi+AM/6AAAB4VJREFUoABgiIACgCECCgCGCCgAGCKgAGCIgAKAIQIKAIYIKOrL2mOnuZ4CkBQBRX1ZI4NdTwFIioDCuvcuGN662fJMZqz0Kf+nh8/dTbrsOfNhg1E3k53L1mwn2yW98XaylcFd4iOPgMK6AyVrWXtAnz3ppD/n/uHtgyTvmCWpRyWgsI+Awra/iQy64ObV7QH9rcgN4T8s31xkx3Ol/8WfENmrLe2wBBT2EVDYdrPInHDhdzf8PPjSHtDTRGa1Ba+BfniCyI/SDvvLG+4uW0NAoY2AwrYfi8wrvlwI6Jpu8rn8m0grN5c9O39HBBTaCChsiwvoP8Onnbl34SeVvL/03mKjOyKg0EZAYdex+beJCm8iTclffjUI6S8KAX3y2mtXZb/sLBMz75338aYwuH+atHXPfrue+Ur7UA9NHLlB/12Pfz53aavCa6CLzt5h/d7bnftWIaD9Zd/8Df4o8sPc0rJL9xvYtf+Oh96f/5f2gJaOCVRHQGFXfEAfF5ladhxoNqDvfVrCZ6wfFG7Y5YLcv634bGHFxeHlQkB/0Tu3uv/D8QG9t2/h7f59VoUr8gEtHxOojoDCrtcXXCBy7YIFa/MBfXPBVSIXL1iwOvN+b+n254qAHitbnjprUSbzOZGW/aedNjpbtxOCf2r7osj6R58/bS+RpvDdo3xA711PpO8BU/fpIX03igvov7qJDDnpoq8d0CxyavgvuYBWjAlUR0BhW/troOWHMc3INnLmC6UBHSjT3g+Wfi2y07PBwrxBInOzX58WGbk0WDFHZHzwNRfQNcNExgXrXx2eTW1MQLNPZqesDRae2kAGhf+SC2jFmEB1BBS2xQZ05Zjw1+ceX19QuOrOIqPChVVbyYZv5NY92CQjs1+uFbkxt2LzXlsGX3IBvU5k97CNmSV9YwP6SemV+809c5TIf4OvuYBWjAlUR0BhW2xAMx98a4PcS5BbX/lBuCIb0N+EC3eJXFS4/V7S9E4Yu/NLhs0FdFeRh/Irzo0N6F8feya/5kSRt4Kv7QEtHROojoDCtviAZjIrbvliLqE7vhJczAZ0Ubh+ekcXg7ed7sv+9r2erDfp8bUdw4YB/aA5/zt5JjwsKvZd+JwP7+1fEtCKMYHqCChsqxbQ4F34QT8/oElk++Clz52lW+4jnYdJiZuzq76ZvZJssP+Fj+aDFwZ0ociYwkir14sP6AcPzp48fruuwVhFAa0YE6iOgMK2WgEdnMn8YfPcq5E7F55Pji0N6E+CdY8d0C28MOBb4QuaYUBfFDmyfaiPxQV01TdzLxV0GTWyNKDlYwLVEVDYliCgmT+IHJYJArpZbu2h2V/bF3TIfzJpxa+n7R4Eb881mXxAV3WRvduHGlAe0IdzAW0LDon63LfufvaD4OWAkoCWjQlUR0BhW1xALzvqrEz7gfR9ZXSmKKDZ0P0lerQVtwzKPSPNvYk0uHCLTGZpxWugN+QCerfI9gvbxy0LaMmYQHUEFLbFBfR46Z9pD+gmckCmKKC3inyncPvLJk9ry2Su+e7385fniZyYKQR0X5FH8ut/3h7QwolJzsgFdKpI4SOcx5YEtGJMoDoCCtviAnqhyBuFgC7KfUSoPaArBsqA/JPGJ5pkYvbLfiIv51b8SWRmphDQm7K/fOfed1q9ZT6gm0r/3HtCb/bMBXSSyF9zN31nUElAK8YEqiOgsC0ioNcGX+8Oo5UL6Ckiv8sUBTRzvchmTwcLT22au/nZIuPDl0KX7SVyT6YQ0LXbiRy4LLvwn70Ln0TaP//sdVHwMdAgoFeLTA4HfXzH7JqXgqVcQCvGBKojoLCtPKAPi3ziph+/m8lkA3fe2iCga38gslPwrLEjoGs/JdLtCxecO349kXOCFYsGiGzwpXMuOKKXyNj2N5Fyn4Xvd+CMA/tI7/G5gF6breQBs+ec3F96NIUBXdhXZJ/Lb7rowCYZKvLF37xfCGjFmEB1BBS2lQd06Qa5szFlnsgubHSM9Jm0jciG4QffOwKaWbZ//hCmrtNzv6I/0L9wUNPY5cHlwtmYft4rt7bfAzPz5wOdmL9e0+3NucOY7mzNrehz41+CL2+0v4lUPiZQHQGFbeUBzfxhj95dBwefOHp970K/dv9X+C9FAc1kfnPk4NYBoye/Uri84nv7bdO6yaiv5N+ebz8f6Jtn77BBj22mvZEpBDRz9wFbdBEZeHcmH9DMwpNG9t5g5EXZX9e/N7Bl63c63oUvGxOojoCijrTNv/II6X7Et+av85FX/f1pPl2EdY6Aor6UnA8UqG8EFPWFgKKBEFDUFwKKBkJAUWdWvOd6BkBSBBQADBFQADBEQAHAEAEFAEMEFAAMEVAAMERAAcAQAQUAQwQUAAwRUAAwREABwBABBQBDBBQADBFQADBEQAHAEAEFAEMEFAAMEVAAMERAAcAQAQUAQwQUAAwRUAAwREABwBABBQBDBBQADBFQADBEQAHAEAEFAEMEFAAMEVAAMERAAcAQAQUAQwQUAAwRUAAwREABwBABBQBDBBQADBFQADBEQAHAEAEFAEMEFAAMEVAAMERAAcAQAQUAQwQUAAz9P3tzo0xE954QAAAAAElFTkSuQmCC" width="672" /></p>
+<p>Or perhaps we want to extract coefficients for use in a vector</p>
+<pre class="r"><code>v &lt;- fit$coefficients
+v</code></pre>
+<pre><code>##       (Intercept)       Sepal.Width Speciesversicolor  Speciesvirginica 
+##           2.25139           0.80356           1.45874           1.94682</code></pre>
+<p>In general, any object returned in R that isn’t a vector or a
+data.frame is going to be a list.</p>
+<p><strong>Question 6:</strong></p>
+<ol style="list-style-type: decimal">
+<li>Using the <code>college</code> dataset, create a 2 way table with
+the variables <code>Type</code> and <code>Region</code></li>
+<li>Use the <code>chisq.test()</code> function to test the hypothesis
+that these variables are independent</li>
+<li>Using list constructs, extract the expected values under independent
+and save it to an object. Recreate the <span class="math inline">\(\chi^2\)</span> test statistic using the tables of
+observed and expected values (note: in the same way we can add two
+vectors of the same length, we can do the same with matrices. This idea
+extends to many arithmetical operations)</li>
+</ol>
+<p><strong>Formula:</strong></p>
+<p><span class="math display">\[
+\chi^2 = \sum_{i=1} \frac{(\text{Observed}_i -
+\text{Expected}_i)^2}{\text{Expected}_i}
+\]</span></p>
+<pre class="r"><code>college &lt;- read.csv(&quot;https://collinn.github.io/data/college2019.csv&quot;)</code></pre>
+<p><strong>Question 7:</strong> Just like the output of
+<code>lm()</code> creates a list object, so too does a summary
+object</p>
+<pre class="r"><code>ss &lt;- summary(fit)
+typeof(ss)</code></pre>
+<pre><code>## [1] &quot;list&quot;</code></pre>
+<p>Given a a linear model and a Type I error rate alpha, write a
+function that returns how many predictors are significant at a given
+alpha level. It should work like this:</p>
+<pre class="r"><code>## Some fitted model
+fit &lt;- lm(Sepal.Length ~ Sepal.Width + Species, data = iris)
+
+## We see 4 covariates (including intercept) have p &lt; alpha
+summary(fit)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Sepal.Length ~ Sepal.Width + Species, data = iris)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1.3071 -0.2571 -0.0533  0.1954  1.4125 
+## 
+## Coefficients:
+##                   Estimate Std. Error t value             Pr(&gt;|t|)    
+## (Intercept)          2.251      0.370    6.09      0.0000000095681 ***
+## Sepal.Width          0.804      0.106    7.56      0.0000000000042 ***
+## Speciesversicolor    1.459      0.112   13.01 &lt; 0.0000000000000002 ***
+## Speciesvirginica     1.947      0.100   19.47 &lt; 0.0000000000000002 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.438 on 146 degrees of freedom
+## Multiple R-squared:  0.726,  Adjusted R-squared:  0.72 
+## F-statistic:  129 on 3 and 146 DF,  p-value: &lt;0.0000000000000002</code></pre>
+<pre class="r"><code>countsig(fit, alpha = 0.05)</code></pre>
+<pre><code>## [1] 4</code></pre>
+<p>Verify your function works by checking it on the following models.
+That is, your solution should include the code for your function and
+verification that it returns the same values with the arguments
+given</p>
+<pre class="r"><code>## Has one significant at alpha = 0.05
+fit1 &lt;- lm(circumference ~ age, data = Orange)
+
+## Has one significant at alpha = 0.05 and two significant at alpha = 0.1
+fit2 &lt;- lm(Murder ~ Assault + UrbanPop, data = USArrests)
+
+## Only two sig at 0.05
+fit3 &lt;- lm(mpg ~ disp + hp + wt + qsec, data = mtcars)
+
+
+## You function should take these arguments and return the same values
+countsig(fit1, alpha = 0.05)</code></pre>
+<pre><code>## [1] 1</code></pre>
+<pre class="r"><code>countsig(fit2, alpha = 0.1)</code></pre>
+<pre><code>## [1] 3</code></pre>
+<pre class="r"><code>countsig(fit3, alpha = 0.2)</code></pre>
+<pre><code>## [1] 2</code></pre>
+</div>
+</div>
+<div id="functionals" class="section level1">
+<h1>Functionals</h1>
+<p>A <em>functional</em> is a special type of function in R in that,
+rather than simply taking data arguments, it can also take other
+functions. The utility of this comes when we remember the purpose of
+writing functions: generalize our ideas and avoid repetitive
+copy-and-pasting.</p>
+<p>R comes with a number of functionals built-in, with two classes in
+particular worth considering here. The first is the *apply family of
+functions, with the second being a common set across functional
+programming languages</p>
+<div id="apply-family" class="section level2">
+<h2>*apply Family</h2>
+<p>The *apply family of functions in R is a collection of functions
+that, broadly, take two arguments: a list or vector to iterate over and
+a function. This makes them similar to loops in a number of ways (in
+fact, any apply functional can be written as a loop). The first of these
+we will introduce is <code>lapply()</code> or “list” apply. This works
+by taking a vector and a function, applying the function to each element
+of the vector, then returning a list of values</p>
+<pre class="r"><code>knitr::include_graphics(&quot;lapply.png&quot;)</code></pre>
+<p><img role="img" src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+<p>You can see the argument syntax with <code>?lapply</code>. The first
+argument will be a list or vector, the second will be a function,
+typically with one argument, that takes each element of the vector. Note
+that if I am passing in a function with a name, I simply give the name
+as the argument (no parenthesis or other arguments)</p>
+<pre class="r"><code>lapply(1:5, sqrt)</code></pre>
+<pre><code>## [[1]]
+## [1] 1
+## 
+## [[2]]
+## [1] 1.4142
+## 
+## [[3]]
+## [1] 1.7321
+## 
+## [[4]]
+## [1] 2
+## 
+## [[5]]
+## [1] 2.2361</code></pre>
+<p>If we are using a function that takes more than two arguments by
+default, we can pass them in following the function (note in the
+documentation, this ability is represented with the <code>...</code>
+argument, but we need not worry about that for now)</p>
+<pre class="r"><code>lapply(1:5, paste, &quot;X&quot;)</code></pre>
+<pre><code>## [[1]]
+## [1] &quot;1 X&quot;
+## 
+## [[2]]
+## [1] &quot;2 X&quot;
+## 
+## [[3]]
+## [1] &quot;3 X&quot;
+## 
+## [[4]]
+## [1] &quot;4 X&quot;
+## 
+## [[5]]
+## [1] &quot;5 X&quot;</code></pre>
+<p>More commonly, though, we are writing <em>anonymous functions</em>
+for use with lapply. An anonymous function is simply a function without
+a name and works identically to how we wrote functions above</p>
+<pre class="r"><code>lapply(1:5, function(x) x^2)</code></pre>
+<pre><code>## [[1]]
+## [1] 1
+## 
+## [[2]]
+## [1] 4
+## 
+## [[3]]
+## [1] 9
+## 
+## [[4]]
+## [1] 16
+## 
+## [[5]]
+## [1] 25</code></pre>
+<p>The key idea with <code>lapply</code> is that, by returning a list of
+objects, we are able to perform useful functions that can have
+complicated return values. For example, lapply on a list of file names
+will give us a list of data.frames</p>
+<pre class="r"><code>## Grab the first 3
+ff &lt;- list.files(&quot;fundir/sim/&quot;, full.names = TRUE)[1:3]
+
+df_list &lt;- lapply(ff, read.csv)
+df_list</code></pre>
+<pre><code>## [[1]]
+##          V1
+## 1  -1.36856
+## 2   0.46344
+## 3   1.87452
+## 4  -0.25650
+## 5  -1.41324
+## 6   0.83684
+## 7  -0.15509
+## 8   0.15707
+## 9   0.19777
+## 10 -0.43873
+## 
+## [[2]]
+##           V1
+## 1   0.064383
+## 2   0.645119
+## 3   1.172006
+## 4  -1.047275
+## 5  -0.263830
+## 6  -1.964384
+## 7   2.731564
+## 8   0.056206
+## 9  -0.041927
+## 10  3.738920
+## 
+## [[3]]
+##           V1
+## 1  -0.536709
+## 2  -1.460844
+## 3   1.016002
+## 4   0.683450
+## 5  -0.126251
+## 6  -2.793817
+## 7   0.227314
+## 8  -1.306102
+## 9  -0.865014
+## 10  0.072594</code></pre>
+<p>It is an exceptionally common task to call lapply on a list of
+data.frames. For example, we may want to verify that each of our
+individual data.frames has exactly 10 observations</p>
+<pre class="r"><code>lapply(df_list, function(x) nrow(x) == 10)</code></pre>
+<pre><code>## [[1]]
+## [1] TRUE
+## 
+## [[2]]
+## [1] TRUE
+## 
+## [[3]]
+## [1] TRUE</code></pre>
+<p>As a quick note, we can always “unlist” an object with the use of
+<code>unlist()</code></p>
+<pre class="r"><code>v &lt;- lapply(1:5, function(x) x^2)
+unlist(v)</code></pre>
+<pre><code>## [1]  1  4  9 16 25</code></pre>
+<p><strong>Question 7:</strong> Rewrite your loop from Question 4 of the
+previous lab so that it uses <code>lapply()</code> instead.</p>
+<p><strong>Question 8:</strong> Look at the documentation for
+<code>lapply()</code>. How is <code>sapply()</code> different? The code
+below is not run, but you can use it to investigate. Can you perform the
+same task with <code>vapply()</code>? See examples in the documentation
+if you get stuck</p>
+<pre class="r"><code>## Create list of data
+df_list &lt;- lapply(1:5, function(x) {
+  data.frame(x = rnorm(10), 
+             y = rnorm(10))
+})
+
+lapply(df_list, function(df) {
+  cor(df$x, df$y)
+})
+
+lapply(df_list, function(df) {
+  cor(df$x, df$y)
+})</code></pre>
+<p><strong>Question 9:</strong> The <code>apply()</code> function is
+slightly different than the the rest of the *apply family in that rather
+than taking a vector or list of objects, it operates on a matrix (a
+matrix is similar to a data.frame with the exception that all of the
+entries must be of the same type e.g., numeric or character). Use
+<code>apply()</code> to verify the row and column sums given below.</p>
+<pre class="r"><code>set.seed(123)
+m &lt;- matrix(rnorm(25), nrow = 5)
+
+## Verify these values with apply
+rowSums(m)</code></pre>
+<pre><code>## [1]  3.09776  0.87043 -2.29820 -0.53320 -1.97005</code></pre>
+<pre class="r"><code>colSums(m)</code></pre>
+<pre><code>## [1]  0.96785 -0.22159  1.53951  0.54671 -3.66573</code></pre>
+</div>
+<div id="common-functionals-in-the-wild" class="section level2">
+<h2>Common Functionals in the Wild</h2>
+<p>The next set of functionals worth knowing are Reduce, Filter, Map,
+and Negate. You can see all of their documentation at once by viewing
+<code>?Reduce</code>. The most commonly used of these is
+<code>Reduce()</code>, which iteratively applies a binary function (a
+function with two arguments) to elements of a list or vector, with the
+option to include each of the intermediate steps. This, for example, is
+useful in computing a cumulative sum:</p>
+<pre class="r"><code>Reduce(f = sum, x = 1:5, accumulate = TRUE)</code></pre>
+<pre><code>## [1]  1  3  6 10 15</code></pre>
+<p>Without accumulate, it simply returns the last element, in this case,
+the sum of the vector</p>
+<pre class="r"><code>Reduce(sum, 1:5)</code></pre>
+<pre><code>## [1] 15</code></pre>
+<p>More usefully, <code>Reduce()</code> can be used to join a list of
+data.frames into a larger one</p>
+<pre class="r"><code>library(dplyr)
+
+df_list &lt;- lapply(LETTERS[1:3], function(val) {
+  data.frame(group = val, 
+             x = rnorm(5), 
+             y = rnorm(5))
+})
+
+df_list</code></pre>
+<pre><code>## [[1]]
+##   group        x        y
+## 1     A -1.68669  0.42646
+## 2     A  0.83779 -0.29507
+## 3     A  0.15337  0.89513
+## 4     A -1.13814  0.87813
+## 5     A  1.25381  0.82158
+## 
+## [[2]]
+##   group         x        y
+## 1     B  0.688640 -0.69471
+## 2     B  0.553918 -0.20792
+## 3     B -0.061912 -1.26540
+## 4     B -0.305963  2.16896
+## 5     B -0.380471  1.20796
+## 
+## [[3]]
+##   group         x         y
+## 1     C -1.123109  0.253319
+## 2     C -0.402885 -0.028547
+## 3     C -0.466655 -0.042870
+## 4     C  0.779965  1.368602
+## 5     C -0.083369 -0.225771</code></pre>
+<pre class="r"><code>Reduce(full_join, df_list)</code></pre>
+<pre><code>##    group         x         y
+## 1      A -1.686693  0.426464
+## 2      A  0.837787 -0.295071
+## 3      A  0.153373  0.895126
+## 4      A -1.138137  0.878133
+## 5      A  1.253815  0.821581
+## 6      B  0.688640 -0.694707
+## 7      B  0.553918 -0.207917
+## 8      B -0.061912 -1.265396
+## 9      B -0.305963  2.168956
+## 10     B -0.380471  1.207962
+## 11     C -1.123109  0.253319
+## 12     C -0.402885 -0.028547
+## 13     C -0.466655 -0.042870
+## 14     C  0.779965  1.368602
+## 15     C -0.083369 -0.225771</code></pre>
+<p>Finally we briefly introduce <code>Map()</code> which works like
+<code>lapply</code> but is able to take any number of arguments. This is
+useful when we want to apply over several lists in sequence. Like
+<code>lapply()</code>, the return object is a list</p>
+<pre class="r"><code>a &lt;- 1:5
+b &lt;- 6:10
+c &lt;- 11:15
+
+## Here a -&gt; x, b -&gt; y, and c -&gt; z
+Map(function(x, y, z) {
+  (y - z)^x
+}, a, b, c)</code></pre>
+<pre><code>## [[1]]
+## [1] -5
+## 
+## [[2]]
+## [1] 25
+## 
+## [[3]]
+## [1] -125
+## 
+## [[4]]
+## [1] 625
+## 
+## [[5]]
+## [1] -3125</code></pre>
+<pre class="r"><code>## Though for simple vectors, we can still often do directly without functionals
+(b-c)^a</code></pre>
+<pre><code>## [1]    -5    25  -125   625 -3125</code></pre>
+<p><strong>Question 10:</strong> AHHHH</p>
+</div>
 </div>
 
 
