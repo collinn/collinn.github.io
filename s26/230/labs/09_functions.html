@@ -1489,7 +1489,7 @@ pre-packaged snippets of code that assist in performing common or
 repetitive tasks. While many functions are provided by R or R packages
 (including nearly everything we have done), there are often times where
 we wish to construct our own. The goal of this lab is to introduce the
-components of functinos in R as well as illustrate how to create them
+components of functions in R as well as illustrate how to create them
 ourselves.</p>
 </div>
 <div id="functions" class="section level1">
@@ -1545,7 +1545,7 @@ sum_of_squares</code></pre>
 ## {
 ##     x^2 + y^2
 ## }
-## &lt;bytecode: 0x6430cb679ff0&gt;</code></pre>
+## &lt;bytecode: 0x5e8ecfb66f70&gt;</code></pre>
 <p><strong>Question 1:</strong> For this question, we will use two
 separate datasets. You may also consider the R functions
 <code>?table()</code> and <code>?sort()</code></p>
@@ -2145,9 +2145,11 @@ individual data.frames has exactly 10 observations</p>
 <pre class="r"><code>v &lt;- lapply(1:5, function(x) x^2)
 unlist(v)</code></pre>
 <pre><code>## [1]  1  4  9 16 25</code></pre>
-<p><strong>Question 7:</strong> Rewrite your loop from Question 4 of the
-previous lab so that it uses <code>lapply()</code> instead.</p>
-<p><strong>Question 8:</strong> Look at the documentation for
+<p><strong>Question 8:</strong> Rewrite your loop from Question 4 of the
+previous lab so that it uses <code>lapply()</code> instead. (Note: You
+might wait until reviewing the <code>Reduce()</code> below for a trick
+on completing this more efficiently)</p>
+<p><strong>Question 9:</strong> Look at the documentation for
 <code>lapply()</code>. How is <code>sapply()</code> different? The code
 below is not run, but you can use it to investigate. Can you perform the
 same task with <code>vapply()</code>? See examples in the documentation
@@ -2165,7 +2167,7 @@ lapply(df_list, function(df) {
 lapply(df_list, function(df) {
   cor(df$x, df$y)
 })</code></pre>
-<p><strong>Question 9:</strong> The <code>apply()</code> function is
+<p><strong>Question 10:</strong> The <code>apply()</code> function is
 slightly different than the the rest of the *apply family in that rather
 than taking a vector or list of objects, it operates on a matrix (a
 matrix is similar to a data.frame with the exception that all of the
@@ -2195,7 +2197,7 @@ useful in computing a cumulative sum:</p>
 the sum of the vector</p>
 <pre class="r"><code>Reduce(sum, 1:5)</code></pre>
 <pre><code>## [1] 15</code></pre>
-<p>More usefully, <code>Reduce()</code> can be used to join a list of
+<p>An extremely common use of <code>Reduce()</code> is to join a list of
 data.frames into a larger one</p>
 <pre class="r"><code>library(dplyr)
 
@@ -2247,8 +2249,9 @@ df_list</code></pre>
 ## 14     C  0.779965  1.368602
 ## 15     C -0.083369 -0.225771</code></pre>
 <p>Finally we briefly introduce <code>Map()</code> which works like
-<code>lapply</code> but is able to take any number of arguments. This is
-useful when we want to apply over several lists in sequence. Like
+<code>lapply</code> but is able to take any number of arguments (see the
+documentation for how the arguments are used). This is useful when we
+want to apply over several lists in sequence. Like
 <code>lapply()</code>, the return object is a list</p>
 <pre class="r"><code>a &lt;- 1:5
 b &lt;- 6:10
@@ -2275,7 +2278,6 @@ Map(function(x, y, z) {
 <pre class="r"><code>## Though for simple vectors, we can still often do directly without functionals
 (b-c)^a</code></pre>
 <pre><code>## [1]    -5    25  -125   625 -3125</code></pre>
-<p><strong>Question 10:</strong> AHHHH</p>
 </div>
 </div>
 
