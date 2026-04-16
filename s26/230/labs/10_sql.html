@@ -11,7 +11,7 @@
 
 
 
-<title>STA 230 Intro to Data Science (Spring 2026)</title>
+<title>Lab 10 – Structured Query Langauge (SQL)</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1477,243 +1477,444 @@ border-radius: 0px;
 
 
 
-<h1 class="title toc-ignore">STA 230 Intro to Data Science (Spring
-2026)</h1>
+<h1 class="title toc-ignore">Lab 10 – Structured Query Langauge
+(SQL)</h1>
 
 </div>
 
 
-<p><span class="math inline">\(~\)</span></p>
-<p>Last updated: Thu Apr 16 2026, 08:16</p>
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- |  |  |  |  | -->
-<!-- |  |  |  |  | -->
-<!-- |  |  |  |  | -->
-<div id="syllabus" class="section level1">
-<h1>Syllabus</h1>
-<p>Welcome to the course website for STA 230, Introduction to Data
-Science. To begin, you can find the course syllabus linked below:</p>
-<ul>
-<li><a href="syllabus230s26.html">Click here</a> to view the course
-syllabus</li>
-</ul>
-<p>You can locate course content by scrolling, or by using the
-navigation bar in the upper left.</p>
-<p>Ahead on your labs? Try working through the 1st Edition of <a href="http://adv-r.had.co.nz/">Advanced R</a>, an excellent resource for
-learning R as a programming language rather than simply a tool for data
-analysis</p>
-<hr />
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>This lab serves as an introduction to SQL (Structured Query Language)
+and how SQL is often implemented in R</p>
+<p>Data are often stored in <em>databases</em>, or organized collections
+of structured information (data). Most databases are a collection of
+tables of data like those we’ve been working with so far in class. For
+this class, and most applications in general, we will work with
+<em>Relational Databases</em>. A system that manages a relational
+database is known (surprisingly) as an relational database management
+system (RDBMS). I bring this up only because you will see the term RDBMS
+thrown around a lot in SQL-land.</p>
+<p>The essential component of a <em>Relational Database</em> is its
+<em>relational structure</em>. A Relational Database consists of a
+number of tables. Each Table consists of columns of attributes and
+unique rows of information. Tables may have a “Primary Key” which is a
+unique identifier. They may also have “Foreign Keys” which are keys that
+can be used to match to other tables. It is best practice that the first
+column be the Primary Key if it exists.</p>
+<p>The combination of a Primary and Foreign Key is a <em>relation</em>
+and where the name comes from. The tables can be related to each other
+to store, access, and modify data more efficiently.</p>
+<p>In effect, this will work nearly identically to our <a href="https://collinn.github.io/s26/230/labs/05_joins.html">joins
+lab</a>, where instead of having the data stored locally, it will be
+kept (and processed) on an RDBMS server, and instead of
+<code>dplyr</code>, we will be using syntax from SQL.</p>
+<p>Copy and run the line below in your console (do <em>not</em> put in
+your Rmd file) to install the packages necessary for this lab:</p>
+<pre class="r"><code>install.packages(c(&quot;DBI&quot;, &quot;odbc&quot;, &quot;RMySQL&quot;, &quot;dbplyr&quot;))</code></pre>
 </div>
-<div id="course-materials" class="section level1">
-<h1>Course Materials</h1>
-<div id="labs" class="section level2">
-<h2>Labs</h2>
-<table>
-<colgroup>
-<col width="19%" />
-<col width="16%" />
-<col width="32%" />
-<col width="32%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Slides</th>
-<th align="left">Lab</th>
-<th align="left">Due Date</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Tue 1/19</td>
-<td align="left"><a href="lectures/intro.pdf">Introduction</a></td>
-<td align="left"><a href="labs/01_introduction.html">Introduction</a></td>
-<td align="left">1/29 at 10pm</td>
-</tr>
-<tr class="even">
-<td align="left">Thur 1/21</td>
-<td align="left"></td>
-<td align="left"><a href="labs/02_ggplot.html">ggplot</a></td>
-<td align="left">(see next)</td>
-</tr>
-<tr class="odd">
-<td align="left">Tue 1/27</td>
-<td align="left"></td>
-<td align="left"><a href="labs/02_ggscales.html">ggplot2
-(cont.)</a></td>
-<td align="left">2/3 at 10pm</td>
-</tr>
-<tr class="even">
-<td align="left">Thur 1/29</td>
-<td align="left"></td>
-<td align="left"><a href="labs/03_dplyr.html">dplyr</a></td>
-<td align="left">2/5 at 10pm</td>
-</tr>
-<tr class="odd">
-<td align="left">Tue 2/3</td>
-<td align="left"></td>
-<td align="left"><a href="labs/04_tidyr.html">tidyr</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Thur 2/5</td>
-<td align="left"><a href="resources/pivot_summary.pdf">Pivot Visual
-Aid</a></td>
-<td align="left"><a href="labs/04_tidyr.html">tidyr cont.</a></td>
-<td align="left">2/10 at 10pm</td>
-</tr>
-<tr class="odd">
-<td align="left">Tue 2/10</td>
-<td align="left"><a href="lectures/joins.pdf">Joins</a></td>
-<td align="left"><a href="labs/05_joins.html">Joins</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Thur 2/12</td>
-<td align="left"></td>
-<td align="left"><a href="labs/05_joins.html">Joins</a></td>
-<td align="left">2/17 at 10pm</td>
-</tr>
-<tr class="odd">
-<td align="left">Thur 2/19</td>
-<td align="left"><a href="lectures/strings.pdf">Strings and
-Regex</a></td>
-<td align="left"><a href="labs/06_stringr.html">Strings + Regex</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Tue 2/24</td>
-<td align="left"></td>
-<td align="left">Continue Strings</td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Thur 2/26</td>
-<td align="left"></td>
-<td align="left"><a href="labs/07_dates.html">Date and Time</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Tue 3/3</td>
-<td align="left"><a href="lectures/dates.pdf">Date and Time</a></td>
-<td align="left"><a href="labs/07_dates.html">Date and Time</a></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Thur 3/5</td>
-<td align="left"></td>
-<td align="left"><a href="https://grinnell.co1.qualtrics.com/jfe/form/SV_3TQYM3QKrHMzpga">Course
-Survey!</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Spring Break</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Tue 3/24</td>
-<td align="left"><a href="lectures/files.pdf">Files and Loops</a></td>
-<td align="left"><a href="labs/08_files_loops.html">Loops and Files and
-Conditionals</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Tue 3/31</td>
-<td align="left">Functions and Functionals</td>
-<td align="left"><a href="labs/09_functions.html">Functions and
-Functionals</a></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Tue 4/7</td>
-<td align="left"></td>
-<td align="left"><a href="project/pregnancy.html">Data Processing
-Project</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Thur 4/16</td>
-<td align="left"></td>
-<td align="left"><a href="labs/10_sql.html">SQL Lab</a></td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<p>On deck:</p>
+<div id="lab" class="section level1">
+<h1>Lab</h1>
+<pre class="r"><code>library(DBI)
+library(odbc)
+library(RMySQL)
+library(tidyverse)
+library(dbplyr)</code></pre>
+<p>We start by establishing a connection to an active RDBMS server
+hosted here on Grinnell’s campus (note: you must be on campus wi-fi to
+do this). We can name this connection whatever we want (in this case, we
+call it <code>con</code>), and all of our SQL operations will be
+performed in the context of this connection.</p>
+<pre class="r"><code>con &lt;- dbConnect(
+  MySQL(),
+  dbname   = &quot;STA230&quot;,
+  host     = &quot;aiken.cs.grinnell.edu&quot;,
+  port     = 3306,
+  user     = &quot;student&quot;,
+  password = &quot;password!&quot;
+)</code></pre>
+<p>Once we have finished working with our connection, it’s good practice
+to disconnect using</p>
+<pre class="r"><code>## Don&#39;t run this until you&#39;re finished
+dbDisconnect(con)</code></pre>
+<p>There are only two functions we’ll need today:
+<code>dbListTables()</code>, which will list all of the tables in our
+relational database and <code>dbGetQuery()</code> which will execute a
+query on the SQL server. We’ll start with the former, showing us which
+tables we have to work with, passing in the connection we have already
+established</p>
+<pre class="r"><code>dbListTables(con)</code></pre>
+<pre><code>##  [1] &quot;Iowa_homes_1&quot;       &quot;Iowa_homes_2&quot;       &quot;Police_shootings_1&quot;
+##  [4] &quot;Police_shootings_2&quot; &quot;course&quot;             &quot;course_offering&quot;   
+##  [7] &quot;courses&quot;            &quot;customers&quot;          &quot;enrollments&quot;       
+## [10] &quot;office_hour&quot;        &quot;orders&quot;             &quot;professor_info&quot;    
+## [13] &quot;students&quot;           &quot;syllabus_info&quot;</code></pre>
+<p>This is a poor example of what a relational database may look like in
+real life, as they contain a number of tables that have nothing to do
+with each other. However, they’ll serve for the time being. For our
+illustrations, we will continue using two of these tables,
+<code>customers</code> and <code>orders</code>.</p>
+<div id="cheat-sheet" class="section level2">
+<h2>Cheat Sheet</h2>
+<p>Here is a helpful <a href="https://www.geeksforgeeks.org/sql/sql-cheat-sheet/">reference
+sheet</a> for common queries and commands in SQL. A short list (without
+examples) is also given below</p>
 <ul>
-<li>Web scrapping and API</li>
-<li>Shiny</li>
+<li>SQL Queries:
+<ul>
+<li>SELECT: retrieve data</li>
+<li>*: Wildcard, everything
+<ul>
+<li>Example: SELECT * FROM employees;</li>
+<li>This returns all columns and all values from the employees
+table</li>
+</ul></li>
+<li>DISTINCT: unique values from a column
+<ul>
+<li>Example: SELECT DISTINCT department FROM employees;</li>
+<li>This returns the distinct departments in the employees table</li>
+</ul></li>
+<li>WHERE: filter on conditions</li>
+<li>LIMIT: limit return size</li>
+<li>CASE: conditional logic</li>
+</ul></li>
+<li>Filters:
+<ul>
+<li>WHERE: filter rows on conditions</li>
+<li>LIKE: Match a pattern in a column</li>
+<li>IN: match any value in a list</li>
+<li>Between: Values in a specified range</li>
+<li>IS NULL: null values</li>
+<li>ORDER BY: Sort</li>
+<li>AND/OR/NOT can be used in Where</li>
+</ul></li>
+<li>Aggregation:
+<ul>
+<li>GROUP BY: group rows with same values</li>
+<li>COUNT: count the values in a column</li>
+<li>SUM: sum the values of a column</li>
+<li>AVG: average the values</li>
+<li>MIN: find minimum value</li>
+<li>MAX: find max value</li>
+<li>HAVING: filter on conditions</li>
+</ul></li>
+<li>Sorting:
+<ul>
+<li>ORDER BY: sorts the output by the column(s) of interest.</li>
+<li>default is ascending, use DESC to descend.</li>
+</ul></li>
 </ul>
 </div>
-<div id="homework" class="section level2">
-<h2>Homework</h2>
-<table style="width:100%;">
-<colgroup>
-<col width="28%" />
-<col width="23%" />
-<col width="47%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Reading</th>
-<th align="left">Assignment</th>
-<th align="left">Due Date</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left"><a href="https://r4ds.hadley.nz/">R4DS</a>
-Introduction, Ch 1-3</td>
-<td align="left"><a href="hw/hw1.html">Homework 1</a></td>
-<td align="left">Thur 1/29 at 10pm</td>
-</tr>
-<tr class="even">
-<td align="left"><a href="https://r4ds.hadley.nz/">R4DS</a> 4, 5,
-19</td>
-<td align="left"><a href="hw/hw2.html">Homework 2</a></td>
-<td align="left">Thur 2/12 at 10pm</td>
-</tr>
-<tr class="odd">
-<td align="left"><a href="https://r4ds.hadley.nz/">R4DS</a> 12-18</td>
-<td align="left"><a href="hw/hw3.html">Homework 3</a></td>
-<td align="left">Thur 3/5 at 10pm</td>
-</tr>
-<tr class="even">
-<td align="left">None</td>
-<td align="left"><a href="hw/hw4.html">Homework 4</a></td>
-<td align="left">Thur 4/7 at 10pm</td>
-</tr>
-</tbody>
-</table>
+<div id="basic-queries" class="section level2">
+<h2>Basic Queries</h2>
+<p>Let’s begin by getting some basic information from one of our tables.
+We do this with the SQL command <code>DESCRIBE</code>. All we need to do
+this is the name of the connection and the table we wish to
+describe:</p>
+<pre class="r"><code>dbGetQuery(con, &quot;DESCRIBE orders&quot;)</code></pre>
+<pre><code>##       Field       Type Null Key Default Extra
+## 1 row_names       text  YES        &lt;NA&gt;      
+## 2     order bigint(20)  YES        &lt;NA&gt;      
+## 3        id bigint(20)  YES        &lt;NA&gt;      
+## 4      date       text  YES        &lt;NA&gt;</code></pre>
+<p>This returns a collection of column names (Field) and the type of
+value (Type). The (Null) column indicates if a column is allowed to
+contain null values (yes by default), (Key) if a key has been
+established in the RBDMS (it hasn’t), (Default) describes how new data
+is handled when adding rows (we don’t need this now), and (Extra)
+describes extra attributes a column may have (also not needed). In any
+event, we see we have four columns, two of type text and two of type
+integer.</p>
+<p>We can run a query and return a data.frame using the syntax
+<code>SELECT [something] FROM [table name]</code>. The
+<code>[something]</code> can be a comma separated list of variables
+names or we can use <code>*</code> to select them all</p>
+<pre class="r"><code>## Select all columns from orders table
+dbGetQuery(con, &quot;SELECT * FROM orders&quot;)</code></pre>
+<pre><code>##   row_names order id   date
+## 1         1     1  4 Jan-01
+## 2         2     2  8 Feb-01
+## 3         3     3 42 Apr-15
+## 4         4     4 50 Apr-17
+## 5         5    11  4 Apr-18
+## 6         6    12  8 Feb-11
+## 7         7    13 42 Jul-15
+## 8         8    14 50 Jun-17</code></pre>
+<pre class="r"><code>## Select date and id from orders table
+dbGetQuery(con, &quot;SELECT date, id FROM orders&quot;)</code></pre>
+<pre><code>##     date id
+## 1 Jan-01  4
+## 2 Feb-01  8
+## 3 Apr-15 42
+## 4 Apr-17 50
+## 5 Apr-18  4
+## 6 Feb-11  8
+## 7 Jul-15 42
+## 8 Jun-17 50</code></pre>
+<p>We can run into problems, though, if we have column names that are
+associated with SQL commands. For example, <code>ORDER</code> is a
+command in SQL as well as a name in this table. If I try to select it,
+I’ll get an error</p>
+<pre class="r"><code>## Select order from orders table
+dbGetQuery(con, &quot;SELECT order FROM orders&quot;)</code></pre>
+<pre><code>## Error in dbSendQuery(conn, statement, ...): could not run statement: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near &#39;order FROM orders&#39; at line 1</code></pre>
+<p>Again, because SQL is case insensitive, the fact we have
+<code>order</code> in lowercase doesn’t matter. We can get around this
+by specifying from which table we want to grab the <code>order</code>
+variable from the table <code>orders</code> using a <code>.</code> with
+the syntax <code>TABLE.VAR_NAME</code></p>
+<pre class="r"><code>## Select order from orders table
+dbGetQuery(con, &quot;SELECT orders.order FROM orders&quot;)</code></pre>
+<pre><code>##   order
+## 1     1
+## 2     2
+## 3     3
+## 4     4
+## 5    11
+## 6    12
+## 7    13
+## 8    14</code></pre>
+<p>I can combine queries with different filtering functions, though the
+order matters. For example, to get distinct IDs from the order list, I
+would use</p>
+<pre class="r"><code>dbGetQuery(con, &quot;SELECT DISTINCT id FROM orders&quot;)</code></pre>
+<pre><code>##   id
+## 1  4
+## 2  8
+## 3 42
+## 4 50</code></pre>
+<p>whereas to put a proper filter on this, I would use
+<code>WHERE</code></p>
+<pre class="r"><code>dbGetQuery(con, &quot;SELECT * FROM orders WHERE id&lt;10&quot;)</code></pre>
+<pre><code>##   row_names order id   date
+## 1         1     1  4 Jan-01
+## 2         2     2  8 Feb-01
+## 3         5    11  4 Apr-18
+## 4         6    12  8 Feb-11</code></pre>
+<p>We can select from a list of values using <code>IN</code> syntax,
+where the list is a parenthetical comma separated list</p>
+<pre class="r"><code>dbGetQuery(con, &quot;SELECT * FROM orders WHERE id IN (4, 8, 42)&quot;)</code></pre>
+<pre><code>##   row_names order id   date
+## 1         1     1  4 Jan-01
+## 2         2     2  8 Feb-01
+## 3         3     3 42 Apr-15
+## 4         5    11  4 Apr-18
+## 5         6    12  8 Feb-11
+## 6         7    13 42 Jul-15</code></pre>
+<p><strong>Problem 1:</strong> First, display the variables that are
+available in the <code>customers</code> table. Return the
+<code>id</code> and <code>name</code> columns in all instances where the
+row names are less than 4</p>
 </div>
-<div id="solutions" class="section level2">
-<h2>Solutions</h2>
-<div id="homework-1" class="section level3">
-<h3>Homework</h3>
+<div id="joins-and-aliasing" class="section level2">
+<h2>Joins and Aliasing</h2>
+<p>One of the most common operations when working with SQL and tables is
+to perform a join. Joins are called using <code>JOIN</code> and
+<code>ON</code> to tell us what type of join we wish and how we want to
+match them</p>
+<pre class="r"><code>dbGetQuery(con, &quot;SELECT * from orders
+           LEFT JOIN customers ON orders.id = customers.id&quot;)</code></pre>
+<pre><code>##   row_names order id   date row_names id    name
+## 1         1     1  4 Jan-01         1  4   Tukey
+## 2         5    11  4 Apr-18         1  4   Tukey
+## 3         2     2  8 Feb-01         2  8 Wickham
+## 4         6    12  8 Feb-11         2  8 Wickham
+## 5         3     3 42 Apr-15         6 42     Cox
+## 6         7    13 42 Jul-15         6 42     Cox
+## 7         4     4 50 Apr-17      &lt;NA&gt; NA    &lt;NA&gt;
+## 8         8    14 50 Jun-17      &lt;NA&gt; NA    &lt;NA&gt;</code></pre>
+<p>Ok, what’s happening here:</p>
 <ul>
-<li><a href="solutions/hw1_solutions.pdf">Homework 1</a></li>
-<li><a href="solutions/hw2_solutions.pdf">Homework 2</a></li>
-<li><a href="solutions/hw3_solutions.pdf">Homework 3</a></li>
-<li><a href="solutions/hw4_solutions.pdf">Homework 4</a></li>
+<li><code>orders.id = customers.id</code> tells us which variables from
+which table with the <code>table.varname</code> syntax</li>
+<li><code>LEFT JOIN</code> tells us left join</li>
+<li>Because we used <code>SELECT *</code> we are retaining all columns
+from both tables. Probably not what we want</li>
 </ul>
-</div>
-<div id="labs-1" class="section level3">
-<h3>Labs</h3>
+<p>If all I want is the customer name from the customers table, I need
+to specify that I want everything from orders and only the customer name
+form customers. That would look something like this</p>
+<pre class="r"><code>dbGetQuery(con, &quot;SELECT orders.*, customers.name FROM orders
+           LEFT JOIN customers ON orders.id = customers.id&quot;)</code></pre>
+<pre><code>##   row_names order id   date    name
+## 1         1     1  4 Jan-01   Tukey
+## 2         5    11  4 Apr-18   Tukey
+## 3         2     2  8 Feb-01 Wickham
+## 4         6    12  8 Feb-11 Wickham
+## 5         3     3 42 Apr-15     Cox
+## 6         7    13 42 Jul-15     Cox
+## 7         4     4 50 Apr-17    &lt;NA&gt;
+## 8         8    14 50 Jun-17    &lt;NA&gt;</code></pre>
+<p>It is no problem, then, to combine this with things we covered
+previously. For example, let’s take this join and only keep those with
+row_names less than 7</p>
+<pre class="r"><code>dbGetQuery(con, &quot;SELECT orders.*, customers.name FROM orders
+           LEFT JOIN customers ON orders.id = customers.id
+           WHERE orders.row_names&lt;7&quot;)</code></pre>
+<pre><code>##   row_names order id   date    name
+## 1         1     1  4 Jan-01   Tukey
+## 2         5    11  4 Apr-18   Tukey
+## 3         2     2  8 Feb-01 Wickham
+## 4         6    12  8 Feb-11 Wickham
+## 5         3     3 42 Apr-15     Cox
+## 6         4     4 50 Apr-17    &lt;NA&gt;</code></pre>
+<p>Magic.</p>
+<p>This brings us to the topic of aliasing. Aliasing involves assigning
+another name to either a variable in a table or a table itself. Aliasing
+can be done with <code>AS</code></p>
+<pre class="r"><code>## Change column names to all caps
+dbGetQuery(con, &quot;SELECT date AS DATE, id AS ID FROM orders AS o&quot;)</code></pre>
+<pre><code>##     DATE ID
+## 1 Jan-01  4
+## 2 Feb-01  8
+## 3 Apr-15 42
+## 4 Apr-17 50
+## 5 Apr-18  4
+## 6 Feb-11  8
+## 7 Jul-15 42
+## 8 Jun-17 50</code></pre>
+<p>In this case, we see the column names have changed, but there has
+been no apparent use of the alias for <code>orders</code>. The utility
+of this becomes clearer when we consider its use in joins</p>
+<pre class="r"><code>dbGetQuery(con, &quot;SELECT * FROM orders AS o
+           LEFT JOIN customers AS c ON o.id = c.id&quot;)</code></pre>
+<pre><code>##   row_names order id   date row_names id    name
+## 1         1     1  4 Jan-01         1  4   Tukey
+## 2         5    11  4 Apr-18         1  4   Tukey
+## 3         2     2  8 Feb-01         2  8 Wickham
+## 4         6    12  8 Feb-11         2  8 Wickham
+## 5         3     3 42 Apr-15         6 42     Cox
+## 6         7    13 42 Jul-15         6 42     Cox
+## 7         4     4 50 Apr-17      &lt;NA&gt; NA    &lt;NA&gt;
+## 8         8    14 50 Jun-17      &lt;NA&gt; NA    &lt;NA&gt;</code></pre>
+<p>Here, by aliasing tables as <code>o</code> and <code>c</code>
+respectively, we can call <code>o.id = c.id</code> rather than
+<code>order.id = customer.id</code>. Whether this was useful in this
+case is besides the point; aliasing is common in the wild and it’s
+important to see its syntax. When we use it in conjunction with joins or
+filters, the alias carries throughout. Here is the same query we ran
+before</p>
+<pre class="r"><code>dbGetQuery(con, &quot;SELECT o.*, c.name FROM orders AS o
+           LEFT JOIN customers AS c ON o.id = c.id
+           WHERE o.row_names&lt;7&quot;)</code></pre>
+<pre><code>##   row_names order id   date    name
+## 1         1     1  4 Jan-01   Tukey
+## 2         5    11  4 Apr-18   Tukey
+## 3         2     2  8 Feb-01 Wickham
+## 4         6    12  8 Feb-11 Wickham
+## 5         3     3 42 Apr-15     Cox
+## 6         4     4 50 Apr-17    &lt;NA&gt;</code></pre>
+<p><strong>Problem 2:</strong> Write a SQL query that performs the
+following:</p>
 <ul>
-<li><a href="solutions/01_introduction_sol.pdf">Lab 1</a></li>
-<li><a href="solutions/02_ggplot_sol.pdf">Lab 2</a></li>
-<li><a href="solutions/03_dplyr_sol.pdf">Lab 3</a></li>
-<li><a href="solutions/04_tidyr_sol.pdf">Lab 4</a></li>
-<li><a href="solutions/05_joins_solution.pdf">Lab 5</a></li>
-<li><a href="solutions/06_stringr_solution.pdf">Lab 6</a></li>
-<li><a href="solutions/07_dates_solutions.pdf">Lab 7</a></li>
-<li><a href="solutions/08_files_sol.pdf">Lab 8</a></li>
-<li><a href="solutions/09_functions_sol.pdf">Lab 9</a></li>
+<li>Selects only order, id, and date from orders table, but change
+column names to be all caps</li>
+<li>Left join on customers by id</li>
+<li>Filter to only include ID values of 4, 8, and 50</li>
+<li>(Hint: If something is ambiguous, it helps to specify which table it
+comes from)</li>
 </ul>
+<p>Your output should look like this</p>
+<pre><code>##   ID   DATE ORDERS
+## 1  4 Jan-01      1
+## 2  4 Apr-18     11
+## 3  8 Feb-01      2
+## 4  8 Feb-11     12
+## 5 50 Apr-17      4
+## 6 50 Jun-17     14</code></pre>
+<p>Note that we also have <code>RIGHT JOIN</code> and
+<code>INNER JOIN</code> available to use as appropriate</p>
+<div id="anti-joins" class="section level3">
+<h3>Anti Joins</h3>
+<p>Recall that anti-joins are used to identify implicit missing values:
+which entries do I have that are missing values in a corresponding
+table?</p>
+<p>For example, suppose we wanted to find all of the customers in our
+database who haven’t placed an order. To do this with dplyr, we would
+run something like</p>
+<pre class="r"><code>customers &lt;- dbGetQuery(con, &quot;SELECT * FROM customers&quot;)
+orders &lt;- dbGetQuery(con, &quot;SELECT * FROM orders&quot;)
+
+anti_join(customers, orders, by = &quot;id&quot;)</code></pre>
+<pre><code>##   row_names id   name
+## 1         3 15  Mason
+## 2         4 16 Jordan
+## 3         5 23  Patil</code></pre>
+<p>Anti-joins don’t exist directly in SQL, but there is a way we can
+deploy them. Start by recognizing that what we are looking for is all
+customers without a corresponding ID in orders. A left join on
+<code>customers</code> will allow us to see which these are</p>
+<pre class="r"><code>dbGetQuery(con, &quot;select * from customers as c
+           LEFT JOIN orders as o ON o.id=c.id&quot;)</code></pre>
+<pre><code>##   row_names id    name row_names order id   date
+## 1         1  4   Tukey         1     1  4 Jan-01
+## 2         2  8 Wickham         2     2  8 Feb-01
+## 3         6 42     Cox         3     3 42 Apr-15
+## 4         1  4   Tukey         5    11  4 Apr-18
+## 5         2  8 Wickham         6    12  8 Feb-11
+## 6         6 42     Cox         7    13 42 Jul-15
+## 7         3 15   Mason      &lt;NA&gt;    NA NA   &lt;NA&gt;
+## 8         4 16  Jordan      &lt;NA&gt;    NA NA   &lt;NA&gt;
+## 9         5 23   Patil      &lt;NA&gt;    NA NA   &lt;NA&gt;</code></pre>
+<p>We see just as above, there are three names without corresponding
+orders: Mason, Jordan, and Patil. To select only those with a missing ID
+in orders, we can use a <code>WHERE</code> statement</p>
+<pre class="r"><code>dbGetQuery(con, &quot;select * from customers as c
+           LEFT JOIN orders as o ON o.id=c.id
+           WHERE o.id IS NULL&quot;)</code></pre>
+<pre><code>##   row_names id   name row_names order id date
+## 1         3 15  Mason      &lt;NA&gt;    NA NA &lt;NA&gt;
+## 2         4 16 Jordan      &lt;NA&gt;    NA NA &lt;NA&gt;
+## 3         5 23  Patil      &lt;NA&gt;    NA NA &lt;NA&gt;</code></pre>
+<p>Then, to extract only the names, we need to modify our
+<code>SELECT</code> statement to only grab the variable
+<code>name</code> from the table <code>customers</code> (aliased as
+<code>c</code>)</p>
+<pre class="r"><code>## Ta-da!
+dbGetQuery(con, &quot;select c.name from customers as c
+           LEFT JOIN orders as o ON o.id=c.id
+           WHERE o.id IS NULL&quot;)</code></pre>
+<pre><code>##     name
+## 1  Mason
+## 2 Jordan
+## 3  Patil</code></pre>
 </div>
+<div id="exercises" class="section level3">
+<h3>Exercises</h3>
+<p>Here are a few exercises covering just what we’ve learned. For these,
+we will be using <code>students</code>, <code>enrollments</code>, and
+<code>courses</code> (not <code>course</code>)</p>
+<pre class="r"><code>dbListTables(con)</code></pre>
+<pre><code>##  [1] &quot;Iowa_homes_1&quot;       &quot;Iowa_homes_2&quot;       &quot;Police_shootings_1&quot;
+##  [4] &quot;Police_shootings_2&quot; &quot;course&quot;             &quot;course_offering&quot;   
+##  [7] &quot;courses&quot;            &quot;customers&quot;          &quot;enrollments&quot;       
+## [10] &quot;office_hour&quot;        &quot;orders&quot;             &quot;professor_info&quot;    
+## [13] &quot;students&quot;           &quot;syllabus_info&quot;</code></pre>
+<p><strong>Problem 3:</strong> Identify the all unique student IDs for
+students who are enrolled in at least one course</p>
+<p><strong>Problem 4:</strong> Identify all of the courses (by course
+name) that have at least one student enrolled</p>
+<p><strong>Problem 5:</strong> How do you think you join on multiple
+tables? Try to produce the following output showing each student and the
+name of the courses in which they’re enrolled. Note also the change in
+variable names</p>
+<pre><code>##   Student_Name                Course_Name
+## 1        Alice        Intro to Statistics
+## 2        Alice             Linear Algebra
+## 3          Bob        Intro to Statistics
+## 4          Bob               Econometrics
+## 5      Charlie               Econometrics
+## 6        Fiona Intro to Political Science
+## 7       George             Linear Algebra</code></pre>
+<p><strong>Problem 6:</strong> Return the names and majors of all
+students not enrolled in any classes.</p>
+</div>
+</div>
+<div id="aggregation-functions" class="section level2">
+<h2>Aggregation Functions</h2>
+<p>sorting and ordering</p>
+<p>group_by, count, sum, avg, having</p>
+<p>paste commands for convenience</p>
 </div>
 </div>
 
