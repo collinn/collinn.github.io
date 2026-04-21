@@ -1544,11 +1544,13 @@ query on the SQL server. We’ll start with the former, showing us which
 tables we have to work with, passing in the connection we have already
 established</p>
 <pre class="r"><code>dbListTables(con)</code></pre>
-<pre><code>##  [1] &quot;Iowa_homes_1&quot;       &quot;Iowa_homes_2&quot;       &quot;Police_shootings_1&quot;
-##  [4] &quot;Police_shootings_2&quot; &quot;course&quot;             &quot;course_offering&quot;   
-##  [7] &quot;courses&quot;            &quot;customers&quot;          &quot;enrollments&quot;       
-## [10] &quot;office_hour&quot;        &quot;orders&quot;             &quot;professor_info&quot;    
-## [13] &quot;students&quot;           &quot;syllabus_info&quot;</code></pre>
+<pre><code>##  [1] &quot;Batting&quot;            &quot;Iowa_homes_1&quot;       &quot;Iowa_homes_2&quot;      
+##  [4] &quot;MLBPlayers&quot;         &quot;MLBTeams&quot;           &quot;Police_shootings_1&quot;
+##  [7] &quot;Police_shootings_2&quot; &quot;batting2&quot;           &quot;course&quot;            
+## [10] &quot;course_offering&quot;    &quot;courses&quot;            &quot;customers&quot;         
+## [13] &quot;enrollments&quot;        &quot;office_hour&quot;        &quot;orders&quot;            
+## [16] &quot;players2&quot;           &quot;professor_info&quot;     &quot;students&quot;          
+## [19] &quot;syllabus_info&quot;      &quot;teams2&quot;</code></pre>
 <p>This is a poor example of what a relational database may look like in
 real life, as they contain a number of tables that have nothing to do
 with each other. However, they’ll serve for the time being. For our
@@ -1583,7 +1585,7 @@ table</li>
 <li>WHERE: filter rows on conditions</li>
 <li>LIKE: Match a pattern in a column</li>
 <li>IN: match any value in a list</li>
-<li>Between: Values in a specified range</li>
+<li>BETWEEN: Values in a specified range</li>
 <li>IS NULL: null values</li>
 <li>ORDER BY: Sort</li>
 <li>AND/OR/NOT can be used in Where</li>
@@ -1604,6 +1606,40 @@ table</li>
 <li>default is ascending, use DESC to descend.</li>
 </ul></li>
 </ul>
+<p>A quick note on computation:</p>
+<p>In <code>dplyr</code>, we understand that piped functions are
+executed in the order they are written. That is, if we wish to mutate,
+group by then summarize, we would write them in that order</p>
+<pre class="r"><code>## Fake data, don&#39;t run this it won&#39;t work
+df %&gt;% mutate(newvar = var) %&gt;% 
+  group_by(grp) %&gt;% 
+  summarize(mean(newvar))</code></pre>
+<p>SQL doesn’t work like this. We will always write our SQL commands in
+this order:</p>
+<pre class="r"><code>## Written order
+&quot;SELECT ...
+FROM ...
+WHERE ...
+GROUP BY ...
+HAVING ...
+ORDER BY ...&quot;</code></pre>
+<p>However, it will always be executed in this order:</p>
+<p><span class="math display">\[
+\text{FROM} \rightarrow \text{WHERE} \rightarrow \text{GROUP BY}
+\rightarrow \text{HAVING} \rightarrow \text{SELECT} \rightarrow
+\text{ORDER BY}
+\]</span> From a computational aspect, we can sort of reason it out.
+<code>FROM</code> (including joins) and <code>WHERE</code> start by
+selecting the tables we need and filtering them accordingly. This also
+includes any aliasing created with <code>AS</code>. The ensures that we
+are working on the smallest dataset we need. <code>HAVING</code> is a
+filter like <code>WHERE</code> that works on data that has already been
+summarized (more on this shortly), <code>SELECT</code> allows you to
+select whichever columns we need after the rest of the query has been
+resolved. Finally, <code>ORDER BY</code> takes the final query and sorts
+it.</p>
+<p>Do not memorize this. But, if you run into issues below, it may be a
+helpful thing to come back to.</p>
 </div>
 <div id="basic-queries" class="section level2">
 <h2>Basic Queries</h2>
@@ -1879,17 +1915,19 @@ dbGetQuery(con, &quot;select c.name from customers as c
 ## 2 Jordan
 ## 3  Patil</code></pre>
 </div>
-<div id="exercises" class="section level3">
-<h3>Exercises</h3>
+<div id="joins-exercises" class="section level3">
+<h3>Joins Exercises</h3>
 <p>Here are a few exercises covering just what we’ve learned. For these,
 we will be using <code>students</code>, <code>enrollments</code>, and
 <code>courses</code> (not <code>course</code>)</p>
 <pre class="r"><code>dbListTables(con)</code></pre>
-<pre><code>##  [1] &quot;Iowa_homes_1&quot;       &quot;Iowa_homes_2&quot;       &quot;Police_shootings_1&quot;
-##  [4] &quot;Police_shootings_2&quot; &quot;course&quot;             &quot;course_offering&quot;   
-##  [7] &quot;courses&quot;            &quot;customers&quot;          &quot;enrollments&quot;       
-## [10] &quot;office_hour&quot;        &quot;orders&quot;             &quot;professor_info&quot;    
-## [13] &quot;students&quot;           &quot;syllabus_info&quot;</code></pre>
+<pre><code>##  [1] &quot;Batting&quot;            &quot;Iowa_homes_1&quot;       &quot;Iowa_homes_2&quot;      
+##  [4] &quot;MLBPlayers&quot;         &quot;MLBTeams&quot;           &quot;Police_shootings_1&quot;
+##  [7] &quot;Police_shootings_2&quot; &quot;batting2&quot;           &quot;course&quot;            
+## [10] &quot;course_offering&quot;    &quot;courses&quot;            &quot;customers&quot;         
+## [13] &quot;enrollments&quot;        &quot;office_hour&quot;        &quot;orders&quot;            
+## [16] &quot;players2&quot;           &quot;professor_info&quot;     &quot;students&quot;          
+## [19] &quot;syllabus_info&quot;      &quot;teams2&quot;</code></pre>
 <p><strong>Problem 3:</strong> Identify the all unique student IDs for
 students who are enrolled in at least one course</p>
 <p><strong>Problem 4:</strong> Identify all of the courses (by course
@@ -1910,11 +1948,233 @@ variable names</p>
 students not enrolled in any classes.</p>
 </div>
 </div>
+<div id="a-quick-note-on-computation" class="section level2">
+<h2>A Quick Note on Computation</h2>
+<p>This snippet should (and will be) placed at the top of this document,
+but as you have already read past that, I will include it here.</p>
+<p>In <code>dplyr</code>, we understand that piped functions are
+executed in the order they are written. That is, if we wish to mutate,
+group by then summarize, we would write them in that order</p>
+<pre class="r"><code>## Fake data, don&#39;t run this it won&#39;t work
+df %&gt;% mutate(newvar = var) %&gt;% 
+  group_by(grp) %&gt;% 
+  summarize(mean(newvar))</code></pre>
+<p>SQL doesn’t work like this. We will always write our SQL commands in
+this order:</p>
+<pre class="r"><code>## Written order
+&quot;SELECT ...
+FROM ...
+WHERE ...
+GROUP BY ...
+HAVING ...
+ORDER BY ...&quot;</code></pre>
+<p>However, it will always be executed in this order:</p>
+<p><span class="math display">\[
+\text{FROM} \rightarrow \text{WHERE} \rightarrow \text{GROUP BY}
+\rightarrow \text{HAVING} \rightarrow \text{SELECT} \rightarrow
+\text{ORDER BY}
+\]</span> From a computational aspect, we can sort of reason it out.
+<code>FROM</code> (including joins) and <code>WHERE</code> start by
+selecting the tables we need and filtering them accordingly. This also
+includes any aliasing created with <code>AS</code>. The ensures that we
+are working on the smallest dataset we need. <code>HAVING</code> is a
+filter like <code>WHERE</code> that works on data that has already been
+summarized (more on this shortly), <code>SELECT</code> allows you to
+select whichever columns we need after the rest of the query has been
+resolved. Finally, <code>ORDER BY</code> takes the final query and sorts
+it.</p>
+<p>Do not memorize this. But, if you run into issues below, it may be a
+helpful thing to come back to.</p>
+</div>
 <div id="aggregation-functions" class="section level2">
 <h2>Aggregation Functions</h2>
-<p>sorting and ordering</p>
-<p>group_by, count, sum, avg, having</p>
-<p>paste commands for convenience</p>
+<p>Just as is the case with <code>dplyr</code> functions, in addition to
+joining and filtering data, we often want to aggregate or summarize our
+data in some way. When searching for these types of functions online or
+with the <a href="https://www.geeksforgeeks.org/sql/sql-cheat-sheet/">reference
+sheet</a>, these functions are typically listed under <em>aggregation
+functions</em>.</p>
+<p>Aggregation functions are included after the <code>SELECT</code>
+command, specifying that we want to select or return an aggregated
+column from our query. For example, the count the number of orders from
+the <code>orders</code> dataset, we would use <code>COUNT(*)</code>,
+which will count the total number of rows in our table. <code>AS</code>,
+as before, allows us to rename the column before returning.</p>
+<pre class="r"><code>dbGetQuery(con, &quot;SELECT COUNT(*) AS total FROM orders&quot;)</code></pre>
+<pre><code>##   total
+## 1     8</code></pre>
+<p>When using <code>COUNT</code> with a specific column or variable
+name, it will instead return the number of non-empty counts</p>
+<pre class="r"><code>## Table of joins
+dbGetQuery(con, &quot;select * from customers as c
+           LEFT JOIN orders as o ON o.id=c.id&quot;)</code></pre>
+<pre><code>##   row_names id    name row_names order id   date
+## 1         1  4   Tukey         1     1  4 Jan-01
+## 2         2  8 Wickham         2     2  8 Feb-01
+## 3         6 42     Cox         3     3 42 Apr-15
+## 4         1  4   Tukey         5    11  4 Apr-18
+## 5         2  8 Wickham         6    12  8 Feb-11
+## 6         6 42     Cox         7    13 42 Jul-15
+## 7         3 15   Mason      &lt;NA&gt;    NA NA   &lt;NA&gt;
+## 8         4 16  Jordan      &lt;NA&gt;    NA NA   &lt;NA&gt;
+## 9         5 23   Patil      &lt;NA&gt;    NA NA   &lt;NA&gt;</code></pre>
+<pre class="r"><code>## How many non-empty order numbers
+dbGetQuery(con, &quot;select COUNT(o.order) as num_orders from customers as c
+           LEFT JOIN orders as o ON o.id=c.id&quot;)</code></pre>
+<pre><code>##   num_orders
+## 1          6</code></pre>
+<p>Other functions work as you might expect. Here we use
+<code>AVG</code> to find the average of the variable
+<code>row_names</code> (admittedly, this is rather unmotivated)</p>
+<pre class="r"><code>dbGetQuery(con, &quot;SELECT AVG(row_names) as avg_row FROM orders&quot;)</code></pre>
+<pre><code>##   avg_row
+## 1     4.5</code></pre>
+<p>Like dplyr, these commands are typically associated with a
+<code>GROUP BY</code> operation, allowing us to perform aggregating
+functions according to a group. We simply specify the name of the group
+on which we wish to aggregate.</p>
+<pre class="r"><code>dbGetQuery(con, &quot;SELECT COUNT(orders.order) as total_orders FROM orders
+           GROUP BY id&quot;)</code></pre>
+<pre><code>##   total_orders
+## 1            2
+## 2            2
+## 3            2
+## 4            2</code></pre>
+<p>Somewhat unconventionally (for us), <code>GROUP BY</code> is included
+<em>after</em> filtering a dataset. From a query standpoint, this makes
+sense: aggregating data can be computationally expensive, and one can
+greatly reduce the time of long queries by subsetting the data first,
+<em>then</em> performing functions on it.</p>
+<pre class="r"><code>dbGetQuery(con, &quot;SELECT COUNT(orders.order) as total_orders FROM orders
+           WHERE row_names &gt; 2
+           GROUP BY id&quot;)</code></pre>
+<pre><code>##   total_orders
+## 1            1
+## 2            1
+## 3            2
+## 4            2</code></pre>
+<p>Depending on the size of our query, we may want to grab only the top
+N of a dataset. We can do this by first ordering the data then
+specifying how much of it we want the query to return. This is done with
+<code>ORDER BY</code> and <code>LIMIT</code>. <code>ORDER BY</code> is
+always the last command in a SQL query.</p>
+<pre class="r"><code>dbGetQuery(con, &quot;SELECT COUNT(orders.order) as total_orders, id FROM orders
+           WHERE row_names &gt; 2
+           GROUP BY id
+           ORDER BY total_orders&quot;)</code></pre>
+<pre><code>##   total_orders id
+## 1            1  4
+## 2            1  8
+## 3            2 42
+## 4            2 50</code></pre>
+<p>Just as <code>sort()</code> in R takes a descending argument, we can
+change the order in a SQL query with <code>DESC</code></p>
+<pre class="r"><code>dbGetQuery(con, &quot;SELECT COUNT(orders.order) as total_orders, id FROM orders
+           WHERE row_names &gt; 2
+           GROUP BY id
+           ORDER BY total_orders DESC&quot;)</code></pre>
+<pre><code>##   total_orders id
+## 1            2 42
+## 2            2 50
+## 3            1  4
+## 4            1  8</code></pre>
+<p>Finally, if we wish to only retain the first N rows, we can do so
+with <code>LIMIT</code></p>
+<pre class="r"><code>dbGetQuery(con, &quot;SELECT COUNT(orders.order) as total_orders, id FROM orders
+           WHERE row_names &gt; 2
+           GROUP BY id
+           ORDER BY total_orders DESC
+           LIMIT 2&quot;)</code></pre>
+<pre><code>##   total_orders id
+## 1            2 42
+## 2            2 50</code></pre>
+<p><strong>Problem 7:</strong> Suppose we wanted to retain the IDs with
+the largest two orders (like we did just above) without also returning
+the <code>total_orders</code> column (that is, we <em>just</em> want to
+return the ID). How might we do this?</p>
+<p><strong>Problem 8:</strong> Revisit your code from <strong>Problem
+3</strong>, and expand upon this to return the number of students who
+are enrolled in at least one course.</p>
+<p><strong>Problem 9:</strong> The tables <code>batting2</code> and
+<code>players2</code> include MLB batting and player information from
+the 2010 season or later, respectively. Only considering the 2020 season
+and later, return the <em>given name</em> of the top 10 MLB players with
+the most homeruns. It should look something like this: (your query may
+take a few seconds to run. Also, you may ignore warning about importing
+as numeric)</p>
+<pre><code>##    total_hr           name
+## 1       196    Aaron James
+## 2       178         Shohei
+## 3       163    Kyle Joseph
+## 4       157   Peter Morgan
+## 5       156   Matthew Kent
+## 6       136   Yordan Ruben
+## 7       136       Vladimir
+## 8       132      Juan Jose
+## 9       128   Jose Enrique
+## 10      127 Michael Austin</code></pre>
+</div>
+<div id="having-and-subqueries" class="section level2">
+<h2>HAVING and Subqueries</h2>
+<p>There are two other topics to help us round off our SQL journey. The
+first of these introduces <code>HAVING</code>, a filter similar to
+<code>WHERE</code> that happens <em>after</em> aggregation has taken
+place.</p>
+<p>For example, consider the situation above where we found the total
+number of orders from each ID</p>
+<pre class="r"><code>dbGetQuery(con, &quot;SELECT COUNT(orders.order) as total_orders, id FROM orders
+           WHERE row_names &gt; 2 
+           GROUP BY id
+           ORDER BY total_orders&quot;)</code></pre>
+<pre><code>##   total_orders id
+## 1            1  4
+## 2            1  8
+## 3            2 42
+## 4            2 50</code></pre>
+<p>If we only wanted to retain IDs with more than 1 order, we would want
+to filter the <code>total_orders</code> variable. However
+<code>WHERE</code> executes before <code>COUNMT(orders.order)</code> is
+evaluated. Trying to filter on this results in an error</p>
+<pre class="r"><code>dbGetQuery(con, &quot;SELECT COUNT(orders.order) as total_orders, id FROM orders
+           WHERE row_names &gt; 2 AND total_orders &gt; 1
+           GROUP BY id
+           ORDER BY total_orders&quot;)</code></pre>
+<pre><code>## Error in dbSendQuery(conn, statement, ...): could not run statement: Unknown column &#39;total_orders&#39; in &#39;WHERE&#39;</code></pre>
+<p><code>HAVING</code> is the second to last SQL command, a final filter
+on any query prior to being sorted. As such, we include it prior to
+<code>ORDER BY</code></p>
+<pre class="r"><code>dbGetQuery(con, &quot;SELECT COUNT(orders.order) as total_orders, id FROM orders
+           WHERE row_names &gt; 2
+           GROUP BY id
+           HAVING total_orders &gt; 1
+           ORDER BY total_orders&quot;)</code></pre>
+<pre><code>##   total_orders id
+## 1            2 42
+## 2            2 50</code></pre>
+<p>Like <code>WHERE</code>, having can use a number of logical
+qualifiers. We have already introduced <code>AND</code>,
+<code>NOT</code>, and <code>IN</code>. Also helpful are <code>OR</code>
+and <code>BETWEEN</code> (observe that when no aggregation takes place,
+<code>HAVING</code> functions identically to <code>WHERE</code>)</p>
+<pre class="r"><code>dbGetQuery(con, &quot;SELECT * from customers
+           HAVING id BETWEEN 15 AND 23 OR row_names = 6&quot;)</code></pre>
+<pre><code>##   row_names id   name
+## 1         3 15  Mason
+## 2         4 16 Jordan
+## 3         5 23  Patil
+## 4         6 42    Cox</code></pre>
+<p><strong>Problem 10:</strong> Why does the following query fail? What
+can you do to fix it?</p>
+<pre class="r"><code>dbGetQuery(con, &quot;SELECT COUNT(orders.order), id from orders
+           GROUP BY id
+           HAVING row_names BETWEEN 2 AND 6 OR id = 50&quot;)</code></pre>
+<pre><code>## Error in dbSendQuery(conn, statement, ...): could not run statement: Unknown column &#39;row_names&#39; in &#39;HAVING&#39;</code></pre>
+<hr />
+<p>Finally, we consider the topic of subqueries (see pg 350 of red
+textbook, Modern Data Science with R)</p>
+</div>
+<div id="extracises" class="section level2">
+<h2>Extracises</h2>
 </div>
 </div>
 
