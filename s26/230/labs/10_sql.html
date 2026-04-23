@@ -1518,7 +1518,6 @@ your Rmd file) to install the packages necessary for this lab:</p>
 <pre class="r"><code>library(DBI)
 library(odbc)
 library(RMySQL)
-library(tidyverse)
 library(dbplyr)</code></pre>
 <p>We start by establishing a connection to an active RDBMS server
 hosted here on Grinnell’s campus (note: you must be on campus wi-fi to
@@ -2065,8 +2064,8 @@ always the last command in a SQL query.</p>
 <pre><code>##   total_orders id
 ## 1            1  4
 ## 2            1  8
-## 3            2 42
-## 4            2 50</code></pre>
+## 3            2 50
+## 4            2 42</code></pre>
 <p>Just as <code>sort()</code> in R takes a descending argument, we can
 change the order in a SQL query with <code>DESC</code></p>
 <pre class="r"><code>dbGetQuery(con, &quot;SELECT COUNT(orders.order) as total_orders, id FROM orders
@@ -2074,8 +2073,8 @@ change the order in a SQL query with <code>DESC</code></p>
            GROUP BY id
            ORDER BY total_orders DESC&quot;)</code></pre>
 <pre><code>##   total_orders id
-## 1            2 42
-## 2            2 50
+## 1            2 50
+## 2            2 42
 ## 3            1  4
 ## 4            1  8</code></pre>
 <p>Finally, if we wish to only retain the first N rows, we can do so
@@ -2086,8 +2085,8 @@ with <code>LIMIT</code></p>
            ORDER BY total_orders DESC
            LIMIT 2&quot;)</code></pre>
 <pre><code>##   total_orders id
-## 1            2 42
-## 2            2 50</code></pre>
+## 1            2 50
+## 2            2 42</code></pre>
 <p><strong>Problem 7:</strong> Suppose we wanted to retain the IDs with
 the largest two orders (like we did just above) without also returning
 the <code>total_orders</code> column (that is, we <em>just</em> want to
@@ -2129,8 +2128,8 @@ number of orders from each ID</p>
 <pre><code>##   total_orders id
 ## 1            1  4
 ## 2            1  8
-## 3            2 42
-## 4            2 50</code></pre>
+## 3            2 50
+## 4            2 42</code></pre>
 <p>If we only wanted to retain IDs with more than 1 order, we would want
 to filter the <code>total_orders</code> variable. However
 <code>WHERE</code> executes before <code>COUNMT(orders.order)</code> is
@@ -2149,8 +2148,8 @@ on any query prior to being sorted. As such, we include it prior to
            HAVING total_orders &gt; 1
            ORDER BY total_orders&quot;)</code></pre>
 <pre><code>##   total_orders id
-## 1            2 42
-## 2            2 50</code></pre>
+## 1            2 50
+## 2            2 42</code></pre>
 <p>Like <code>WHERE</code>, having can use a number of logical
 qualifiers. We have already introduced <code>AND</code>,
 <code>NOT</code>, and <code>IN</code>. Also helpful are <code>OR</code>
@@ -2170,11 +2169,166 @@ can you do to fix it?</p>
            HAVING row_names BETWEEN 2 AND 6 OR id = 50&quot;)</code></pre>
 <pre><code>## Error in dbSendQuery(conn, statement, ...): could not run statement: Unknown column &#39;row_names&#39; in &#39;HAVING&#39;</code></pre>
 <hr />
-<p>Finally, we consider the topic of subqueries (see pg 350 of red
-textbook, Modern Data Science with R)</p>
+<p>Finally, we consider the topic of subqueries. A subquery is a
+summarized result set that is used as a part of a larger query. For
+example, suppose using our courses database we wish to find all of the
+students enrolled in at least two coures. Up to this point, we would
+first join students with enrollment data then keep those with two or
+more entries</p>
+<pre class="r"><code>## This shows us all the students from the join
+dbGetQuery(con, &quot;SELECT * FROM students AS s
+           LEFT JOIN enrollments AS e on e.student_id = s.student_id&quot;)</code></pre>
+<pre><code>##    row_names student_id    name            major row_names student_id course_id
+## 1          1       S001   Alice       Statistics         1       S001      C101
+## 2          1       S001   Alice       Statistics         2       S001      C102
+## 3          2       S002     Bob      Mathematics         3       S002      C101
+## 4          2       S002     Bob      Mathematics         4       S002      C103
+## 5          3       S003 Charlie Computer Science         5       S003      C103
+## 6          6       S007   Fiona          Biology         7       S007      C104
+## 7          7       S008  George      Mathematics         8       S008      C102
+## 8          7       S008  George      Mathematics         9       S008      C105
+## 9          4       S004   Diana       Statistics      &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;
+## 10         5       S005    Evan          Physics      &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;
+##    semester
+## 1      Fall
+## 2      Fall
+## 3      Fall
+## 4      Fall
+## 5      Fall
+## 6      Fall
+## 7      Fall
+## 8      Fall
+## 9      &lt;NA&gt;
+## 10     &lt;NA&gt;</code></pre>
+<pre class="r"><code>## Here we use HAVING to aggregate on the resulting set
+dbGetQuery(con, &quot;SELECT s.* FROM students AS s
+           LEFT JOIN enrollments AS e on e.student_id = s.student_id
+           GROUP BY s.student_id
+           HAVING COUNT(*) &gt; 1&quot;)</code></pre>
+<pre><code>##   row_names student_id   name       major
+## 1         1       S001  Alice  Statistics
+## 2         2       S002    Bob Mathematics
+## 3         7       S008 George Mathematics</code></pre>
+<p>This works, but we can make our intent more clear by creating a query
+more consistent with our goal as we would typically express it in
+English: “select all rows from students table that are in the enrollment
+table more than twice”</p>
+<pre class="r"><code>dbGetQuery(con, &quot;SELECT * from students as s
+           WHERE student_id IN (
+              SELECT student_id
+              FROM enrollments
+              GROUP BY student_id
+              HAVING COUNT(*) &gt; 1
+           )&quot;)</code></pre>
+<pre><code>##   row_names student_id   name       major
+## 1         1       S001  Alice  Statistics
+## 2         2       S002    Bob Mathematics
+## 3         7       S008 George Mathematics</code></pre>
+<p>This syntax of “find students IN some set” makes clear what our goal
+is. Note also that while the indenting here is optional, the parenthesis
+are not.</p>
+<p>There is one oddity when using subqueries to be aware of: if I am
+pulling a variable from a subquery, I need to give that subquery an
+alias since it does not exist as a table. SQL insists that this be true.
+For this contrived example, suppose I want to take the average (by ID)
+of 2 times the row names from a subquery. This won’t work:</p>
+<pre class="r"><code>dbGetQuery(con, &quot;SELECT AVG(double_row) FROM (
+            SELECT 2*row_names AS double_row, id FROM orders
+            )
+           GROUP BY id&quot;)</code></pre>
+<pre><code>## Error in dbSendQuery(conn, statement, ...): could not run statement: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near &#39;GROUP BY id&#39; at line 4</code></pre>
+<p>What I need to do is give an alias to the table generated between the
+parenthesis</p>
+<pre class="r"><code>dbGetQuery(con, &quot;SELECT AVG(double_row), id FROM (
+            SELECT 2*row_names AS double_row, id FROM orders
+            ) AS new_table
+           GROUP BY id&quot;)</code></pre>
+<pre><code>##   AVG(double_row) id
+## 1               6  4
+## 2               8  8
+## 3              10 42
+## 4              12 50</code></pre>
+<p>This appears to only be the case when using <code>FROM</code>; you
+can <code>SELECT</code> all you wish from subqueries without ever having
+to give them a name.</p>
+</div>
+<div id="arithmetic" class="section level2">
+<h2>Arithmetic</h2>
+<p>One final thing of note is that basic arithmetic in the construction
+of new variables works very similar to R</p>
+<pre class="r"><code>## This shows us everything in orders
+dbGetQuery(con, &quot;SELECT * from orders&quot;)</code></pre>
+<pre><code>##   row_names order id   date
+## 1         1     1  4 Jan-01
+## 2         2     2  8 Feb-01
+## 3         3     3 42 Apr-15
+## 4         4     4 50 Apr-17
+## 5         5    11  4 Apr-18
+## 6         6    12  8 Feb-11
+## 7         7    13 42 Jul-15
+## 8         8    14 50 Jun-17</code></pre>
+<pre class="r"><code>## Here is how we would do arithmetic
+dbGetQuery(con, &quot;SELECT
+           row_names + 3*orders.order / id AS new_val, orders.*
+           FROM orders&quot;)</code></pre>
+<pre><code>##   new_val row_names order id   date
+## 1  1.7500         1     1  4 Jan-01
+## 2  2.7500         2     2  8 Feb-01
+## 3  3.2143         3     3 42 Apr-15
+## 4  4.2400         4     4 50 Apr-17
+## 5 13.2500         5    11  4 Apr-18
+## 6 10.5000         6    12  8 Feb-11
+## 7  7.9286         7    13 42 Jul-15
+## 8  8.8400         8    14 50 Jun-17</code></pre>
+<p>There are a few functions built into SQL, but more typically we will
+reserve complex data analysis and manipulation to R, leaving SQL to
+handle large-scale queries on the server. Here are a few others</p>
+<pre class="r"><code>dbGetQuery(con, &quot;SELECT
+           POWER(row_names, 2) AS powers, 
+           ABS(orders.order - id) AS abs_val,
+           MOD(row_names, orders.order) AS mod_remainders
+           FROM orders&quot;)</code></pre>
+<pre><code>##   powers abs_val mod_remainders
+## 1      1       3              0
+## 2      4       6              0
+## 3      9      39              0
+## 4     16      46              0
+## 5     25       7              5
+## 6     36       4              6
+## 7     49      29              7
+## 8     64      36              8</code></pre>
 </div>
 <div id="extracises" class="section level2">
 <h2>Extracises</h2>
+<p><strong>Problem 11:</strong> In <a href="https://collinn.github.io/s26/230/hw/hw2.html">Homework 2,
+Question 3</a>, you were asked to find the slugging percentage for each
+team from 1969 and return the top 10. Rewrite that query in SQL syntax,
+pulling instead from the <code>MLBTeams</code> table on the database.
+You should end up with the following query</p>
+<pre><code>##    yearID teamID    SLG
+## 1    2023    ATL 0.5008
+## 2    2019    HOU 0.4955
+## 3    2019    MIN 0.4941
+## 4    2003    BOS 0.4909
+## 5    2019    NYA 0.4899
+## 6    1997    SEA 0.4845
+## 7    1994    CLE 0.4838
+## 8    1996    SEA 0.4836
+## 9    2001    COL 0.4830
+## 10   2020    LAN 0.4829</code></pre>
+<p><strong>Problem 12:</strong> Run a query to find the ten players with
+at least 5 career at-bats (AB) (that is, not 5 AB per season) with the
+highest home run percentage (home runs divided by at bats) from the
+<code>Batting</code> table</p>
+<p><strong>Problem 13:</strong> Run a query to determine how many
+players with at least 5 at-bats (AB) have a career home run percentage
+(home runs divided by at bats) of at least 0.3. Confirm that it is
+647</p>
+<p><strong>Problem 14:</strong> Run a query to find all players whose
+total career home runs exceeds the average total career home runs across
+all players since 1980</p>
+<p><strong>Problem 15:</strong> Determine the number of players who have
+at least 5 seasons in which they hit 20 or more home runs since 1980</p>
 </div>
 </div>
 
