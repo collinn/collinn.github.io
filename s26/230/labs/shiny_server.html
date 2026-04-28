@@ -11,7 +11,7 @@
 
 
 
-<title>STA 230 Intro to Data Science (Spring 2026)</title>
+<title>Shiny Part 2: Server</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1477,247 +1477,572 @@ border-radius: 0px;
 
 
 
-<h1 class="title toc-ignore">STA 230 Intro to Data Science (Spring
-2026)</h1>
+<h1 class="title toc-ignore">Shiny Part 2: Server</h1>
 
 </div>
 
 
-<p><span class="math inline">\(~\)</span></p>
-<p>Last updated: Tue Apr 28 2026, 08:25</p>
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- |  |  |  |  | -->
-<!-- |  |  |  |  | -->
-<!-- |  |  |  |  | -->
-<div id="syllabus" class="section level1">
-<h1>Syllabus</h1>
-<p>Welcome to the course website for STA 230, Introduction to Data
-Science. To begin, you can find the course syllabus linked below:</p>
-<ul>
-<li><a href="syllabus230s26.html">Click here</a> to view the course
-syllabus</li>
-</ul>
-<p>You can locate course content by scrolling, or by using the
-navigation bar in the upper left.</p>
-<p>Ahead on your labs? Try working through the 1st Edition of <a href="http://adv-r.had.co.nz/">Advanced R</a>, an excellent resource for
-learning R as a programming language rather than simply a tool for data
-analysis</p>
+<div id="preamble" class="section level1">
+<h1>Preamble</h1>
+<pre class="r"><code>library(shiny)
+library(ggplot2)</code></pre>
+<p>As we introduced in our previous lab, the main components of every
+Shiny app look like this:</p>
+<pre class="r"><code>ui &lt;- fluidPage(
+  # user interface
+)
+
+server &lt;- function(input, output) {
+  # backend logic
+}
+
+shinyApp(ui, server)</code></pre>
+<p>Whereas the last lab focus on the major components related to the
+frontend user interface, this lab will pick up where the previous left
+off. In particular, we are going to take a closer look at reactivity in
+the context of Shiny and paint a clearer illustration of how inputs
+relate to outputs in an interactive environment.</p>
+</div>
+<div id="lab" class="section level1">
+<h1>Lab</h1>
+<p>In this lab we will review again the concept of reactivity, managing
+the relationship between reactive objects and rendering functions, and
+introduce a number of techniques for working with server-side logic.</p>
+<div id="reactivity-again" class="section level2">
+<h2>Reactivity again</h2>
+<p>We ended the previous lab with an illustration of the
+<code>reactive()</code> function which creates a reactive object
+responding to changes in user input. Here, we have created reactive
+objects <code>n()</code> and <code>bins()</code> responding to
+<code>input$n</code> and <code>input$bin</code>. We illustrate this
+again with an additional <code>textOutput()</code> that tells us the
+mean and standard deviation of our simulated data.</p>
+<pre class="r"><code>ui &lt;- fluidPage(
+  numericInput(&quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100),
+  sliderInput(&quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
+  
+  textOutput(&quot;summary&quot;),
+  plotOutput(&quot;myhist&quot;)
+)
+
+server &lt;- function(input, output) {
+  
+  n &lt;- reactive(input$n)
+  bins &lt;- reactive(input$bins)
+  
+  ## It&#39;s also worth noting that the order that we define things in server() doesn&#39;t
+  # matter. Here, we have output$myhist defined before output$summary, even though
+  # summary comes first in the UI. This is true for ALL objects in server()
+  output$myhist &lt;- renderPlot({
+    X &lt;- rnorm(n())
+    ggplot() + geom_histogram(aes(x = X), bins = bins())
+  })
+  
+  output$summary &lt;- renderText({
+    X &lt;- rnorm(n())
+    paste0(&quot;The mean is: &quot;,  round(mean(X), 4), 
+           &quot; and the standard deviation is: &quot;, round(sd(X), 4))
+  })
+}
+
+shinyApp(ui, server)</code></pre>
+<p>A critical thing to know about the relationship created between
+rendered and reactive objects is that a render function will respond to
+<em>any</em> changes from <em>any</em> of the reactive objects specified
+within it’s expression (between the <code>{}</code>). (Take note of the
+phrase “within it’s expression” as we will be using it several times in
+this lab.)</p>
+<p><strong>Question 1: </strong> To illustrate this reactivity
+relationship, we will do an experiment. Run the Shiny app above and set
+the number of observations to 100 and the number of bins to 10. Make
+careful note of the shape of the distribution. Now, use the slider to
+change the number of bins to 11, wait for the plot to update, then
+change the slider back to 10. What do you notice? Is the distribution in
+the plot the same? What about the summary information? Explain why this
+is going on.</p>
 <hr />
+<p>Let’s unpack the solution to Question 1. First, changing the value of
+<code>input$bins</code> updates the reactive object <code>bins()</code>;
+any rendered objects dependent on the the previous value of
+<code>bins()</code> will be <em>invalidated</em> and Shiny will
+determine that they need to be recomputed. In this case, since
+<code>renderPlot()</code> contains <code>bin()</code>, the entire block
+of code within it is rerun, causing the line
+<code>X &lt;- rnorm(n())</code> to be rerun, recomputing the data for
+our histogram. This explains why the underlying data distribution
+changes each time we change the number of bins.</p>
+<p>The way this is currently set up, we have inadvertently created a
+dependency between the data being plotted and the number of bins in our
+histogram. Our intention was likely that changing the bins would
+<em>only</em> change the histogram, not the underlying data. We need to
+find a way to divorce the relationship between the computation of the
+data and the creation of the histogram. We can solve the problem by
+moving the computing of the data inside of the reactive function
+associated with <code>input$n</code>; now, our underlying data will only
+change along with changes to <code>input$n</code>.</p>
+<p>Take note that this solves a second, less obvious problem as well –
+previously, when the data was computed within the
+<code>renderText()</code> and <code>renderPlot()</code> functions, the
+data in the plot and the data in the summary weren’t even the same! This
+sort of logical error is far more insidious as there is nothing directly
+within the app that will warn you of its existence.</p>
+<pre class="r"><code>ui &lt;- fluidPage(
+  numericInput(inputId = &quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100),
+  sliderInput(inputId = &quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
+  plotOutput(outputId = &quot;myhist&quot;)
+)
+
+server &lt;- function(input, output) {
+  
+  X &lt;- reactive(rnorm(input$n))
+  bins &lt;- reactive(input$bins)
+  
+  # Now it&#39;s the same X() here as in renderPlot()
+  output$summary &lt;- renderText({
+    paste0(&quot;The mean is: &quot;,  round(mean(X()), 4), 
+           &quot; and the standard deviation is: &quot;, round(sd(X()), 4))
+  })
+  
+  output$myhist &lt;- renderPlot({
+    ggplot() + geom_histogram(aes(x = X()), bins = bins())
+  })
+}
+
+shinyApp(ui, server)</code></pre>
+<hr />
+<p><strong>Question 2: </strong> The shiny code below draws two samples
+from a <a href="https://en.wikipedia.org/wiki/Poisson_distribution">Poisson
+distribution</a>, a statistical distribution with only a single
+parameter, lambda, and plots them against each other. Modify the shiny
+code so that changing the value of <code>n</code> will update both
+distributions but changing the value of <span class="math inline">\(\lambda_1\)</span> or <span class="math inline">\(\lambda_2\)</span> will only impact its related
+distribution.</p>
+<pre class="r"><code># Function for plot
+freqpoly &lt;- function(x1, x2, binwidth = 0.1, xlim = c(-3, 3)) {
+  df &lt;- data.frame(
+    x = c(x1, x2),
+    g = c(rep(&quot;x1&quot;, length(x1)), rep(&quot;x2&quot;, length(x2)))
+  )
+  
+  ggplot(df, aes(x, colour = g)) +
+    geom_freqpoly(binwidth = binwidth, size = 1) +
+    coord_cartesian(xlim = xlim)
+}
+
+# This would make a good question actually
+ui &lt;- fluidPage(
+  numericInput(&quot;lambda1&quot;, label = &quot;lambda1&quot;, value = 3),
+  numericInput(&quot;lambda2&quot;, label = &quot;lambda2&quot;, value = 5),
+  numericInput(&quot;n&quot;, label = &quot;n&quot;, value = 1e4, min = 0), 
+  column(9, plotOutput(&quot;hist&quot;))
+)
+server &lt;- function(input, output) {
+  output$hist &lt;- renderPlot({
+    x1 &lt;- rpois(input$n, input$lambda1)
+    x2 &lt;- rpois(input$n, input$lambda2)
+    freqpoly(x1, x2, binwidth = 1, xlim = c(0, 40))
+  }, res = 96)
+}
+
+shinyApp(ui, server)</code></pre>
+<hr />
+<p>In this section, we spent a bit more time investigating how
+reactivity works in an R Shiny app. In particular, we reviewed the
+relationship between rendered and reactive objects, as well as some of
+the subtle ways in which dependencies (or a lack of dependency in the
+case of the plot/summary data) can modify what our application is doing
+without any sort of explicit warning or errors. Next, we will
+investigate ways in which we can exercise a little bit more control on
+how our server side function responds to reactive objects.</p>
 </div>
-<div id="course-materials" class="section level1">
-<h1>Course Materials</h1>
-<div id="labs" class="section level2">
-<h2>Labs</h2>
-<table>
-<colgroup>
-<col width="19%" />
-<col width="16%" />
-<col width="32%" />
-<col width="32%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Slides</th>
-<th align="left">Lab</th>
-<th align="left">Due Date</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Tue 1/19</td>
-<td align="left"><a href="lectures/intro.pdf">Introduction</a></td>
-<td align="left"><a href="labs/01_introduction.html">Introduction</a></td>
-<td align="left">1/29 at 10pm</td>
-</tr>
-<tr class="even">
-<td align="left">Thur 1/21</td>
-<td align="left"></td>
-<td align="left"><a href="labs/02_ggplot.html">ggplot</a></td>
-<td align="left">(see next)</td>
-</tr>
-<tr class="odd">
-<td align="left">Tue 1/27</td>
-<td align="left"></td>
-<td align="left"><a href="labs/02_ggscales.html">ggplot2
-(cont.)</a></td>
-<td align="left">2/3 at 10pm</td>
-</tr>
-<tr class="even">
-<td align="left">Thur 1/29</td>
-<td align="left"></td>
-<td align="left"><a href="labs/03_dplyr.html">dplyr</a></td>
-<td align="left">2/5 at 10pm</td>
-</tr>
-<tr class="odd">
-<td align="left">Tue 2/3</td>
-<td align="left"></td>
-<td align="left"><a href="labs/04_tidyr.html">tidyr</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Thur 2/5</td>
-<td align="left"><a href="resources/pivot_summary.pdf">Pivot Visual
-Aid</a></td>
-<td align="left"><a href="labs/04_tidyr.html">tidyr cont.</a></td>
-<td align="left">2/10 at 10pm</td>
-</tr>
-<tr class="odd">
-<td align="left">Tue 2/10</td>
-<td align="left"><a href="lectures/joins.pdf">Joins</a></td>
-<td align="left"><a href="labs/05_joins.html">Joins</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Thur 2/12</td>
-<td align="left"></td>
-<td align="left"><a href="labs/05_joins.html">Joins</a></td>
-<td align="left">2/17 at 10pm</td>
-</tr>
-<tr class="odd">
-<td align="left">Thur 2/19</td>
-<td align="left"><a href="lectures/strings.pdf">Strings and
-Regex</a></td>
-<td align="left"><a href="labs/06_stringr.html">Strings + Regex</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Tue 2/24</td>
-<td align="left"></td>
-<td align="left">Continue Strings</td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Thur 2/26</td>
-<td align="left"></td>
-<td align="left"><a href="labs/07_dates.html">Date and Time</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Tue 3/3</td>
-<td align="left"><a href="lectures/dates.pdf">Date and Time</a></td>
-<td align="left"><a href="labs/07_dates.html">Date and Time</a></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Thur 3/5</td>
-<td align="left"></td>
-<td align="left"><a href="https://grinnell.co1.qualtrics.com/jfe/form/SV_3TQYM3QKrHMzpga">Course
-Survey!</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Spring Break</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Tue 3/24</td>
-<td align="left"><a href="lectures/files.pdf">Files and Loops</a></td>
-<td align="left"><a href="labs/08_files_loops.html">Loops and Files and
-Conditionals</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Tue 3/31</td>
-<td align="left">Functions and Functionals</td>
-<td align="left"><a href="labs/09_functions.html">Functions and
-Functionals</a></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Tue 4/7</td>
-<td align="left"></td>
-<td align="left"><a href="project/pregnancy.html">Data Processing
-Project</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Thur 4/16</td>
-<td align="left"></td>
-<td align="left"><a href="labs/10_sql.html">SQL Lab</a></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Tue 4/28</td>
-<td align="left"></td>
-<td align="left"><a href="labs/11_api.html">API Lab</a></td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<p>On deck:</p>
-<ul>
-<li><a href="https://shiny.grinnell.edu/connect/#/apps/e11309e6-e0a6-4771-8bd6-dbf2ed4a376b/access">Shiny</a></li>
-</ul>
+<div id="controlling-reactivity" class="section level2">
+<h2>Controlling Reactivity</h2>
+<p>As we have seen several times now, a rendering function will update
+in response to <em>any</em> changes in <em>any</em> of the reactive
+objects contained within their expression. There are primarily two ways
+that we can go about controlling this reactivity, the first involves
+creating reactions in response to a particular event, the other in
+isolating the reactive objects within their rendering expressions.</p>
+<div id="event-reactivity" class="section level3">
+<h3>Event Reactivity</h3>
+<p>We return to a simplified version of our basic histogram from earlier
+in the lab, where we have already put the data generation
+(<code>X()</code>) and the number of bins (<code>bins()</code>) in their
+own reactive containers</p>
+<pre class="r"><code>ui &lt;- fluidPage(
+  numericInput(&quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100),
+  sliderInput(&quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
+  plotOutput(&quot;myhist&quot;)
+)
+
+server &lt;- function(input, output) {
+  X &lt;- reactive(rnorm(input$n))
+  bins &lt;- reactive(input$bins)
+
+  output$myhist &lt;- renderPlot({
+    ggplot() + geom_histogram(aes(x = X()), bins = bins())
+  })
+}
+
+shinyApp(ui, server)</code></pre>
+<p>Our goal here is to create a situation in which we can directly
+dictate when the plot is rendered without having it automatically change
+in response to either of our inputs. One solution here would be to
+create a button that initiates the simulation. That is, we will create a
+reactive input that we can use to update all of our reactive objects
+without changing any of our existing inputs. Run the app below using the
+simulate button to see how this works.</p>
+<pre class="r"><code>ui &lt;- fluidPage(
+  numericInput(&quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100),
+  sliderInput(&quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
+  
+  # The action button (class = &quot;btn-success&quot; is just being cute and is not necessary)
+  actionButton(&quot;simulate&quot;, label = &quot;Run Simulation&quot;, class = &quot;btn-success&quot;),
+  
+  plotOutput(&quot;myhist&quot;)
+)
+
+server &lt;- function(input, output) {
+  
+  X &lt;- reactive({
+    # Now simulate will cause this reactive value to update
+    input$simulate
+    rnorm(input$n)
+    })
+  bins&lt;- reactive({
+    input$simulate # It will also update the computation of bins
+    input$bins
+    })
+
+  
+  output$myhist &lt;- renderPlot({
+    ggplot() + geom_histogram(aes(x = X()), bins = bins())
+  })
+}
+
+shinyApp(ui, server)</code></pre>
+<p>As you may have noticed, however, changing the number of observations
+or the number of bins <em>also</em> caused the plot to update,
+inadvertently creating <em>more</em> dependencies in our Shiny app, not
+fewer. The solution to this is to create a reactive object that
+explicitly responds to changes that we indicate. This function is
+<code>eventReactive()</code> which takes two arguments – the first is an
+expression containing any events that should be responded to, the second
+is an expression that determines the value it returns (exactly as
+<code>reactive()</code> has done until this point). It works like
+this:</p>
+<pre class="r"><code>ui &lt;- fluidPage(
+  numericInput(&quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100),
+  sliderInput(&quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
+  actionButton(&quot;simulate&quot;, label = &quot;Run Simulation&quot;, class = &quot;btn-success&quot;),
+  plotOutput(&quot;myhist&quot;)
+)
+
+server &lt;- function(input, output) {
+  
+  
+  X &lt;- eventReactive(eventExpr = input$simulate, # This causes it to update
+                     valueExpr = { # This is the value it returns
+                       rnorm(input$n)
+                     })
+  
+  # We don&#39;t need to name the arguments, though
+  bins &lt;- eventReactive(input$simulate, input$bins)
+  
+  output$myhist &lt;- renderPlot({
+    ggplot() + geom_histogram(aes(x = X()), bins = bins())
+  })
+}
+
+shinyApp(ui, server)</code></pre>
+<p>Notice that changes to either <code>input$n</code> or
+<code>input$bins</code> no longer causes the histogram or data to
+regenerate. By introducing a reactive object that responds to a
+particular event, we gained more explicit control on the operations of
+the app.</p>
+<!-- **Question 3: ** not sure what question to have here -->
+<!-- ```{r} -->
+<!-- ui <- fluidPage( -->
+<!--   numericInput("n", label = "Number of obs:", value = 100), -->
+<!--   sliderInput("bins", label = "Number of bins:", min = 2, max = 20, value = 10), -->
+<!--   actionButton("simulate", label = "Run Simulation", class = "btn-success"), -->
+<!--   plotOutput("myhist") -->
+<!-- ) -->
+<!-- server <- function(input, output) { -->
+<!--   observeEvent(input$simulate, { -->
+<!--     output$myhist <- renderPlot({ -->
+<!--       X <- rnorm(input$n) # hmm -->
+<!--       bins <- input$bins -->
+<!--       ggplot() + geom_histogram(aes(x = X), bins = bins) -->
+<!--     }) -->
+<!--   }) -->
+<!-- } -->
+<!-- shinyApp(ui, server) -->
+<!-- ``` -->
 </div>
-<div id="homework" class="section level2">
-<h2>Homework</h2>
-<table style="width:100%;">
-<colgroup>
-<col width="28%" />
-<col width="23%" />
-<col width="47%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Reading</th>
-<th align="left">Assignment</th>
-<th align="left">Due Date</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left"><a href="https://r4ds.hadley.nz/">R4DS</a>
-Introduction, Ch 1-3</td>
-<td align="left"><a href="hw/hw1.html">Homework 1</a></td>
-<td align="left">Thur 1/29 at 10pm</td>
-</tr>
-<tr class="even">
-<td align="left"><a href="https://r4ds.hadley.nz/">R4DS</a> 4, 5,
-19</td>
-<td align="left"><a href="hw/hw2.html">Homework 2</a></td>
-<td align="left">Thur 2/12 at 10pm</td>
-</tr>
-<tr class="odd">
-<td align="left"><a href="https://r4ds.hadley.nz/">R4DS</a> 12-18</td>
-<td align="left"><a href="hw/hw3.html">Homework 3</a></td>
-<td align="left">Thur 3/5 at 10pm</td>
-</tr>
-<tr class="even">
-<td align="left">None</td>
-<td align="left"><a href="hw/hw4.html">Homework 4</a></td>
-<td align="left">Thur 4/7 at 10pm</td>
-</tr>
-</tbody>
-</table>
+<div id="isolate" class="section level3">
+<h3>Isolate</h3>
+<p>In nearly opposite fashion to the use of <code>eventReactive()</code>
+there is the <code>isolate()</code> function which, when wrapped around
+a reactive object, prevents changes from triggering changes in its
+embedded expression. Here, the use of <code>isolate()</code> prevents
+changes in <code>input$n</code> from updating the histogram while still
+allowing it to respond to changes from <code>input$bins</code>:</p>
+<pre class="r"><code>ui &lt;- fluidPage(
+  numericInput(&quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100),
+  sliderInput(&quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
+  plotOutput(&quot;myhist&quot;)
+)
+
+server &lt;- function(input, output) {
+  
+  X &lt;- reactive(rnorm(input$n))
+  bins &lt;- reactive(input$bins)
+  
+  output$myhist &lt;- renderPlot({
+    X &lt;- isolate(X())
+    ggplot() + geom_histogram(aes(x = X), bins = bins())
+  })
+}
+
+shinyApp(ui, server)</code></pre>
+<p>The <code>isolate()</code> function is less commonly used than
+<code>eventReactive()</code>, but it’s a helpful resource to be aware of
+in the event that you need it.</p>
+<p><strong>Question 3: </strong> Using the <code>isolate()</code>
+function, rewrite the Shiny app below so that it functions the same
+(updates on <code>input$simluate</code>, not on <code>input$n</code> or
+<code>input$bins</code>) but without using
+<code>eventReactive()</code></p>
+<pre class="r"><code>ui &lt;- fluidPage(
+  numericInput(&quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100),
+  sliderInput(&quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
+  actionButton(&quot;simulate&quot;, label = &quot;Run Simulation&quot;, class = &quot;btn-success&quot;),
+  
+  plotOutput(&quot;myhist&quot;)
+)
+
+server &lt;- function(input, output) {
+  
+  X &lt;- eventReactive(input$simulate, rnorm(input$n))
+  bins &lt;- eventReactive(input$simulate, input$bins)
+  
+  output$myhist &lt;- renderPlot({
+    ggplot() + geom_histogram(aes(x = X()), bins = bins())
+  })
+}
+
+shinyApp(ui, server)</code></pre>
 </div>
-<div id="solutions" class="section level2">
-<h2>Solutions</h2>
-<div id="homework-1" class="section level3">
-<h3>Homework</h3>
-<ul>
-<li><a href="solutions/hw1_solutions.pdf">Homework 1</a></li>
-<li><a href="solutions/hw2_solutions.pdf">Homework 2</a></li>
-<li><a href="solutions/hw3_solutions.pdf">Homework 3</a></li>
-<li><a href="solutions/hw4_solutions.pdf">Homework 4</a></li>
-</ul>
 </div>
-<div id="labs-1" class="section level3">
-<h3>Labs</h3>
-<ul>
-<li><a href="solutions/01_introduction_sol.pdf">Lab 1</a></li>
-<li><a href="solutions/02_ggplot_sol.pdf">Lab 2</a></li>
-<li><a href="solutions/03_dplyr_sol.pdf">Lab 3</a></li>
-<li><a href="solutions/04_tidyr_sol.pdf">Lab 4</a></li>
-<li><a href="solutions/05_joins_solution.pdf">Lab 5</a></li>
-<li><a href="solutions/06_stringr_solution.pdf">Lab 6</a></li>
-<li><a href="solutions/07_dates_solutions.pdf">Lab 7</a></li>
-<li><a href="solutions/08_files_sol.pdf">Lab 8</a></li>
-<li><a href="solutions/09_functions_sol.pdf">Lab 9</a></li>
-</ul>
+<div id="additional-techniques" class="section level2">
+<h2>Additional Techniques</h2>
+<div id="using-dplyr" class="section level3">
+<h3>Using <code>dplyr</code></h3>
+<p>As mentioned in the previous lab, we run into a potential conflict
+with the fact that most of the <code>input</code> objects are either
+characters or numerics, while up until now <code>dplyr</code> and
+<code>ggplot2</code> both used <em>names</em>. That is, we are used to
+typing</p>
+<pre class="r"><code>mpg %&gt;% group_by(cyl) %&gt;% 
+  filter(cty &gt; 10) %&gt;% 
+  summarize(meanHwy = mean(hwy))</code></pre>
+<p>instead of what we would get using character vectors, which doesn’t
+work:</p>
+<pre class="r"><code>mpg %&gt;% group_by(&quot;cyl&quot;) %&gt;% 
+  filter(&quot;cty&quot; &gt; 10) %&gt;% 
+  summarize(meanHwy = mean(&quot;hwy&quot;))</code></pre>
+<p>Rather than spending any time discussing <em>why</em> this is, or why
+the solution is the way it is (you are more than welcome to come to my
+office to discuss, however), I am simply going to present the solution
+to this problem.</p>
+<p>First, we should understand that “variables” can have two meanings
+when discussing data manipulation in dplyr: first, there are variables
+<em>within</em> the data frame (such as <code>cyl</code>,
+<code>cty</code>, <code>displ</code>) that, for now, we will call
+<em>data variables</em>. Second, we have variables that exist within the
+environment which involves nearly everything that you might create with
+<code>&lt;-</code>. We will call these <em>environment
+variables</em>.</p>
+<p>To get around the issue with using dplyr with strings in Shiny and to
+remove any potential of confusing the app, we will always designate data
+variables with <code>.data.</code> and environment variables with
+<code>.env</code> and then reference the variable name within
+<code>[[]]</code> when using <code>.data</code> and <code>$</code> when
+using <code>.env</code>:</p>
+<pre class="r"><code>var1 &lt;- &quot;cyl&quot;
+var2 &lt;- &quot;cty&quot;
+var3 &lt;- &quot;hwy&quot;
+ten &lt;- 10
+
+mpg %&gt;% group_by(.data[[var1]]) %&gt;% 
+  filter(.data[[var2]] &gt; .env$ten) %&gt;% 
+  summarize(meanHwy = mean(.data[[var3]]))</code></pre>
+<p>Yes, this is cumbersome and weird, but unfortunately it is what it
+is. If its any consolation, the base R solution is not tremendously
+better:</p>
+<pre class="r"><code># base R solution
+mpg2 &lt;- mpg[mpg[[var2]] &gt; ten, ]
+by(mpg2, 
+   mpg2[[var1]], 
+   function(x) mean(x[[var3]])) %&gt;% array2DF()</code></pre>
+<p><strong>Question 4</strong> Complete the logic of this Shiny app so
+that it is dplyr compliant. Note that if an input (say,
+<code>input$cutoff</code>) has multiple values, you can access each one
+as you would a vector, i.e., <code>input$cutoff[1]</code> and
+<code>input$cutoff[2]</code>.</p>
+<pre class="r"><code>ui &lt;- fluidPage(
+  selectInput(&quot;group&quot;, &quot;Group by: &quot;, c(&quot;year&quot;, &quot;drv&quot;)),
+  selectInput(&quot;filter&quot;, &quot;Filter var: &quot;, c(&quot;cty&quot;, &quot;hwy&quot;)),
+  sliderInput(&quot;cutoff&quot;, &quot;Cutoff for filter:&quot;, min = 9, max = 44, value = c(10, 40)), 
+  DT::DTOutput(&quot;result&quot;)
+)
+
+server &lt;- function(input, output) {
+  
+  dat &lt;- reactive({
+    # filter input$filter by input$cutoff values
+    # group by input$group
+    # summarize to find mean hwy by group
+  })
+  
+  output$result &lt;- renderDT({
+    # Example of how input vector value works, you can delete this
+    data.frame(x = input$cutoff[1], y = input$cutoff[2])
+    
+    #dat() # uncomment when you are done creating dat()
+  })
+}
+
+shinyApp(ui, server)</code></pre>
+</div>
+<div id="reactive-ui" class="section level3">
+<h3>Reactive UI</h3>
+<p>In many cases, the interface that we provide to a user of our app
+will be dependent on various user inputs. For example, if we wish to
+simulate the sampling of a random variable according to a distribution’s
+parameters, the parameters used as input will be dependent on the
+distribution from which we are sampling. The process of creating a
+responsive UI is similar to other server-side operations we have seen
+thus far: there is a <code>uiOutput()</code> function that reserves
+space on the UI side and a <code>renderUI()</code> on the server side.
+We include UI input functions within <code>renderUI()</code> just as we
+would in the UI object.</p>
+<pre class="r"><code>ui &lt;- fluidPage(
+  selectInput(&quot;dist&quot;, &quot;Select distribution&quot;, choices = c(&quot;normal&quot;, &quot;poisson&quot;)),
+  uiOutput(&quot;par1out&quot;), 
+  uiOutput(&quot;par2out&quot;),
+  plotOutput(&quot;plot&quot;)
+)
+
+server &lt;- function(input, output) {
+  
+  output$par1out &lt;- renderUI({
+    # This will create a numericInput based on input$dist
+    if (input$dist == &quot;normal&quot;) {
+      numericInput(inputId = &quot;normalMean&quot;, label = &quot;Mean&quot;, value = 0, min = -3, max = 3)
+    } else if (input$dist == &quot;poisson&quot;) {
+      numericInput(inputId = &quot;lambda&quot;, &quot;Lambda&quot;, value = 1, min = 0.1, max = 5)
+    }
+  })
+  
+  output$par2out &lt;- renderUI({
+    if (input$dist == &quot;normal&quot;) {
+      numericInput(inputId = &quot;normalSD&quot;, label = &quot;Standard Deviation&quot;, value = 1, min = 0.1, max = 5)
+    } else if (input$dist == &quot;poisson&quot;) {
+     # Returning NULL will leave the slot empty
+      NULL 
+    }
+  })
+  
+  dat &lt;- reactive({
+    if (input$dist == &quot;normal&quot;) {
+      X &lt;- rnorm(n = 1000, mean = input$normalMean, sd = input$normalSD)
+    } else {
+      X &lt;- rpois(n = 1000, lambda = input$lambda)
+    }
+    data.frame(x = X)
+  })
+  
+  output$plot &lt;- renderPlot({
+    ggplot(dat(), aes(x)) + geom_freqpoly(binwidth = 1)
+  })
+  
+}
+
+shinyApp(ui, server)</code></pre>
+</div>
+<div id="misc" class="section level3">
+<h3>Misc</h3>
+<p>Finally, we include two relatively simple functions that exist in
+base R that you may find helpful on your journey towards making a really
+cool Shiny app. The first of these, <code>switch()</code>, is a
+generally useful function to know – it takes a single input and,
+depending on it’s value, returns something else:</p>
+<pre class="r"><code>val &lt;- &quot;five&quot;
+
+switch(val, 
+       &quot;five&quot; = 5, # If equal to &quot;five&quot;, return 5
+       &quot;six&quot; = 6, 
+       &quot;seven&quot; = 7, 
+       &quot;I DON&#39;T KNOW&quot;)</code></pre>
+<pre><code>## [1] 5</code></pre>
+<pre class="r"><code>val &lt;- &quot;six&quot;
+
+switch(val, 
+       &quot;five&quot; = 5, 
+       &quot;six&quot; = 6, # If equal to &quot;six&quot; return 6
+       &quot;seven&quot; = 7, 
+       &quot;I DON&#39;T KNOW&quot;)</code></pre>
+<pre><code>## [1] 6</code></pre>
+<pre class="r"><code>val &lt;- &quot;nine&quot;
+
+switch(val, 
+       &quot;five&quot; = 5, 
+       &quot;six&quot; = 6, 
+       &quot;seven&quot; = 7, 
+       &quot;I DON&#39;T KNOW&quot;) # If a match isn&#39;t found, return the last row (default)</code></pre>
+<pre><code>## [1] &quot;I DON&#39;T KNOW&quot;</code></pre>
+<p>The other function you will be far less likely to run into in the
+wild but is incredibly useful with Shiny apps: this function is
+<code>get()</code>. <code>get()</code> takes as an argument a character
+vector and returns any objects in the environment with that name.</p>
+<pre class="r"><code>somevar &lt;- 1991
+get(&quot;somevar&quot;)</code></pre>
+<p>Of course, this works with variables containing strings as well:</p>
+<pre class="r"><code>somevar &lt;- 1991
+string &lt;- &quot;somevar&quot;
+get(string)</code></pre>
+<p>This may come in handy if your Shiny app utilizes multiple
+datasets.</p>
+<pre class="r"><code># Create some data sets named df1 and df2
+N &lt;- 1000
+X &lt;- rnorm(N)
+df1 &lt;- data.frame(x = X, y = -X + rnorm(N, sd = 0.1))
+df2 &lt;- data.frame(x = X, y = 4*X + rnorm(N, sd = 2))
+
+ui &lt;- fluidPage(
+  selectInput(&quot;dataset&quot;, label = &quot;Select dataset&quot;, choices = c(&quot;Data 1&quot;, &quot;Data 2&quot;)), 
+  plotOutput(&quot;plot&quot;)
+)
+
+server &lt;- function(input, output) {
+  
+  dat &lt;- reactive({
+    var &lt;- switch(input$dataset, 
+                  &quot;Data 1&quot; = &quot;df1&quot;, 
+                  &quot;Data 2&quot; = &quot;df2&quot;, 
+                  NULL)
+    get(var)
+  })
+  
+  output$plot &lt;- renderPlot({
+    ggplot(dat(), aes(x, y)) + geom_point()
+  })
+  
+}
+
+shinyApp(ui, server)</code></pre>
 </div>
 </div>
 </div>

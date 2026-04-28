@@ -11,7 +11,7 @@
 
 
 
-<title>STA 230 Intro to Data Science (Spring 2026)</title>
+<title>Shiny Part 1: UI</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1477,248 +1477,513 @@ border-radius: 0px;
 
 
 
-<h1 class="title toc-ignore">STA 230 Intro to Data Science (Spring
-2026)</h1>
+<h1 class="title toc-ignore">Shiny Part 1: UI</h1>
 
 </div>
 
 
+<div id="preamble" class="section level1">
+<h1>Preamble</h1>
+<pre class="r"><code># install.packages(&quot;shiny&quot;)
+# install.packages(&quot;DT&quot;)
+# install.packages(&quot;shinyWidgets&quot;)
+library(shiny)
+library(dplyr)
+library(ggplot2)</code></pre>
+<p>For the next component of our class, we are going to begin our
+introduction to <a href="https://shiny.posit.co/r/gallery/">R Shiny</a>,
+a package that provides a framework for building interactive web
+applications in R without requiring any knowledge of HTML, CSS, or
+JavaScript.</p>
+<p>Additionally, much of this and the following labs “borrow heavily”
+from the <a href="https://mastering-shiny.org/index.html">Mastering
+Shiny</a> book, in particular Chapters 1-6. I have tried to contain the
+bulk of what we need to get running in the labs that follow, but if
+you’re interested in learning more or if you’re not able to find
+guidance on what you are trying to do through an internet search, this
+would be a decent place to look.</p>
+<div id="lab-workflow" class="section level2">
+<h2>Lab Workflow</h2>
+<p>Because R Shiny requires an active R session to run, it can cause
+issues when embedded in a static HTML document such as those created
+with knitting in R Markdown. To handle this, we are going to slightly
+modify our workflow for the next few labs. At the top of a new R
+Markdown folder we typically see this line for our setup:</p>
+<pre><code>```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```</code></pre>
+<p>We are going to add an argument here (<code>eval = FALSE</code>) so
+that, by default, R Markdown doesn’t try to run any of the code we
+include in code blocks. This will allow you to submit an R Markdown
+document with R code but without it trying to run Shiny apps in each
+block:</p>
+<pre><code>```{r setup, include=FALSE}
+# Adding `warning` and `message` will hide package output, which is nice
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE, warning = FALSE, message = FALSE)
+```</code></pre>
+<p>Much of this lab will be the presentation of examples that need to be
+ran elsewhere (this will make more sense Shiny code has been copied into
+a blank R Script, you can run the app by:</p>
+<ol style="list-style-type: decimal">
+<li>Pushing <code>Ctrl+Shift+Enter</code> (possibly <code>Cmd</code> for
+Mac)</li>
+<li>Clicking the little Run button at the top of the window pane</li>
+<li>Highlighting all of the code in the R Script file related to your
+app and hitting <code>Ctrl+Enter</code></li>
+</ol>
+<p>All of the code we have will be safe to overwrite, so don’t fret on
+deleting everything and starting over. You are also highly encouraged to
+modify examples on your own to see how your apps respond to changes. Any
+code that you are asked to keep can be placed in a code chunk in your R
+Markdown file.</p>
+</div>
+<div id="example-shiny" class="section level2">
+<h2>Example Shiny</h2>
+<p>An R Shiny application consists of three parts that must be included
+in each app:</p>
+<ol style="list-style-type: decimal">
+<li>A <code>ui</code> (user interface) object</li>
+<li>A <code>server</code> function</li>
+<li>A call to the function <code>shinyApp(ui, server)</code>.</li>
+</ol>
+<p>The first of these objects, <code>ui</code>, is responsible for
+organizing all of the user interface; this primarily means collecting
+input from the user and organizing output. The second object, the
+<code>server</code> function, is responsible for performing “back-end”
+operations such as creating plots or subsetting data frames. It acts in
+response to changes in user input. And finally,
+<code>shinyApp(ui, server)</code>, takes these two components and builds
+the R Shiny app. A completely minimal Shiny app looks like this:</p>
+<pre class="r"><code>library(shiny)
+
+## Set up the UI object
+ui &lt;- fluidPage(
+  &quot;Hello world&quot;
+)
+
+## Set up the server function
+server &lt;- function(input, output) {
+}
+
+## Build and run the app
+shinyApp(ui, server)</code></pre>
+<p><strong>Question 0:</strong> Copy and paste the above code into a
+blank R script. Verify that you are able to run the Shiny app and
+successfully close it when you are finished.</p>
+<p><em>Note:</em> I won’t make a point of saying it explicitly each
+time, but when you see a code block like the one above containing a
+<code>ui</code>, <code>server</code>, and <code>shinyApp</code>, it
+should be understood that you are to copy and paste it into your R
+script, run it, play with it, and make sure you understand what it is
+doing before moving on.</p>
+</div>
+</div>
+<div id="lab" class="section level1">
+<h1>Lab</h1>
+<p>This lab will be primarily focused on the UI aspects of a Shiny App.
+Following this, we will have a lab on server-side code, and finally, we
+will wrap up with a few tips on adding a little bit of style.</p>
+<div id="ui" class="section level2">
+<h2>UI</h2>
+<p>Broadly speaking, the UI interface of a shiny app can be broken into
+operations:</p>
+<ol style="list-style-type: decimal">
+<li>Receiving user input</li>
+<li>Organizing output</li>
+</ol>
+<p>The input and output that you specify in the <code>ui</code> object
+will be passed to the <code>server</code> function as indicated by the
+arguments it takes, <code>input</code> and <code>output</code>.</p>
+<div id="input" class="section level3">
+<h3>Input</h3>
+<p>Both input and output are created with functions. Conveniently, most
+(but not all) of the input functions are named according to the
+convention <code>&lt;type&gt;Input()</code>. The first argument of all
+input functions will be the <em>identifier</em> which allows you to
+manipulate the input in the server function, while the rest tend to be
+function specific. In this next example, we see two inputs with the ID
+<code>&quot;n&quot;</code> and <code>&quot;bins&quot;</code> along with their use in the
+server function.</p>
+<pre class="r"><code>ui &lt;- fluidPage(
+  # Input functions allow us to solicit input from user
+  numericInput(inputId = &quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100), # comma after each object in ui
+  sliderInput(inputId = &quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
+  
+  # Output functions reserve space for output
+  plotOutput(outputId = &quot;myhist&quot;)
+)
+
+server &lt;- function(input, output) {
+  
+  # Note that output$myhist aligns with outputId &quot;myhist&quot; in the ui
+  # And that input$n aligns with inputId &quot;n&quot; in the ui (same with input$bins)
+  output$myhist &lt;- renderPlot({
+    # Draw n values from a random normal distribution
+    X &lt;- rnorm(input$n)
+    ggplot() + geom_histogram(aes(x = X), bins = input$bins)
+  })
+}
+
+shinyApp(ui, server)</code></pre>
+<p>Here, there are a few things to take note of. First and perhaps most
+importantly, we see that we are able to access each of the inputs in the
+server function with the use of <code>input$varname</code>; that is,
+<code>input$n</code> was used in <code>rnorm</code> to compute the
+quantity of random numbers we wished to draw and <code>input$bin</code>
+was used to determine how many bins we wanted in our histogram. Second,
+take note that each function in <code>ui</code> is separated by a comma.
+Shiny is pretty vocal if you ever forget this.</p>
+<p>The class of the input object is determined by the input function.
+Both <code>numericInput()</code> and <code>sliderInput()</code> return
+numeric values by default so there was no issue with them being used as
+number for sample size and bins. <code>textInput()</code>, on the other
+hand, returns a character vector by default which is not compatible with
+(most) numeric operations.</p>
+<pre class="r"><code>ui &lt;- fluidPage(
+  textInput(inputId = &quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100), 
+  numericInput(inputId = &quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
+  
+  plotOutput(outputId = &quot;myhist&quot;)
+)
+
+server &lt;- function(input, output) {
+  
+  output$myhist &lt;- renderPlot({
+    # Draw n values from a random normal distribution
+    N &lt;- 1 * input$n # rnorm(&quot;10&quot;) will coerce without warning, but 1 * &quot;10&quot; will not
+    X &lt;- rnorm(N) 
+    ggplot() + geom_histogram(aes(x = X), bins = input$bins)
+  })
+}
+
+shinyApp(ui, server)</code></pre>
+<p>Debugging applications in Shiny can be bewildering at first because
+of the number of moving parts. However, we can utilize the fact that
+when a Shiny app is running, so is R. We can use this to our advantage
+to print things to the console for investigation. In this case, I’m not
+sure what class <code>input$n</code> is, so I will include a
+<code>print()</code> function which won’t impact the app but will send
+output to my console.</p>
+<pre class="r"><code>ui &lt;- fluidPage(
+  textInput(inputId = &quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100), 
+  sliderInput(inputId = &quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
+  
+  plotOutput(outputId = &quot;myhist&quot;)
+)
+
+server &lt;- function(input, output) {
+  
+  output$myhist &lt;- renderPlot({
+    
+    ## Look for this output in the console
+    print(paste0(&quot;Class of input$n: &quot;, class(input$n)))
+    
+    N &lt;- 1 * input$n 
+    X &lt;- rnorm(N) 
+    ggplot() + geom_histogram(aes(x = X), bins = input$bins)
+  })
+}
+
+shinyApp(ui, server)</code></pre>
+<p>To solve this, we would either need to change the type of input
+function we use to solicit the data (<code>textInput()</code> to
+<code>numericInput()</code> or we would need to coerce the variable with
+<code>as.numeric(input$n)</code>). We will introduce additional
+debugging tips as they arise.</p>
+<div id="using-ggplot2-and-dplyr" class="section level4">
+<h4>Using ggplot2 and dplyr</h4>
+<p>By far the most common classes for inputs to take are numeric or
+character. A consequence of how these values are stored arises when we
+try to use functions like <code>ggplot</code> or <code>mutate</code>
+which take unquoted variable names rather than character strings for
+their arguments. Addressing this issue (known as <a href="http://adv-r.had.co.nz/Computing-on-the-language.html">non-standard
+evaluation</a>) lies comfortably beyond the scope of this course.
+Regarding <code>dplyr</code> functions, we will simply try and perform
+most of our data manipulations prior to running Shiny, though we will
+see in the next lab a few ways around this when data manipulation is a
+critical aspect of the application. As for <code>ggplot</code>, we will
+introduce two idioms: the first is using <code>aes_string()</code> to
+pass character strings to aesthetics instead of names, while the second
+uses <code>as.formula()</code> in conjunction with faceting. I will
+include examples of both for reference. Here, we are asking for two
+inputs: one to choose a numeric variable to plot with displacement, the
+other with which to facet wrap.</p>
+<pre class="r"><code>ui &lt;- fluidPage(
+  
+  # Select plotting variable (we can used a named vector to change name of radio buttons)
+  selectInput(inputId = &quot;var&quot;, label = &quot;Select Y Axis:&quot;, choices = c(&quot;City&quot; = &quot;cty&quot;, 
+                                                                     &quot;Highway&quot; = &quot;hwy&quot;)), 
+
+  # Select facet variable (in addition to named list, we can use choiceNames/choiceValues)
+  radioButtons(inputId = &quot;facet&quot;, label = &quot;Select Facet Column:&quot;, 
+               choiceNames = c(&quot;Cylinder&quot;, &quot;Drive&quot;, &quot;Year&quot;),
+               choiceValues = c(&quot;cyl&quot;, &quot;drv&quot;, &quot;year&quot;)), 
+  plotOutput(outputId = &quot;myhist&quot;)
+)
+
+server &lt;- function(input, output) {
+
+  output$myhist &lt;- renderPlot({
+    ## Use aes_string, note that &quot;displ&quot; must now be in quotes
+    ggplot(mpg, aes_string(&quot;displ&quot;, input$var)) + geom_point() + 
+      # replace input$facet with any other character string in your own app
+      facet_wrap(as.formula(paste(&quot;~&quot;, input$facet))) 
+  })
+}
+
+shinyApp(ui, server)</code></pre>
 <p><span class="math inline">\(~\)</span></p>
-<p>Last updated: Tue Apr 28 2026, 08:25</p>
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- |  |  |  |  | -->
-<!-- |  |  |  |  | -->
-<!-- |  |  |  |  | -->
-<div id="syllabus" class="section level1">
-<h1>Syllabus</h1>
-<p>Welcome to the course website for STA 230, Introduction to Data
-Science. To begin, you can find the course syllabus linked below:</p>
-<ul>
-<li><a href="syllabus230s26.html">Click here</a> to view the course
-syllabus</li>
-</ul>
-<p>You can locate course content by scrolling, or by using the
-navigation bar in the upper left.</p>
-<p>Ahead on your labs? Try working through the 1st Edition of <a href="http://adv-r.had.co.nz/">Advanced R</a>, an excellent resource for
-learning R as a programming language rather than simply a tool for data
-analysis</p>
-<hr />
 </div>
-<div id="course-materials" class="section level1">
-<h1>Course Materials</h1>
-<div id="labs" class="section level2">
-<h2>Labs</h2>
+<div id="additional-input-functions" class="section level4">
+<h4>Additional Input Functions</h4>
+<p>There are a number of additional input functions here that cater to a
+variety of different inputs and formats that you may be interested, see
+the list here:</p>
+<ol style="list-style-type: decimal">
+<li><a href="https://shiny.posit.co/r/gallery/widgets/widget-gallery/">Additional
+Shiny input functions</a></li>
+<li><a href="https://dreamrs.github.io/shinyWidgets/">Fancy Shiny input
+functions with package <code>shinyWidgets</code></a></li>
+</ol>
+<p><strong>Question 1:</strong> Using the outline of the code below,
+write a shiny app that creates a scatter plot using any two numeric
+variables from the dataset (already computed below in
+<code>numcols</code>). In addition to this, either add an additional
+input from <code>numcols</code> to add a color aesthetic to your plot OR
+add radio buttons to facet between either the variable “Private” or
+“Region” (or both).</p>
+<pre class="r"><code>colleges &lt;- read.csv(&quot;https://remiller1450.github.io/data/Colleges2019.csv&quot;)
+
+# Character vector of numeric college variables
+numcols &lt;- names(colleges)[sapply(colleges, is.numeric)]
+
+ui &lt;- fluidPage(
+)
+
+## Set up the server function
+server &lt;- function(input, output) {
+}
+
+## Build and run the 
+shinyApp(ui, server)</code></pre>
+</div>
+</div>
+<div id="output" class="section level3">
+<h3>Output</h3>
+<p>From our previous examples, you may have already inferred a bit about
+how outputs work in R Shiny. Similar to the inputs, we specify output
+using a function that is typically named according to the convention
+<code>&lt;type&gt;Output</code>, along with an associated ID. Unlike
+input objects, however, we don’t manipulate outputs directly; rather, we
+pair an output function with an associated <em>render</em> function
+within <code>server()</code>.</p>
+<p>Let’s return to the first example we ran, and consider again that on
+the UI side we allocate space for a plot with
+<code>plotOutput(outputId = &quot;myhist&quot;)</code>. On the server side, we
+<em>assign</em> an object to <code>output$myhist</code> that directly
+corresponds to the associated ID from the UI with the function
+<code>renderPlot()</code>.</p>
+<pre class="r"><code>ui &lt;- fluidPage(
+
+  numericInput(inputId = &quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100),
+  
+  # Output functions reserve space for output with ID &quot;myhist&quot;
+  plotOutput(outputId = &quot;myhist&quot;)
+)
+
+server &lt;- function(input, output) {
+  
+  # A render function then assigns output to output$myhist
+  output$myhist &lt;- renderPlot({
+    ggplot() + geom_histogram(aes(x = rnorm(input$n)), bins = 20)
+  })
+}
+
+shinyApp(ui, server)</code></pre>
+<p>For every UI function associated with output, there is a
+corresponding <code>render&lt;type&gt;()</code> function in
+<code>server()</code>. Without this render function, the app will not
+work as intended (or at all, actually):</p>
+<pre class="r"><code>ui &lt;- fluidPage(
+  numericInput(inputId = &quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100),
+  plotOutput(outputId = &quot;myhist&quot;)
+)
+
+server &lt;- function(input, output) {
+  # Remove renderPlot() results in error
+  output$myhist &lt;- ggplot() + geom_histogram(aes(x = rnorm(input$n)), bins = 20)
+}
+
+shinyApp(ui, server)</code></pre>
+<p>This render function does two things:</p>
+<ol style="list-style-type: decimal">
+<li>First, it generates the necessary HTML for the object to be
+correctly presented in the Shiny app</li>
+<li>Second, it creates a <em>reactive</em> context that responds to
+changes in the user input, allowing the output to have the appropriate
+values. We will explore this briefly in the next section and
+comprehensively in the next lab.</li>
+</ol>
+<p>In addition to the output/render functions for plots, the following
+table will prove useful.</p>
 <table>
 <colgroup>
-<col width="19%" />
-<col width="16%" />
-<col width="32%" />
-<col width="32%" />
+<col width="40%" />
+<col width="30%" />
+<col width="30%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th align="left">Date</th>
-<th align="left">Slides</th>
-<th align="left">Lab</th>
-<th align="left">Due Date</th>
+<th>Input</th>
+<th>Output</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Tue 1/19</td>
-<td align="left"><a href="lectures/intro.pdf">Introduction</a></td>
-<td align="left"><a href="labs/01_introduction.html">Introduction</a></td>
-<td align="left">1/29 at 10pm</td>
+<td><code>plotOutput()</code></td>
+<td><code>renderPlot()</code></td>
+<td>Produces basic plot or ggplot objects</td>
 </tr>
 <tr class="even">
-<td align="left">Thur 1/21</td>
-<td align="left"></td>
-<td align="left"><a href="labs/02_ggplot.html">ggplot</a></td>
-<td align="left">(see next)</td>
+<td><code>textOutput()</code></td>
+<td><code>renderText()</code></td>
+<td>Prints character strings</td>
 </tr>
 <tr class="odd">
-<td align="left">Tue 1/27</td>
-<td align="left"></td>
-<td align="left"><a href="labs/02_ggscales.html">ggplot2
-(cont.)</a></td>
-<td align="left">2/3 at 10pm</td>
+<td><code>verbatimTextOutput()</code></td>
+<td><code>renderPrint()</code></td>
+<td>Prints text as raw R output</td>
 </tr>
 <tr class="even">
-<td align="left">Thur 1/29</td>
-<td align="left"></td>
-<td align="left"><a href="labs/03_dplyr.html">dplyr</a></td>
-<td align="left">2/5 at 10pm</td>
+<td><code>tableOutput()</code> or <code>DT::DTOutput()</code></td>
+<td><code>renderTable()</code> or <code>DT::renderDT()</code></td>
+<td>Creates nice tables from data frames</td>
 </tr>
 <tr class="odd">
-<td align="left">Tue 2/3</td>
-<td align="left"></td>
-<td align="left"><a href="labs/04_tidyr.html">tidyr</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Thur 2/5</td>
-<td align="left"><a href="resources/pivot_summary.pdf">Pivot Visual
-Aid</a></td>
-<td align="left"><a href="labs/04_tidyr.html">tidyr cont.</a></td>
-<td align="left">2/10 at 10pm</td>
-</tr>
-<tr class="odd">
-<td align="left">Tue 2/10</td>
-<td align="left"><a href="lectures/joins.pdf">Joins</a></td>
-<td align="left"><a href="labs/05_joins.html">Joins</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Thur 2/12</td>
-<td align="left"></td>
-<td align="left"><a href="labs/05_joins.html">Joins</a></td>
-<td align="left">2/17 at 10pm</td>
-</tr>
-<tr class="odd">
-<td align="left">Thur 2/19</td>
-<td align="left"><a href="lectures/strings.pdf">Strings and
-Regex</a></td>
-<td align="left"><a href="labs/06_stringr.html">Strings + Regex</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Tue 2/24</td>
-<td align="left"></td>
-<td align="left">Continue Strings</td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Thur 2/26</td>
-<td align="left"></td>
-<td align="left"><a href="labs/07_dates.html">Date and Time</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Tue 3/3</td>
-<td align="left"><a href="lectures/dates.pdf">Date and Time</a></td>
-<td align="left"><a href="labs/07_dates.html">Date and Time</a></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Thur 3/5</td>
-<td align="left"></td>
-<td align="left"><a href="https://grinnell.co1.qualtrics.com/jfe/form/SV_3TQYM3QKrHMzpga">Course
-Survey!</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Spring Break</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Tue 3/24</td>
-<td align="left"><a href="lectures/files.pdf">Files and Loops</a></td>
-<td align="left"><a href="labs/08_files_loops.html">Loops and Files and
-Conditionals</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Tue 3/31</td>
-<td align="left">Functions and Functionals</td>
-<td align="left"><a href="labs/09_functions.html">Functions and
-Functionals</a></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Tue 4/7</td>
-<td align="left"></td>
-<td align="left"><a href="project/pregnancy.html">Data Processing
-Project</a></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Thur 4/16</td>
-<td align="left"></td>
-<td align="left"><a href="labs/10_sql.html">SQL Lab</a></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Tue 4/28</td>
-<td align="left"></td>
-<td align="left"><a href="labs/11_api.html">API Lab</a></td>
-<td align="left"></td>
+<td><code>plotlyOutput()</code></td>
+<td><code>renderPlotly()</code></td>
+<td>Produce plotly graphs in Shiny</td>
 </tr>
 </tbody>
 </table>
-<p>On deck:</p>
-<ul>
-<li><a href="https://shiny.grinnell.edu/connect/#/apps/e11309e6-e0a6-4771-8bd6-dbf2ed4a376b/access">Shiny</a></li>
-</ul>
+<hr />
+<p><strong>Question 2:</strong> Use the appropriate output functions in
+order to render a table or data table showing the <code>colleges</code>
+dataset subset by selected states. Hint: use <code>subset</code> and
+<code>%in%</code> on the server side to create the necessary data
+frame.</p>
+<pre class="r"><code>library(DT)
+
+colleges &lt;- read.csv(&quot;https://remiller1450.github.io/data/Colleges2019.csv&quot;)
+
+ui &lt;- fluidPage(
+  
+  # I can use values from colleges to populate choices
+  # multiple = TRUE allows me to select multiple states at once
+  selectInput(&quot;stateSub&quot;, label = &quot;Choose states to subset:&quot;, 
+              choices = unique(colleges$State), multiple = TRUE)
+)
+
+server &lt;- function(input, output, session) {
+
+}
+
+shinyApp(ui, server)</code></pre>
 </div>
-<div id="homework" class="section level2">
-<h2>Homework</h2>
-<table style="width:100%;">
-<colgroup>
-<col width="28%" />
-<col width="23%" />
-<col width="47%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Reading</th>
-<th align="left">Assignment</th>
-<th align="left">Due Date</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left"><a href="https://r4ds.hadley.nz/">R4DS</a>
-Introduction, Ch 1-3</td>
-<td align="left"><a href="hw/hw1.html">Homework 1</a></td>
-<td align="left">Thur 1/29 at 10pm</td>
-</tr>
-<tr class="even">
-<td align="left"><a href="https://r4ds.hadley.nz/">R4DS</a> 4, 5,
-19</td>
-<td align="left"><a href="hw/hw2.html">Homework 2</a></td>
-<td align="left">Thur 2/12 at 10pm</td>
-</tr>
-<tr class="odd">
-<td align="left"><a href="https://r4ds.hadley.nz/">R4DS</a> 12-18</td>
-<td align="left"><a href="hw/hw3.html">Homework 3</a></td>
-<td align="left">Thur 3/5 at 10pm</td>
-</tr>
-<tr class="even">
-<td align="left">None</td>
-<td align="left"><a href="hw/hw4.html">Homework 4</a></td>
-<td align="left">Thur 4/7 at 10pm</td>
-</tr>
-</tbody>
-</table>
 </div>
-<div id="solutions" class="section level2">
-<h2>Solutions</h2>
-<div id="homework-1" class="section level3">
-<h3>Homework</h3>
-<ul>
-<li><a href="solutions/hw1_solutions.pdf">Homework 1</a></li>
-<li><a href="solutions/hw2_solutions.pdf">Homework 2</a></li>
-<li><a href="solutions/hw3_solutions.pdf">Homework 3</a></li>
-<li><a href="solutions/hw4_solutions.pdf">Homework 4</a></li>
-</ul>
-</div>
-<div id="labs-1" class="section level3">
-<h3>Labs</h3>
-<ul>
-<li><a href="solutions/01_introduction_sol.pdf">Lab 1</a></li>
-<li><a href="solutions/02_ggplot_sol.pdf">Lab 2</a></li>
-<li><a href="solutions/03_dplyr_sol.pdf">Lab 3</a></li>
-<li><a href="solutions/04_tidyr_sol.pdf">Lab 4</a></li>
-<li><a href="solutions/05_joins_solution.pdf">Lab 5</a></li>
-<li><a href="solutions/06_stringr_solution.pdf">Lab 6</a></li>
-<li><a href="solutions/07_dates_solutions.pdf">Lab 7</a></li>
-<li><a href="solutions/08_files_sol.pdf">Lab 8</a></li>
-<li><a href="solutions/09_functions_sol.pdf">Lab 9</a></li>
-</ul>
-</div>
+<div id="reactivity" class="section level2">
+<h2>Reactivity</h2>
+<p>As we mentioned previously, the use of the
+<code>render&lt;Type&gt;()</code> functions creates a <em>reactive</em>
+environment necessary for Shiny to run. Put simply, a reactive
+environment is one that is able to respond to user inputs. In a typical
+R session, a particular value is computed once when the code is
+initially run, whereas with Shiny, we want reactive code to change each
+time we modify the input. It’s this relationship between reactive
+objects and the UI that allows the the number of observations or bins in
+a histogram to change after we modify the input.</p>
+<p>To be clear, reactive objects change in response to changes in the
+<code>input</code> object. So when we see code like this (you don’t have
+to run this):</p>
+<pre class="r"><code>ui &lt;- fluidPage(
+  numericInput(inputId = &quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100),
+  sliderInput(inputId = &quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
+  plotOutput(outputId = &quot;myhist&quot;)
+)
+
+server &lt;- function(input, output) {
+  output$myhist &lt;- renderPlot({
+    X &lt;- rnorm(input$n)
+    ggplot() + geom_histogram(aes(x = X), bins = input$bins)
+  })
+}
+
+shinyApp(ui, server)</code></pre>
+<p>we understand that the <code>renderPlot()</code> is responding to
+changes in <code>input$n</code> and <code>input$bins</code>.</p>
+<p>We can explicitly create our own reactive objects with the
+<code>recative()</code> function. Unlike functions we have seen so far
+in R, this doesn’t simply return a static object, but rather another
+function. This means that to use reactive objects elsewhere, we need to
+append <code>()</code> to the end of it:</p>
+<pre class="r"><code>ui &lt;- fluidPage(
+  numericInput(inputId = &quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100),
+  sliderInput(inputId = &quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
+  plotOutput(outputId = &quot;myhist&quot;)
+)
+
+server &lt;- function(input, output) {
+  
+  ## Create reactive objects with reactive()
+  n &lt;- reactive(input$n)
+  bins &lt;- reactive(input$bins)
+  
+  output$myhist &lt;- renderPlot({
+    # Use reactive objects n() and bins()
+    X &lt;- rnorm(n())
+    ggplot() + geom_histogram(aes(x = X), bins = bins())
+  })
+}
+
+shinyApp(ui, server)</code></pre>
+<p>These reactive objects will respond just as their associated inputs
+would: changes to <code>input$n</code> trigger <code>n()</code> to
+update which then triggers the reactivity in
+<code>renderPlot()</code>.</p>
+<p>This will be a critical tool for us to use as the complexity of our
+Shiny app grows. In particular, it will help us manage webs of reactive
+relationships between objects as well as reduce redundant code and
+computation. We will spend the next lab exploring reactivity in a number
+of different contexts.</p>
+<p><strong>Question 3:</strong> Modify the following Shiny app so that
+duplicated expressions are contained within a reactive context.</p>
+<pre class="r"><code>library(shiny)
+
+ui &lt;- fluidPage(
+  sliderInput(&quot;x&quot;, &quot;If x is&quot;, min = 1, max = 50, value = 30),
+  sliderInput(&quot;y&quot;, &quot;and y is&quot;, min = 1, max = 50, value = 5),
+  textOutput(&quot;product&quot;),
+  textOutput(&quot;product_plus5&quot;),
+  textOutput(&quot;product_plus10&quot;)
+)
+
+server &lt;- function(input, output, session) {
+  output$product &lt;- renderText({ 
+    product &lt;- input$x * input$y
+    paste0(&quot;Then (x * y) is: &quot;, product)
+  })
+  output$product_plus5 &lt;- renderText({ 
+    product &lt;- input$x * input$y
+    paste0(&quot;and (x * y) + 5 is: &quot;, product + 5)
+  })
+  output$product_plus10 &lt;- renderText({ 
+    product &lt;- input$x * input$y
+    paste0(&quot;and (x * y) + 10 is: &quot;, product + 10)
+  })
+}
+
+shinyApp(ui, server)</code></pre>
 </div>
 </div>
 
