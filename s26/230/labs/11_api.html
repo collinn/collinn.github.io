@@ -928,25 +928,23 @@ times until you have a total of 50 pokemon</li>
 <li>Finally, return a data.frame that has 50 rows (one for each
 pokemon), will attributes as collumns</li>
 </ul>
-<p>Come up with 3-4 attributes to extract, then create a data.frame as
-we did above.</p>
 </div>
 </div>
 <div id="here-are-some-things-you-can-do-on-your-own" class="section level1">
 <h1>Here are some things you can do on your own</h1>
 <div id="cats" class="section level2">
 <h2>Cats</h2>
-<p>Another fun (free, authentication free) API is Catass
+<p>Another fun (free, authentication free) API is Cataas
 (Cats-As-A-Service), the documentation of which is another good example
 of how APIs can differ. <a href="https://cataas.com/doc.html">Looking at
 the documentation</a>, we see a few things.</p>
 <p>First, we see that all of the given API calls are GET, indicating
 that all calls to the API are those that allow us to retrieve data. We
-also see that the API is broken into two sections: Cats (Catass API) and
+also see that the API is broken into two sections: Cats (Cataas API) and
 API (Public API). The Cats section describes literal URL endpoints that
 can be used by users to generate cat images, whereas the API section
 tells us how we can make structured requests for information.</p>
-<p>Let’s start with the API section, mirroring whta we have already
+<p>Let’s start with the API section, mirroring what we have already
 done. We specify a request to the API, perform the request, and then
 investigate the resulting JSON</p>
 <pre class="r"><code>## Here we request 10 api/cats
@@ -979,7 +977,7 @@ cat_api[[1]]</code></pre>
 ## 
 ## $createdAt
 ## [1] &quot;2022-07-18T11:28:29.596Z&quot;</code></pre>
-<p>We can then use this cat picture metadata to make calls to the Catas
+<p>We can then use this cat picture metadata to make calls to the Cataas
 API to request images. (You’ll have to copy this code and run it
 yourself)</p>
 <pre class="r"><code>base_url &lt;- &quot;https://cataas.com/cat/&quot;
