@@ -1484,9 +1484,7 @@ border-radius: 0px;
 
 <div id="preamble" class="section level1">
 <h1>Preamble</h1>
-<pre class="r"><code># install.packages(&quot;shiny&quot;)
-# install.packages(&quot;DT&quot;)
-# install.packages(&quot;shinyWidgets&quot;)
+<pre class="r"><code># install.packages(c(&quot;shiny&quot;, &quot;DT&quot;, &quot;shinyWidgets&quot;))
 library(shiny)
 library(dplyr)
 library(ggplot2)</code></pre>
@@ -1495,13 +1493,6 @@ introduction to <a href="https://shiny.posit.co/r/gallery/">R Shiny</a>,
 a package that provides a framework for building interactive web
 applications in R without requiring any knowledge of HTML, CSS, or
 JavaScript.</p>
-<p>Additionally, much of this and the following labs “borrow heavily”
-from the <a href="https://mastering-shiny.org/index.html">Mastering
-Shiny</a> book, in particular Chapters 1-6. I have tried to contain the
-bulk of what we need to get running in the labs that follow, but if
-you’re interested in learning more or if you’re not able to find
-guidance on what you are trying to do through an internet search, this
-would be a decent place to look.</p>
 <div id="lab-workflow" class="section level2">
 <h2>Lab Workflow</h2>
 <p>Because R Shiny requires an active R session to run, it can cause
@@ -1521,9 +1512,10 @@ block:</p>
 # Adding `warning` and `message` will hide package output, which is nice
 knitr::opts_chunk$set(echo = TRUE, eval = FALSE, warning = FALSE, message = FALSE)
 ```</code></pre>
-<p>Much of this lab will be the presentation of examples that need to be
-ran elsewhere (this will make more sense Shiny code has been copied into
-a blank R Script, you can run the app by:</p>
+<p>Much of the code in this lab will be the presentation of examples
+that can (and should) be run elsewhere. I recommend opening a new R
+script and copying the examples there. Once you have the code copied,
+you can run the app by either:</p>
 <ol style="list-style-type: decimal">
 <li>Pushing <code>Ctrl+Shift+Enter</code> (possibly <code>Cmd</code> for
 Mac)</li>
@@ -1600,11 +1592,12 @@ arguments it takes, <code>input</code> and <code>output</code>.</p>
 (but not all) of the input functions are named according to the
 convention <code>&lt;type&gt;Input()</code>. The first argument of all
 input functions will be the <em>identifier</em> which allows you to
-manipulate the input in the server function, while the rest tend to be
-function specific. In this next example, we see two inputs with the ID
-<code>&quot;n&quot;</code> and <code>&quot;bins&quot;</code> along with their use in the
-server function.</p>
+manipulate the associated input in the server function, while the rest
+tend to be function specific. In this next example, we see two inputs
+with the ID <code>&quot;n&quot;</code> and <code>&quot;bins&quot;</code> along with their
+use in the server function.</p>
 <pre class="r"><code>ui &lt;- fluidPage(
+  
   # Input functions allow us to solicit input from user
   numericInput(inputId = &quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100), # comma after each object in ui
   sliderInput(inputId = &quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
@@ -1638,7 +1631,8 @@ Both <code>numericInput()</code> and <code>sliderInput()</code> return
 numeric values by default so there was no issue with them being used as
 number for sample size and bins. <code>textInput()</code>, on the other
 hand, returns a character vector by default which is not compatible with
-(most) numeric operations.</p>
+(most) numeric operations. The following code will fail to run
+correctly:</p>
 <pre class="r"><code>ui &lt;- fluidPage(
   textInput(inputId = &quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100), 
   numericInput(inputId = &quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
@@ -1659,11 +1653,12 @@ server &lt;- function(input, output) {
 shinyApp(ui, server)</code></pre>
 <p>Debugging applications in Shiny can be bewildering at first because
 of the number of moving parts. However, we can utilize the fact that
-when a Shiny app is running, so is R. We can use this to our advantage
-to print things to the console for investigation. In this case, I’m not
-sure what class <code>input$n</code> is, so I will include a
-<code>print()</code> function which won’t impact the app but will send
-output to my console.</p>
+when a Shiny app is running, R is also running in the background. We can
+use this to our advantage to print things to the console for
+investigation. In this case, I’m not sure what class
+<code>input$n</code> is, so I will include a <code>print()</code>
+function which won’t impact the app but will send output to my
+console.</p>
 <pre class="r"><code>ui &lt;- fluidPage(
   textInput(inputId = &quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100), 
   sliderInput(inputId = &quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
@@ -1685,11 +1680,10 @@ server &lt;- function(input, output) {
 }
 
 shinyApp(ui, server)</code></pre>
-<p>To solve this, we would either need to change the type of input
-function we use to solicit the data (<code>textInput()</code> to
-<code>numericInput()</code> or we would need to coerce the variable with
-<code>as.numeric(input$n)</code>). We will introduce additional
-debugging tips as they arise.</p>
+<p>Verify that you see the warning message printed in your console.</p>
+<p>While this example is a bit contrived, it does represent a common
+enough occurrence. Whenever ambiguity about an object arises, printing
+diagnostic information to the console is always a good first step.</p>
 <div id="using-ggplot2-and-dplyr" class="section level4">
 <h4>Using ggplot2 and dplyr</h4>
 <p>By far the most common classes for inputs to take are numeric or
@@ -1724,6 +1718,7 @@ other with which to facet wrap.</p>
 server &lt;- function(input, output) {
 
   output$myhist &lt;- renderPlot({
+    
     ## Use aes_string, note that &quot;displ&quot; must now be in quotes
     ggplot(mpg, aes_string(&quot;displ&quot;, input$var)) + geom_point() + 
       # replace input$facet with any other character string in your own app
@@ -1750,18 +1745,24 @@ write a shiny app that creates a scatter plot using any two numeric
 variables from the dataset (already computed below in
 <code>numcols</code>). In addition to this, either add an additional
 input from <code>numcols</code> to add a color aesthetic to your plot OR
-add radio buttons to facet between either the variable “Private” or
-“Region” (or both).</p>
-<pre class="r"><code>colleges &lt;- read.csv(&quot;https://remiller1450.github.io/data/Colleges2019.csv&quot;)
+add radio buttons to facet between either the variable “Type” or
+“Region” (or both). Examples for these other types of inputs are
+included in the thinks above</p>
+<pre class="r"><code>## Note that we can read in data and manipulate variables outside of ui() or server()
+colleges &lt;- read.csv(&quot;https://collinn.github.io/data/college2019.csv&quot;)
 
 # Character vector of numeric college variables
 numcols &lt;- names(colleges)[sapply(colleges, is.numeric)]
 
 ui &lt;- fluidPage(
+  
+  ## Add stuff here
 )
 
 ## Set up the server function
 server &lt;- function(input, output) {
+  
+  ## Add stuff here
 }
 
 ## Build and run the 
@@ -1875,7 +1876,7 @@ dataset subset by selected states. Hint: use <code>subset</code> and
 frame.</p>
 <pre class="r"><code>library(DT)
 
-colleges &lt;- read.csv(&quot;https://remiller1450.github.io/data/Colleges2019.csv&quot;)
+colleges &lt;- read.csv(&quot;https://collinn.github.io/data/college2019.csv&quot;)
 
 ui &lt;- fluidPage(
   
@@ -1887,6 +1888,9 @@ ui &lt;- fluidPage(
 
 server &lt;- function(input, output, session) {
 
+  ## Here I need to manipulate `colleges` based on input$stateSub
+  ## Then I need to generate a table of that data
+  
 }
 
 shinyApp(ui, server)</code></pre>
@@ -1903,9 +1907,12 @@ initially run, whereas with Shiny, we want reactive code to change each
 time we modify the input. It’s this relationship between reactive
 objects and the UI that allows the the number of observations or bins in
 a histogram to change after we modify the input.</p>
-<p>To be clear, reactive objects change in response to changes in the
-<code>input</code> object. So when we see code like this (you don’t have
-to run this):</p>
+<p>To reiterate, any reactive object (created with
+<code>render&lt;Type&gt;()</code>) will change or update in response to
+any changes in <code>input</code> contained within it. As the plot
+associated with <code>output$myhist</code> contains both
+<code>input$n</code> and <code>input$bins</code>, it will automatically
+update any time one of these values changes.</p>
 <pre class="r"><code>ui &lt;- fluidPage(
   numericInput(inputId = &quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100),
   sliderInput(inputId = &quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
@@ -1920,8 +1927,6 @@ server &lt;- function(input, output) {
 }
 
 shinyApp(ui, server)</code></pre>
-<p>we understand that the <code>renderPlot()</code> is responding to
-changes in <code>input$n</code> and <code>input$bins</code>.</p>
 <p>We can explicitly create our own reactive objects with the
 <code>recative()</code> function. Unlike functions we have seen so far
 in R, this doesn’t simply return a static object, but rather another
@@ -1949,15 +1954,15 @@ server &lt;- function(input, output) {
 shinyApp(ui, server)</code></pre>
 <p>These reactive objects will respond just as their associated inputs
 would: changes to <code>input$n</code> trigger <code>n()</code> to
-update which then triggers the reactivity in
-<code>renderPlot()</code>.</p>
-<p>This will be a critical tool for us to use as the complexity of our
-Shiny app grows. In particular, it will help us manage webs of reactive
-relationships between objects as well as reduce redundant code and
-computation. We will spend the next lab exploring reactivity in a number
-of different contexts.</p>
+update which then triggers the reactivity in <code>renderPlot()</code>.
+This may seem redundant now, but as the complexity of our Shiny app
+grows it will be an essential tool for helping to manage the web of
+relationships between reactive objects and the outputs associated with
+them. We will spend the next lab exploring reactivity in a number of
+different contexts.</p>
 <p><strong>Question 3:</strong> Modify the following Shiny app so that
-duplicated expressions are contained within a reactive context.</p>
+duplicated expressions are contained within a reactive context. How does
+this save on computation time?</p>
 <pre class="r"><code>library(shiny)
 
 ui &lt;- fluidPage(

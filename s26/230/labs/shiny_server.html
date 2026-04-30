@@ -1501,7 +1501,7 @@ shinyApp(ui, server)</code></pre>
 frontend user interface, this lab will pick up where the previous left
 off. In particular, we are going to take a closer look at reactivity in
 the context of Shiny and paint a clearer illustration of how inputs
-relate to outputs in an interactive environment.</p>
+relate to outputs in an reactive environment.</p>
 </div>
 <div id="lab" class="section level1">
 <h1>Lab</h1>
@@ -1585,7 +1585,11 @@ previously, when the data was computed within the
 <code>renderText()</code> and <code>renderPlot()</code> functions, the
 data in the plot and the data in the summary weren’t even the same! This
 sort of logical error is far more insidious as there is nothing directly
-within the app that will warn you of its existence.</p>
+within the app that will warn you of its existence. In the code below,
+the simulated data is created inside the reactive object
+<code>X()</code>; when <code>renderText()</code> and
+<code>renderPlot()</code> are called, they are now both referencing the
+same, already computed object.</p>
 <pre class="r"><code>ui &lt;- fluidPage(
   numericInput(inputId = &quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100),
   sliderInput(inputId = &quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
@@ -1594,7 +1598,7 @@ within the app that will warn you of its existence.</p>
 
 server &lt;- function(input, output) {
   
-  X &lt;- reactive(rnorm(input$n))
+  X &lt;- reactive(rnorm(input$n)) # This now only computed when input$n changes
   bins &lt;- reactive(input$bins)
   
   # Now it&#39;s the same X() here as in renderPlot()
@@ -1619,6 +1623,7 @@ distributions but changing the value of <span class="math inline">\(\lambda_1\)<
 distribution.</p>
 <pre class="r"><code># Function for plot
 freqpoly &lt;- function(x1, x2, binwidth = 0.1, xlim = c(-3, 3)) {
+  
   df &lt;- data.frame(
     x = c(x1, x2),
     g = c(rep(&quot;x1&quot;, length(x1)), rep(&quot;x2&quot;, length(x2)))
@@ -1629,19 +1634,24 @@ freqpoly &lt;- function(x1, x2, binwidth = 0.1, xlim = c(-3, 3)) {
     coord_cartesian(xlim = xlim)
 }
 
-# This would make a good question actually
 ui &lt;- fluidPage(
+  
   numericInput(&quot;lambda1&quot;, label = &quot;lambda1&quot;, value = 3),
   numericInput(&quot;lambda2&quot;, label = &quot;lambda2&quot;, value = 5),
   numericInput(&quot;n&quot;, label = &quot;n&quot;, value = 1e4, min = 0), 
   column(9, plotOutput(&quot;hist&quot;))
+  
 )
+
+
 server &lt;- function(input, output) {
+  
   output$hist &lt;- renderPlot({
     x1 &lt;- rpois(input$n, input$lambda1)
     x2 &lt;- rpois(input$n, input$lambda2)
     freqpoly(x1, x2, binwidth = 1, xlim = c(0, 40))
   }, res = 96)
+  
 }
 
 shinyApp(ui, server)</code></pre>
@@ -1687,11 +1697,17 @@ server &lt;- function(input, output) {
 shinyApp(ui, server)</code></pre>
 <p>Our goal here is to create a situation in which we can directly
 dictate when the plot is rendered without having it automatically change
-in response to either of our inputs. One solution here would be to
-create a button that initiates the simulation. That is, we will create a
+in response to either of our inputs. One solution here will be to create
+a button that initiates the simulation. That is, we will create a
 reactive input that we can use to update all of our reactive objects
-without changing any of our existing inputs. Run the app below using the
-simulate button to see how this works.</p>
+without changing any of our existing inputs. Run the app below, using
+the newly created simulate button to see how this works.
+Specifically:</p>
+<ol style="list-style-type: decimal">
+<li>What does pushing the button do?</li>
+<li>What happens when you change <code>n</code> or
+<code>bins</code>?</li>
+</ol>
 <pre class="r"><code>ui &lt;- fluidPage(
   numericInput(&quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100),
   sliderInput(&quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
@@ -1709,7 +1725,8 @@ server &lt;- function(input, output) {
     input$simulate
     rnorm(input$n)
     })
-  bins&lt;- reactive({
+  
+  bins &lt;- reactive({
     input$simulate # It will also update the computation of bins
     input$bins
     })
@@ -1740,9 +1757,10 @@ this:</p>
 
 server &lt;- function(input, output) {
   
-  
-  X &lt;- eventReactive(eventExpr = input$simulate, # This causes it to update
-                     valueExpr = { # This is the value it returns
+  ## eventExpr tells us specifically which inputs to respond to
+  ## valueExpr tells us what to return when evaluated
+  X &lt;- eventReactive(eventExpr = input$simulate, 
+                     valueExpr = {
                        rnorm(input$n)
                      })
   
@@ -1812,8 +1830,8 @@ in the event that you need it.</p>
 <p><strong>Question 3: </strong> Using the <code>isolate()</code>
 function, rewrite the Shiny app below so that it functions the same
 (updates on <code>input$simluate</code>, not on <code>input$n</code> or
-<code>input$bins</code>) but without using
-<code>eventReactive()</code></p>
+<code>input$bins</code>) but without using <code>eventReactive()</code>.
+(The solution for this is included directly below)</p>
 <pre class="r"><code>ui &lt;- fluidPage(
   numericInput(&quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100),
   sliderInput(&quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
@@ -1829,6 +1847,28 @@ server &lt;- function(input, output) {
   
   output$myhist &lt;- renderPlot({
     ggplot() + geom_histogram(aes(x = X()), bins = bins())
+  })
+}
+
+shinyApp(ui, server)</code></pre>
+<pre class="r"><code>###################
+## Solution to 3 ##
+###################
+
+ui &lt;- fluidPage(
+  numericInput(&quot;n&quot;, label = &quot;Number of obs:&quot;, value = 100),
+  sliderInput(&quot;bins&quot;, label = &quot;Number of bins:&quot;, min = 2, max = 20, value = 10),
+  actionButton(&quot;simulate&quot;, label = &quot;Run Simulation&quot;, class = &quot;btn-success&quot;),
+  plotOutput(&quot;myhist&quot;)
+)
+
+server &lt;- function(input, output) {
+
+  output$myhist &lt;- renderPlot({
+    input$simulate
+    X &lt;- isolate(rnorm(input$n))
+    bins &lt;- isolate(input$bins)
+    ggplot() + geom_histogram(aes(x = X), bins = bins)
   })
 }
 
@@ -1853,8 +1893,7 @@ work:</p>
   filter(&quot;cty&quot; &gt; 10) %&gt;% 
   summarize(meanHwy = mean(&quot;hwy&quot;))</code></pre>
 <p>Rather than spending any time discussing <em>why</em> this is, or why
-the solution is the way it is (you are more than welcome to come to my
-office to discuss, however), I am simply going to present the solution
+the solution is the way it is, I am simply going to present the solution
 to this problem.</p>
 <p>First, we should understand that “variables” can have two meanings
 when discussing data manipulation in dplyr: first, there are variables
@@ -1869,7 +1908,9 @@ remove any potential of confusing the app, we will always designate data
 variables with <code>.data.</code> and environment variables with
 <code>.env</code> and then reference the variable name within
 <code>[[]]</code> when using <code>.data</code> and <code>$</code> when
-using <code>.env</code>:</p>
+using <code>.env</code>. In this sense, <code>.data[[var1]]</code> is
+indicating that we should group by the <code>cyl</code> variable
+<em>within</em> the <code>mpg</code> dataset:</p>
 <pre class="r"><code>var1 &lt;- &quot;cyl&quot;
 var2 &lt;- &quot;cty&quot;
 var3 &lt;- &quot;hwy&quot;
@@ -1889,7 +1930,7 @@ by(mpg2,
 <p><strong>Question 4</strong> Complete the logic of this Shiny app so
 that it is dplyr compliant. Note that if an input (say,
 <code>input$cutoff</code>) has multiple values, you can access each one
-as you would a vector, i.e., <code>input$cutoff[1]</code> and
+as you would a vector, e.g., <code>input$cutoff[1]</code> and
 <code>input$cutoff[2]</code>.</p>
 <pre class="r"><code>ui &lt;- fluidPage(
   selectInput(&quot;group&quot;, &quot;Group by: &quot;, c(&quot;year&quot;, &quot;drv&quot;)),
@@ -1930,14 +1971,14 @@ We include UI input functions within <code>renderUI()</code> just as we
 would in the UI object.</p>
 <pre class="r"><code>ui &lt;- fluidPage(
   selectInput(&quot;dist&quot;, &quot;Select distribution&quot;, choices = c(&quot;normal&quot;, &quot;poisson&quot;)),
-  uiOutput(&quot;par1out&quot;), 
-  uiOutput(&quot;par2out&quot;),
+  uiOutput(&quot;parameter1out&quot;), 
+  uiOutput(&quot;parameter2out&quot;),
   plotOutput(&quot;plot&quot;)
 )
 
 server &lt;- function(input, output) {
   
-  output$par1out &lt;- renderUI({
+  output$parameter1out &lt;- renderUI({
     # This will create a numericInput based on input$dist
     if (input$dist == &quot;normal&quot;) {
       numericInput(inputId = &quot;normalMean&quot;, label = &quot;Mean&quot;, value = 0, min = -3, max = 3)
@@ -1946,7 +1987,7 @@ server &lt;- function(input, output) {
     }
   })
   
-  output$par2out &lt;- renderUI({
+  output$parameter2out &lt;- renderUI({
     if (input$dist == &quot;normal&quot;) {
       numericInput(inputId = &quot;normalSD&quot;, label = &quot;Standard Deviation&quot;, value = 1, min = 0.1, max = 5)
     } else if (input$dist == &quot;poisson&quot;) {
@@ -1972,8 +2013,8 @@ server &lt;- function(input, output) {
 
 shinyApp(ui, server)</code></pre>
 </div>
-<div id="misc" class="section level3">
-<h3>Misc</h3>
+<div id="miscellaneous" class="section level3">
+<h3>Miscellaneous</h3>
 <p>Finally, we include two relatively simple functions that exist in
 base R that you may find helpful on your journey towards making a really
 cool Shiny app. The first of these, <code>switch()</code>, is a
