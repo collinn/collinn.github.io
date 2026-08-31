@@ -1,0 +1,72 @@
+---
+title: "Homework 1 Template"
+author: "Name"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Chapter 4 Q5
+
+**Part A**
+
+**Part B**
+
+**Part C**
+
+
+
+## Chapter 4 Q6
+
+**Part A**
+
+**Part B**
+
+**Part C**
+
+**Part D**
+
+
+## Chapter 5 Q1
+
+**Part A**
+
+**Part B**
+
+**Part C**
+
+## Chapter 5 Q2
+
+**Part A**
+
+**Part B**
+
+**Part C**
+
+**Part D**
+
+
+## Question 1
+
+**Part A**
+
+**Part B**
+
+**Part C**
+
+
+## Question 2
+
+**Part A**
+
+**Part B**
+
+**Part C**
+
+**Part D**
+
+**Part E**
