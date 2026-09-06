@@ -379,6 +379,39 @@ Poisson is</li>
 <p><span class="math display">\[
   \hat{\lambda} = \frac{1}{n} \sum_{i=1}^n x_i
   \]</span></p>
+<div id="bonus-exercise" class="section level2">
+<h2>Bonus Exercise</h2>
+<p>For this exercise, we will investigate comparative coverage of the
+Wald and Score confidence intervals for varying levels of <span class="math inline">\(\pi\)</span> using simulation. Specifically, for a
+nominal 95% confidence interval, we want to estimate the proportion of
+repeated samples for which the derived confidence interval actually
+contains the true value of <span class="math inline">\(\pi\)</span>.</p>
+<p>The simulation should use the following settings:</p>
+<ul>
+<li>Confidence intervals should have nominal coverage of 95%</li>
+<li>Each simulation should draw from a binomial random variable with
+<span class="math inline">\(n = 20\)</span></li>
+<li>Coverage should be evaluated at at least 50 separate values of <span class="math inline">\(\pi\)</span> between 0.01 and 0.99</li>
+<li>For each value of <span class="math inline">\(\pi\)</span>, simulate
+<span class="math inline">\(N = 1000\)</span> independent samples</li>
+</ul>
+<p>The final product should be a ggplot with <span class="math inline">\(\pi\)</span> on the x-axis and the estimated
+coverage probability on y-axis, with separate lines for the Score and
+Wald intervals. Include a horizontal reference line at <span class="math inline">\(y = 0.95\)</span>. Describe the resulting plot in
+2-3 sentences.</p>
+<p>Useful functions, though you may not need all (see e.g.,
+<code>?rbinom()</code> for use of each):</p>
+<ul>
+<li><code>rbinom()</code></li>
+<li><code>seq()</code></li>
+<li><code>replicate()</code></li>
+<li><code>mean(c(TRUE, TRUE, FALSE))</code> &lt;- useful trick to
+know</li>
+<li><code>sapply()</code></li>
+<li><code>prop.test(x, n, correct = FALSE)$conf.int</code> to get Score
+interval</li>
+</ul>
+</div>
 
 
 
