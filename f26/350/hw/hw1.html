@@ -364,9 +364,18 @@ class (handwritten or printed is OK)</p>
 distribution given with a binomial. Identify why the distribution
 function given should be used <em>instead</em> of the binomial</p>
 <p>Question 4: 1.12. Part (d) can be determined using
-<code>binom.test()</code>. It may be a fun exercise to see if you can
-write a function to do this without <code>binom.test()</code> as well,
+<code>prop.test()</code>. It may be a fun exercise to see if you can
+write a function to do this without <code>prop.test()</code> as well,
 but this is optional.</p>
+<ul>
+<li><strong>Correction:</strong> I originally suggested using
+<code>binom.test()</code> for this, though this instead gives <a href="https://academic.oup.com/biomet/article-abstract/26/4/404/291538?redirectedFrom=fulltext">yet
+another confidence interval</a>.</li>
+<li>Read the documentation for <code>?prop.test()</code> to see how the
+score should be implemented without a correction</li>
+<li>If you already did this with <code>binom.test()</code> that’s
+fine</li>
+</ul>
 <p>Question 5: 1.13</p>
 <p>Question 6: 1.15</p>
 <p>Question 7:</p>
