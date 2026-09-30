@@ -1,0 +1,101 @@
+---
+title: "Penguin Wranglin' in R"
+author: "Your name"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+```
+
+## Getting started
+
+Use your plans from Monday to answer the questions below in R. Put your code in the provided chunks and your written answers beneath the questions. Use `dplyr` for the data wrangling and `ggplot2` for the plots.
+
+**Save each resulting dataset with a descriptive name**, then display it by putting its name on a line of its own. Keep the original `penguins` dataset available for the next problem. For Problem 4, save the two results under different names.
+
+Run the following chunk before starting. When you are finished, knit the document to check that it runs from beginning to end.
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+penguins <- read.csv("https://collinn.github.io/data/penguins.csv")
+```
+
+## Problem 1
+
+For each species, describe the average body mass and its standard deviation. Include how many penguins contribute to each summary. Create a plot comparing body-mass distributions across species.
+
+```{r}
+# Pick a descriptive name for your summary dataset, save it, and display it.
+# Create your plot using the appropriate dataset.
+
+```
+
+Does the resulting dataset resemble what you predicted it would?
+
+## Problem 2
+
+Among female penguins measured in 2008, how does average flipper length differ across species?
+
+```{r}
+# Pick a descriptive name for your resulting dataset, save it, and display it.
+
+```
+
+Does the resulting dataset resemble what you predicted it would?
+
+## Problem 3
+
+Start with all penguins. Create body mass in kilograms; group by species and sex; calculate mean mass in kilograms; arrange from largest to smallest mean.
+
+```{r}
+# Pick a descriptive name for your resulting dataset, save it, and display it.
+
+```
+
+Does the resulting dataset resemble what you predicted it would?
+
+## Problem 4
+
+Implement both plans:
+
+**Plan A:** Retain penguins weighing at least 4,000 g, then calculate mean body mass by species.
+
+**Plan B:** Calculate mean body mass by species, then retain species with means of at least 4,000 g.
+
+```{r}
+# Pick a different descriptive name for each resulting dataset.
+# Save and display both results.
+
+```
+
+Do the resulting datasets resemble what you predicted they would?
+
+## Problem 5
+
+For this exercise, label penguins weighing at least 4,000 grams "Big" and the rest "Small". Does the proportion in the heavier category differ across species? Create a plot showing this comparison.
+
+```{r}
+# Pick descriptive names for the datasets you create, save them, and display your summary.
+# Create your comparison plot.
+
+```
+
+Does the resulting dataset resemble what you predicted it would?
+
+## Problem 6
+
+Investigate the relationship between flipper length and body mass within each species. Implement your revised plan from Monday and create a plot showing the relationship.
+
+```{r}
+# If you create a new dataset, pick a descriptive name and save it.
+# Create your plot using the appropriate dataset.
+
+```
+
+Does the resulting plot resemble what you predicted it would?
+
