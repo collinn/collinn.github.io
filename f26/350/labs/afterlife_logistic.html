@@ -11,7 +11,7 @@
 
 
 
-<title>STA 350 - Categorical Data Analysis (Fall 2026)</title>
+<title>Logistic Regression with Categorical Predictors</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1477,389 +1477,452 @@ border-radius: 0px;
 
 
 
-<h1 class="title toc-ignore">STA 350 - Categorical Data Analysis (Fall
-2026)</h1>
+<h1 class="title toc-ignore">Logistic Regression with Categorical
+Predictors</h1>
+<h3 class="subtitle">Belief in an Afterlife: Tables, Odds, and
+Models</h3>
 
 </div>
 
 
-<p><span class="math inline">\(~\)</span></p>
-<p>Last updated: Fri Oct 9 2026, 10:36</p>
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- |  |  |  |  | -->
-<!-- |  |  |  |  | -->
-<!-- |  |  |  |  | -->
-<div id="syllabus" class="section level1">
-<h1>Syllabus</h1>
-<p>Welcome to the course website for STA 350, Categorical Data Analysis.
-To begin, you can find the course syllabus linked below:</p>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>In class, we used marijuana-use data to connect odds ratios
+calculated from tables with coefficients from logistic regression. In
+this worksheet, you will make those connections using data on belief in
+an afterlife.</p>
+<p>Our questions are:</p>
 <ul>
-<li><a href="syllabus350f26.html">Click here</a> to view the course
-syllabus</li>
+<li>How do marginal and conditional odds ratios appear in logistic
+regression?</li>
+<li>What do the intercept and predictor coefficients mean?</li>
+<li>What assumption does an additive model make about the conditional
+odds ratios?</li>
+<li>How can we test that assumption?</li>
 </ul>
-<p>You can locate course content by scrolling, or by using the
-navigation bar in the upper left.</p>
+<p>Show your calculations and relevant R output, and write
+interpretations in complete sentences. Every odds ratio should identify
+the outcome, the two groups being compared, and any variable held fixed.
+Use table counts to check the model output rather than reporting output
+alone.</p>
 </div>
-<div id="course-materials" class="section level1">
-<h1>Course Materials</h1>
-<div id="week-1-introduction" class="section level2">
-<h2>Week 1 (Introduction)</h2>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">-</td>
-<td align="left">-</td>
-<td align="left">-</td>
-<td align="left">-</td>
-</tr>
-<tr class="even">
-<td align="left">-</td>
-<td align="left">-</td>
-<td align="left">-</td>
-<td align="left">-</td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 8/28</td>
-<td align="left">Introduction</td>
-<td align="left">-</td>
-<td align="left">-</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
+<div id="prepare-the-tables" class="section level2">
+<h2>1. Prepare the tables</h2>
+<pre class="r"><code>library(dplyr)
+
+afterlife &lt;- read.table(
+  &quot;https://raw.githubusercontent.com/alanagresti/categorical-data/refs/heads/master/Afterlife.dat&quot;,
+  header = TRUE
+)
+afterlife</code></pre>
+<pre><code>##    race gender yes undecided no
+## 1 white female 371        49 74
+## 2 white   male 250        45 71
+## 3 black female  64         9 15
+## 4 black   male  25         5 13</code></pre>
+<p>The original responses are <code>yes</code>, <code>undecided</code>,
+and <code>no</code>. For this worksheet, define the binary outcome as
+<strong>yes versus no or undecided</strong>. An event, or success, is a
+<strong>yes</strong> response. We retain undecided respondents in the
+analysis; we do not claim that being undecided is the same as answering
+no.</p>
+<p>Set the reference categories explicitly so that everyone interprets
+the same coefficients.</p>
+<pre class="r"><code>afterlife &lt;- afterlife %&gt;%
+  mutate(
+    gender = factor(gender, levels = c(&quot;female&quot;, &quot;male&quot;)),
+    race = factor(race, levels = c(&quot;black&quot;, &quot;white&quot;)),
+    not_yes = no + undecided,
+    n = yes + not_yes
+  )
+
+afterlife_gender &lt;- afterlife %&gt;%
+  group_by(gender) %&gt;%
+  summarize(yes = sum(yes), not_yes = sum(not_yes), .groups = &quot;drop&quot;) %&gt;%
+  mutate(n = yes + not_yes)
+
+afterlife_race &lt;- afterlife %&gt;%
+  group_by(race) %&gt;%
+  summarize(yes = sum(yes), not_yes = sum(not_yes), .groups = &quot;drop&quot;) %&gt;%
+  mutate(n = yes + not_yes)
+
+# Individual records for the gender marginal table.
+# Build them from the counts instead of hard-coding an ordering of frequencies.
+afterlife_gender_long &lt;- bind_rows(
+  afterlife_gender %&gt;% transmute(gender, belief = 1L, freq = yes),
+  afterlife_gender %&gt;% transmute(gender, belief = 0L, freq = not_yes)
+)
+afterlife_gender_long &lt;- afterlife_gender_long[
+  rep(seq_len(nrow(afterlife_gender_long)),
+      times = afterlife_gender_long$freq),
+  c(&quot;gender&quot;, &quot;belief&quot;)
+]
+
+# Keep the full table, both marginal tables, and the individual records together.
+afterlife_tables &lt;- list(
+  full = afterlife,
+  gender = afterlife_gender,
+  gender_long = afterlife_gender_long,
+  race = afterlife_race
+)
+
+afterlife_tables$full</code></pre>
+<pre><code>##    race gender yes undecided no not_yes   n
+## 1 white female 371        49 74     123 494
+## 2 white   male 250        45 71     116 366
+## 3 black female  64         9 15      24  88
+## 4 black   male  25         5 13      18  43</code></pre>
+<pre class="r"><code>afterlife_tables$gender</code></pre>
+<pre><code>## # A tibble: 2 × 4
+##   gender   yes not_yes     n
+##   &lt;fct&gt;  &lt;int&gt;   &lt;int&gt; &lt;int&gt;
+## 1 female   435     147   582
+## 2 male     275     134   409</code></pre>
+<pre class="r"><code>afterlife_tables$race</code></pre>
+<pre><code>## # A tibble: 2 × 4
+##   race    yes not_yes     n
+##   &lt;fct&gt; &lt;int&gt;   &lt;int&gt; &lt;int&gt;
+## 1 black    89      42   131
+## 2 white   621     239   860</code></pre>
+<pre class="r"><code>head(afterlife_tables$gender_long)</code></pre>
+<pre><code>## # A tibble: 6 × 2
+##   gender belief
+##   &lt;fct&gt;   &lt;int&gt;
+## 1 female      1
+## 2 female      1
+## 3 female      1
+## 4 female      1
+## 5 female      1
+## 6 female      1</code></pre>
+<p><strong>Question 1</strong></p>
+<p><strong>(a)</strong> What does one row represent in each of the four
+data frames? How many people are represented in total?</p>
+<p><strong>(b)</strong> Which variable was collapsed over to create each
+marginal table? What information is lost when the full table is replaced
+by the gender marginal table?</p>
+<p><strong>(c)</strong> Use <code>table()</code> or <code>xtabs()</code>
+on <code>afterlife_tables$gender_long</code> to verify that it
+reproduces the counts in <code>afterlife_tables$gender</code>. What do
+<code>belief = 0</code> and <code>belief = 1</code> mean?</p>
+<pre class="r"><code># Your work here.</code></pre>
+</div>
+<div id="start-with-the-intercept" class="section level2">
+<h2>2. Start with the intercept</h2>
+<p>Before including predictors, consider a model with one probability of
+a yes response for everyone.</p>
+<p><strong>Question 2</strong></p>
+<p><strong>(a)</strong> Using the full table, calculate the overall
+proportion answering yes, the overall odds of a yes response, and the
+log of those odds. Predict the intercept of an intercept-only logistic
+regression.</p>
+<p><strong>(b)</strong> Run the code below. Verify your prediction. What
+does <code>exp(coef(f0))</code> represent? Convert the fitted intercept
+back to a probability and verify that it equals your proportion from
+part (a).</p>
+<pre class="r"><code>f0 &lt;- glm(yes / n ~ 1, family = binomial, weights = n,
+          data = afterlife_tables$full)
+coef(f0)</code></pre>
+<pre><code>## (Intercept) 
+##     0.92691</code></pre>
+<pre class="r"><code>exp(coef(f0))</code></pre>
+<pre><code>## (Intercept) 
+##      2.5267</code></pre>
+<p><strong>(c)</strong> Explain why exponentiating the intercept here
+gives an <strong>odds</strong>, not an odds ratio.</p>
+<pre class="r"><code># Your work here.</code></pre>
+</div>
+<div id="marginal-odds-ratios" class="section level2">
+<h2>3. Marginal odds ratios</h2>
+<p>We will consistently compare <strong>male with female</strong> and
+<strong>white with black</strong>. For each comparison, put the first
+group’s odds in the numerator.</p>
+<p><strong>Question 3</strong></p>
+<p><strong>(a)</strong> From <code>afterlife_tables$gender</code>,
+calculate the odds of a yes response for females and for males. Divide
+to obtain the marginal male-versus-female odds ratio.</p>
+<p><strong>(b)</strong> From <code>afterlife_tables$race</code>,
+calculate the odds of a yes response for black respondents and for white
+respondents. Obtain the marginal white-versus-black odds ratio.</p>
+<pre class="r"><code># Your table calculations here, before inspecting the fitted coefficients.</code></pre>
+<pre class="r"><code>f_gender &lt;- glm(yes / n ~ gender, family = binomial, weights = n,
+                data = afterlife_tables$gender)
+f_race &lt;- glm(yes / n ~ race, family = binomial, weights = n,
+              data = afterlife_tables$race)
+
+coef(f_gender)</code></pre>
+<pre><code>## (Intercept)  gendermale 
+##     1.08491    -0.36598</code></pre>
+<pre class="r"><code>exp(coef(f_gender))</code></pre>
+<pre><code>## (Intercept)  gendermale 
+##     2.95918     0.69352</code></pre>
+<pre class="r"><code>coef(f_race)</code></pre>
+<pre><code>## (Intercept)   racewhite 
+##     0.75097     0.20390</code></pre>
+<pre class="r"><code>exp(coef(f_race))</code></pre>
+<pre><code>## (Intercept)   racewhite 
+##      2.1190      1.2262</code></pre>
+<p><strong>(c)</strong> Match each exponentiated coefficient to an odds
+or odds ratio you calculated. Explain what each intercept represents and
+why these intercepts need not equal the intercept from Section 2.</p>
+<p><strong>(d)</strong> Explain why the predictor coefficients describe
+<strong>marginal</strong> associations. Interpret each odds ratio in a
+sentence without describing an odds ratio as a ratio of
+probabilities.</p>
+<pre class="r"><code># Your verification here.</code></pre>
+</div>
+<div id="grouped-and-individual-data" class="section level2">
+<h2>4. Grouped and individual data</h2>
+<pre class="r"><code>f_gender_long &lt;- glm(belief ~ gender, family = binomial,
+                     data = afterlife_tables$gender_long)
+
+summary(f_gender)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = yes/n ~ gender, family = binomial, data = afterlife_tables$gender, 
+##     weights = n)
+## 
+## Coefficients:
+##             Estimate Std. Error z value            Pr(&gt;|z|)    
+## (Intercept)   1.0849     0.0954   11.37 &lt;0.0000000000000002 ***
+## gendermale   -0.3660     0.1421   -2.58                0.01 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance:  6.6134242874149613556  on 1  degrees of freedom
+## Residual deviance: -0.0000000000000082157  on 0  degrees of freedom
+## AIC: 16.88
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>summary(f_gender_long)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = belief ~ gender, family = binomial, data = afterlife_tables$gender_long)
+## 
+## Coefficients:
+##             Estimate Std. Error z value            Pr(&gt;|z|)    
+## (Intercept)   1.0849     0.0954   11.37 &lt;0.0000000000000002 ***
+## gendermale   -0.3660     0.1421   -2.58                0.01 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1181.8  on 990  degrees of freedom
+## Residual deviance: 1175.2  on 989  degrees of freedom
+## AIC: 1179
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+<p><strong>Question 4</strong></p>
+<p><strong>(a)</strong> Compare the coefficients and their standard
+errors. For each gender, verify that the two models give the same fitted
+probability. Why does the individual-data model not need a
+<code>weights</code> argument?</p>
+<p><strong>(b)</strong> Record the null and residual deviances for each
+model. Why is the grouped model’s residual deviance zero, while the
+individual-data model’s residual deviance is not? Describe what a
+saturated model can fit in each data format.</p>
+<p><strong>(c)</strong> For each model, subtract the residual deviance
+from the null deviance. What hypothesis does this difference test, and
+how many degrees of freedom does the test have? Verify that the two
+formats give the same likelihood-ratio test statistic and p-value.</p>
+<p>Useful components are <code>fit$null.deviance</code>,
+<code>deviance(fit)</code>, <code>fit$df.null</code>, and
+<code>df.residual(fit)</code>. A chi-squared upper-tail probability can
+be calculated with
+<code>pchisq(statistic, df, lower.tail = FALSE)</code>.</p>
+<pre class="r"><code># Your work here.</code></pre>
+</div>
+<div id="conditional-odds-ratios-from-the-full-table" class="section level2">
+<h2>5. Conditional odds ratios from the full table</h2>
+<p>Return to <code>afterlife_tables$full</code>. You now have separate
+gender comparisons within each race, and separate race comparisons
+within each gender.</p>
+<p><strong>Question 5</strong></p>
+<p><strong>(a)</strong> Calculate the male-versus-female odds ratio
+separately among black respondents and among white respondents.</p>
+<p><strong>(b)</strong> Calculate the white-versus-black odds ratio
+separately among females and among males.</p>
+<p><strong>(c)</strong> Compare these conditional odds ratios with the
+corresponding marginal odds ratios from Section 3. Explain what is held
+fixed in each conditional comparison.</p>
+<p><strong>(d)</strong> Are the two observed gender odds ratios exactly
+equal? Does a difference between sample odds ratios, by itself,
+establish that the population odds ratios differ? Explain.</p>
+<pre class="r"><code># Your work here. You may find filter() and mutate() useful.</code></pre>
+</div>
+<div id="the-additive-model-a-common-conditional-odds-ratio" class="section level2">
+<h2>6. The additive model: a common conditional odds ratio</h2>
+<p>Fit a model with both predictors and no interaction.</p>
+<pre class="r"><code>f_add &lt;- glm(yes / n ~ gender + race, family = binomial, weights = n,
+             data = afterlife_tables$full)
+summary(f_add)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = yes/n ~ gender + race, family = binomial, data = afterlife_tables$full, 
+##     weights = n)
+## 
+## Coefficients:
+##             Estimate Std. Error z value  Pr(&gt;|z|)    
+## (Intercept)    0.881      0.195    4.52 0.0000061 ***
+## gendermale    -0.378      0.143   -2.65     0.008 ** 
+## racewhite      0.243      0.203    1.19     0.232    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 8.57690  on 3  degrees of freedom
+## Residual deviance: 0.56652  on 1  degrees of freedom
+## AIC: 28.05
+## 
+## Number of Fisher Scoring iterations: 3</code></pre>
+<pre class="r"><code>exp(coef(f_add))</code></pre>
+<pre><code>## (Intercept)  gendermale   racewhite 
+##     2.41217     0.68515     1.27502</code></pre>
+<p>Write the model as</p>
+<p><span class="math display">\[
+\operatorname{logit}\{P(\text{yes}\mid G,R)\}
+= \alpha + \beta_G G + \beta_R R,
+\]</span></p>
+<p>where <span class="math inline">\(G=1\)</span> for male and 0 for
+female, and <span class="math inline">\(R=1\)</span> for white and 0 for
+black.</p>
+<p><strong>Question 6</strong></p>
+<p><strong>(a)</strong> State the fitted equation. Identify the group
+described by the intercept. Interpret the exponentiated intercept and
+each exponentiated predictor coefficient. Which comparisons hold race
+fixed, and which hold gender fixed?</p>
+<p><strong>(b)</strong> Substitute the four combinations of <span class="math inline">\(G\)</span> and <span class="math inline">\(R\)</span> into the fitted equation. Calculate the
+fitted log odds, odds, and probability for each group. Check your
+probabilities using the code below.</p>
+<pre class="r"><code>add_check &lt;- afterlife_tables$full %&gt;%
+  select(race, gender, yes, not_yes, n)
+add_check$observed_probability &lt;- with(add_check, yes / n)
+add_check$fitted_probability &lt;- predict(f_add, type = &quot;response&quot;)
+add_check</code></pre>
+<pre><code>##    race gender yes not_yes   n observed_probability fitted_probability
+## 1 white female 371     123 494              0.75101            0.75464
+## 2 white   male 250     116 366              0.68306            0.67817
+## 3 black female  64      24  88              0.72727            0.70693
+## 4 black   male  25      18  43              0.58140            0.62302</code></pre>
+<p><strong>(c)</strong> Convert the fitted probabilities to odds using
+<span class="math inline">\(p/(1-p)\)</span>. From those fitted odds,
+calculate the male-versus-female OR within each race. Verify that both
+equal <code>exp(coef(f_add)[&quot;gendermale&quot;])</code>. Similarly, verify the
+common white-versus-black OR within each gender.</p>
+<p><strong>(d)</strong> Compare these model-based conditional odds
+ratios with the <strong>observed</strong> conditional odds ratios from
+Section 5. Why does the additive model give one common gender OR even
+though the two sample gender ORs differ? Must its common estimate equal
+either sample OR exactly?</p>
+<p><strong>(e)</strong> Explain homogeneous association in this setting.
+Does it require males and females to have equal probabilities of
+answering yes? Does it require the male-female <strong>difference in
+probabilities</strong> to be the same for both races?</p>
+<pre class="r"><code># Your work here.</code></pre>
+</div>
+<div id="test-the-homogeneity-assumption" class="section level2">
+<h2>7. Test the homogeneity assumption</h2>
+<p>In R, <code>gender * race</code> includes the main effects and their
+interaction. We will use the interaction to test whether the
+common-odds-ratio restriction is reasonable; you do not need to
+interpret its exponentiated coefficient.</p>
+<pre class="r"><code>f_int &lt;- glm(yes / n ~ gender * race, family = binomial, weights = n,
+             data = afterlife_tables$full)
+summary(f_int)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = yes/n ~ gender * race, family = binomial, data = afterlife_tables$full, 
+##     weights = n)
+## 
+## Coefficients:
+##                      Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)             0.981      0.239    4.10 0.000042 ***
+## gendermale             -0.652      0.391   -1.67    0.095 .  
+## racewhite               0.123      0.261    0.47    0.637    
+## gendermale:racewhite    0.316      0.420    0.75    0.451    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 8.5769  on 3  degrees of freedom
+## Residual deviance: 0.0000  on 0  degrees of freedom
+## AIC: 29.48
+## 
+## Number of Fisher Scoring iterations: 3</code></pre>
+<pre class="r"><code>anova(f_add, f_int, test = &quot;LRT&quot;)</code></pre>
+<pre><code>## Analysis of Deviance Table
+## 
+## Model 1: yes/n ~ gender + race
+## Model 2: yes/n ~ gender * race
+##   Resid. Df Resid. Dev Df Deviance Pr(&gt;Chi)
+## 1         1      0.567                     
+## 2         0      0.000  1    0.567     0.45</code></pre>
+<p><strong>Question 7</strong></p>
+<p><strong>(a)</strong> State the null hypothesis in terms of the
+interaction coefficient. State it again in terms of the
+male-versus-female conditional odds ratios.</p>
+<p><strong>(b)</strong> Report the likelihood-ratio statistic, degrees
+of freedom, and p-value. At the 5% level, is there evidence against
+homogeneous association? Explain why failing to reject would not prove
+that the population odds ratios are equal.</p>
+<p><strong>(c)</strong> Obtain the four fitted probabilities from
+<code>f_int</code>. Compare them with the four observed proportions.
+Explain why the interaction model is saturated for these grouped data
+and why its residual deviance is zero up to numerical rounding.</p>
+<p><strong>(d)</strong> Convert the interaction model’s fitted
+probabilities into odds and calculate the male-versus-female OR within
+each race. Verify that these reproduce the two <strong>observed</strong>
+conditional ORs from Section 5. Contrast this result with the additive
+model in Section 6.</p>
+<pre class="r"><code># Your work here.</code></pre>
+</div>
+<div id="summarize-what-the-models-say" class="section level2">
+<h2>8. Summarize what the models say</h2>
+<p><strong>Question 8</strong></p>
+<p>Write a short paragraph explaining what you learned about gender,
+race, and the odds of answering yes. Include the marginal gender
+comparison, the gender comparison conditional on race, and the evidence
+about homogeneous association. Make clear that your outcome combines no
+and undecided as the alternative to yes. Describe associations, not
+causal effects.</p>
+<p>As a final check, identify which model or calculation you would use
+to answer each question:</p>
 <ol style="list-style-type: decimal">
-<li>Download <a href="http://www.r-project.org/">R</a></li>
-<li>Download <a href="http://www.rstudio.com/">R Studio</a>
-<!-- 3. [Lab template](labs/template.Rmd) --></li>
+<li>What are the overall odds of a yes response, ignoring gender and
+race?</li>
+<li>How do the odds for males compare with those for females, ignoring
+race?</li>
+<li>Under a common-OR assumption, how do males compare with females of
+the same race?</li>
+<li>Is there evidence that the male-versus-female OR differs between
+races?</li>
 </ol>
 </div>
-<div id="week-2-inference" class="section level2">
-<h2>Week 2 (Inference)</h2>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Lab</th>
-<th align="left">Reading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 8/31</td>
-<td align="left"><a href="lectures/likelihood.pdf">Likelihoods and
-MLE</a></td>
-<td align="left"></td>
-<td align="left">Ch 1.1-1.3</td>
-</tr>
-<tr class="even">
-<td align="left">Wed 9/2</td>
-<td align="left">Inference for <span class="math inline">\(\pi\)</span></td>
-<td align="left"></td>
-<td align="left">Ch 1.3-1.4</td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 8/28</td>
-<td align="left">Methods and Misc for Inference</td>
-<td align="left"></td>
-<td align="left">Ch 1.3-1.4</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ol style="list-style-type: decimal">
-<li><a href="hw/hw1.html">Homework 1</a> due Friday, Sep 11 in
-class</li>
-</ol>
-<!-- **Assignments and Deadlines**:  -->
-<!--  - [Homework 1](hw/hw1.html) (Due Tuesday, Feb 11) -->
-<!--  - [Book Scan for Chapter 1 (Exercises only)](textbook/ch1_exercises.pdf) -->
-<div id="week-3-tables-and-associations" class="section level3">
-<h3>Week 3 (Tables and Associations)</h3>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Reading</th>
-<th align="left"></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 9/7</td>
-<td align="left">Labor Day</td>
-<td align="left">-</td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 9/9</td>
-<td align="left">Contingency Tables</td>
-<td align="left">2.1-2.2</td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 9/11</td>
-<td align="left">Association of Categorical Variables</td>
-<td align="left">2.2-2.3</td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ol style="list-style-type: decimal">
-<li><a href="hw/hw1.html">Homework 1</a> due Friday, Sep 11</li>
-<li><a href="hw/hw2.html">Homework 2</a> due Friday, Sep 25</li>
-</ol>
-</div>
-<div id="week-4-tables-and-associations" class="section level3">
-<h3>Week 4 (Tables and Associations)</h3>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Reading</th>
-<th align="left"></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 9/14</td>
-<td align="left">Odds Ratio and RR</td>
-<td align="left">2.3</td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 9/16</td>
-<td align="left"><span class="math inline">\(\chi^2\)</span>
-Statistic</td>
-<td align="left">2.4</td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 9/18</td>
-<td align="left"><span class="math inline">\(\chi^2\)</span> (Residuals
-and Partition)</td>
-<td align="left">2.4</td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ol style="list-style-type: decimal">
-<li><a href="hw/hw2.html">Homework 2</a> due Friday, Sep 25</li>
-<li><a href="labs/gender_party.html">Gender and Ideology</a></li>
-</ol>
-</div>
-<div id="week-5-tables-and-tables-and-tables" class="section level3">
-<h3>Week 5 (Tables and Tables and Tables)</h3>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Reading</th>
-<th align="left"></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 9/21</td>
-<td align="left"><a href="labs/fisher.html">Fisher Test</a></td>
-<td align="left">2.6.1-2.6.2</td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 9/23</td>
-<td align="left">Three-way tables</td>
-<td align="left">2.7</td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 9/25</td>
-<td align="left">Three-way tables</td>
-<td align="left">2.7</td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ul>
-<li>Exam 1 on Wednesday September 30</li>
-<li><a href="exam/topic_list_exam1.html">Topic list and
-questions</a></li>
-</ul>
-</div>
-<div id="week-6-exam-glm" class="section level3">
-<h3>Week 6 (Exam, GLM)</h3>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Reading</th>
-<th align="left"></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 9/28</td>
-<td align="left">Simpson’s Paradox, Review</td>
-<td align="left">2.7</td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 9/30</td>
-<td align="left">Exam 1</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 10/2</td>
-<td align="left"><a href="lectures/glm1.pdf">Intro to GLM</a></td>
-<td align="left">3.1-3.2</td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ul>
-<li>Exam 1 on Wednesday, written 50 minutes but we can stay 60ish</li>
-<li>Homework 2 will be graded by Tuesday</li>
-</ul>
-</div>
-<div id="week-7-glm" class="section level3">
-<h3>Week 7 (GLM)</h3>
-<table style="width:100%;">
-<colgroup>
-<col width="23%" />
-<col width="30%" />
-<col width="23%" />
-<col width="23%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Date</th>
-<th align="left">Lecture</th>
-<th align="left">Reading</th>
-<th align="left"></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mon 10/5</td>
-<td align="left"><a href="labs/data3.html">GLM, Deviance</a></td>
-<td align="left">3.3-3.4</td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Wed 10/7</td>
-<td align="left">Logistic Regression</td>
-<td align="left">4.1, 4.2</td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Fri 10/9</td>
-<td align="left"><a href="labs/logistic_with_catpred_afterlife.html">Cat
-Pred!</a></td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Assignments and Deadlines</strong>:</p>
-<ul>
-<li><a href="hw/hw3.html">Homework 3</a> due Friday, Oct 23</li>
-</ul>
-<!-- ### Week 4 (Inference) -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Tue 2/11 | [Chi-square tests](lectures/chisq.pdf) | [Functions](labs/functions.html)  | 2.4 | -->
-<!-- | Thur 2/13 | - | [Fisher Exact](labs/fisher.html) | 2.6 | -->
-<!-- **Assignments and Deadlines**:  -->
-<!-- - [Homework 2](hw/hw2.html) due Thursday Feb 27 -->
-<!-- - [Book scan for Chapter 2 exercises](textbook/ch2_exercises.pdf) -->
-<!-- - Feb 27 is tentative come talk to me day -->
-<!-- ### Week 5 (Threeway Tables and Intro GLM) -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Tue 2/18  | [Threeway Tables](lectures/threeway.pdf) | | 2.7 | -->
-<!-- | Thur 2/20 | [Components of a GLM](lectures/glm1.pdf) |  [Intro GLM](labs/glm1.html) | 3.1-3.2 | -->
-<!-- ### Week 6 (GLM) -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Tue 2/18  | [Statistical Inference for GLM](lectures/glm2.pdf) |[Deviance](labs/deviance.html)  | 3.4-3.5| -->
-<!-- | Thur 2/20 | Exam day yay 😎| | | -->
-<!-- - [Exam 1 Topic List](exam/exam1.html) -->
-<!-- ### Week 7 (Poisson Regression) -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Tue 3/4  | [Poisson for Contingency Tables](lectures/poisson_count.pdf) | [Loglinear Models 1](labs/loglinear_contingency.html)  | 7.1 | -->
-<!-- | Thur 3/6 | [Poisson Models](labs/poisson_lecture.html) |  | 7.1 | -->
-<!-- ### Week 8 (Poisson and Negative Binomial) -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Tue 3/25  | [Poisson for Count](labs/poisson_glm_lecture.html) |  | 3.3 | -->
-<!-- | Thur 3/27 | Poisson for Rate |  | 3.3/7.6  | -->
-<!-- - [Homework 3](hw/hw3.html) due 4/3 -->
-<!-- - [Iowa ASA Chapter Meeting on 4/11](https://stats-tgeorge.quarto.pub/iowaasa_stat_conf/) -->
-<!-- - [Chapter 3 Book Problems](textbook/agresti_ch3_exercises.pdf) -->
-<!-- - [Chapter 7 Book Problems](textbook/agresti_ch7_exercises.pdf) -->
-<!-- ### Week 9 (Logistic Regression) -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Tue 4/1 | [Logistic Regression Model](labs/logistic1.html) |  | 4.1  | -->
-<!-- | Thur 4/3 | Inference for Logistic |  | 4.1-4.2 | -->
-<!--   - [Exam 2 Topic List](exam/exam2.html) -->
-<!-- ### Week 10 (Logistic Regression) -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Tue 4/8 | Review |  |   | -->
-<!-- | Thur 4/10 | Exam 2 |  |  | -->
-<!-- ### Week 11 (Logistic Regression -- Extending Predictors) -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Tue 4/15 | [Logistic with Categorical Predictors](labs/logit_pred.html) | 4.3 |   | -->
-<!-- | Thur 4/17 | [Multiple Logistic Regression](labs/logit_mult.html) |  4.4 |  | -->
-<!-- ### Week 12 (Logistic Regression) -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Tue 4/22 | [ROC Curves](labs/roc.html) | 4.6 |   | -->
-<!-- | Thur 4/24 | Logistic Regression Model Selection |  5.1 |  | -->
-<!-- ### Week 12 (Model Selection) -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Tue 4/29 | [Logistic Regression Model Selection](labs/chap5.html) | 5.1-5.2 |   | -->
-<!-- | Thur 5/1 | [Linear Discriminant Analysis](labs/lda.html) |  11.1 or [4.4.1 and 4.4.2 of ISLR](https://www.statlearning.com/) |  | -->
-<!-- - [Homework 4](hw/hw4.html) -->
-<!-- - [Chapter 4 Book Exercises](textbook/ch4_exercises.pdf) -->
-<!-- - [Chapter 5 Book Exercises](textbook/ch5_exercises.pdf) -->
-<!-- ### Week 13 (Classification and Smoothing) -->
-<!-- | Date | Lecture | Lab | Reading | -->
-<!-- |:-----|:-------|:-----|:-----| -->
-<!-- | Tue 5/6 | [Trees, yo](labs/trees.html) | 11.2-1.3 or 8.2.1 and 8.2.2 of ISLR |   | -->
-<!-- | Thur 5/8 | [GAMS and Regularization](labs/gams_lasso.html) |  11.4-11.5 or 6.2 and 7.7 of ISLR  |  | -->
-<!-- - [Take Home Exam](exam/final.html) -->
-<!--   - Not required if presented at ASA meeting -->
-<!--   - Due Thursday at 5pm along with homework 4 -->
-</div>
-</div>
+<div id="optional-exploration-change-the-reference-group" class="section level2">
+<h2>Optional exploration: change the reference group</h2>
+<p>Refit the additive model with male as the gender reference
+category.</p>
+<pre class="r"><code>afterlife_ref &lt;- afterlife_tables$full %&gt;%
+  mutate(gender = relevel(gender, ref = &quot;male&quot;))
+
+f_ref &lt;- glm(yes / n ~ gender + race, family = binomial, weights = n,
+             data = afterlife_ref)
+coef(f_ref)</code></pre>
+<pre><code>##  (Intercept) genderfemale    racewhite 
+##      0.50241      0.37812      0.24297</code></pre>
+<pre class="r"><code>exp(coef(f_ref))</code></pre>
+<pre><code>##  (Intercept) genderfemale    racewhite 
+##       1.6527       1.4595       1.2750</code></pre>
+<p>Before running the code, predict what will happen to the gender
+coefficient, its exponentiated value, the intercept, and the fitted
+probabilities. Then check your predictions. Why does changing the
+reference category change the coefficients without changing the fitted
+model?</p>
+<pre class="r"><code># Your work here.</code></pre>
 </div>
 
 
@@ -1921,7 +1984,7 @@ $(document).ready(function ()  {
       scrollTo: 0
     };
     options.showAndHide = true;
-    options.smoothScroll = false;
+    options.smoothScroll = true;
 
     // tocify
     var toc = $("#TOC").tocify(options).data("toc-tocify");
