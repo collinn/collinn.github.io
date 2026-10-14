@@ -39,7 +39,7 @@ simulateConfInt <- function(n = 20, C = 2, sd = 5, N = 25) {
   for (i in seq_len(N)) {
     xb <- rnorm(n, 50, sd)
     mm[i] <- mean(xb)
-    vv[i] <- sd(xb)
+    vv[i] <- sd # sd(xb)
   }
   
   df <- data.frame(sim = seq_len(N), mean = mm, sd = vv / sqrt(n))
