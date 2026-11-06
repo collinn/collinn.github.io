@@ -1,0 +1,33 @@
+---
+title: "Hypothesis Testing Project Day"
+author: "Your name and your partner's name"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
+                      fig.width = 6, fig.height = 3.5)
+```
+
+
+```{r load-data, message=FALSE, warning=FALSE}
+library(dplyr)
+library(ggplot2)
+
+crawdad <- read.csv("https://collinn.github.io/data/crawdad2_209.csv")
+```
+
+
+## Problem 1
+
+
+## Problem 2
+
+
+## Problem 3
+
+
+## Problem 4
+
+
+## Problem 5
