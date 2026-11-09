@@ -1,0 +1,160 @@
+---
+title: "Lab 7 -- Proportions"
+author: "Your name"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.align = 'center',
+                      fig.width = 5,
+                      fig.height = 4)
+```
+
+Use the Lab 7 questions to complete the sections below. Put your code in the
+chunks and your written answers beneath them. Replace the blanks in the
+Problem 5 table with your results; keep the vertical bars in place.
+
+```{r load-data}
+library(ggplot2)
+library(dplyr)
+
+theme_set(theme_bw())
+
+college <- read.csv("https://collinn.github.io/data/college2019.csv")
+college <- select(college, Name, State, Enrollment, Type, Region)
+
+tips <- read.csv("https://collinn.github.io/data/tips.csv")
+```
+
+## Problem 1 -- Getting our critical values
+
+### Part A
+
+```{r problem-1a}
+
+```
+
+
+### Part B
+
+```{r problem-1b}
+
+```
+
+
+## Problem 2 -- Big schools, small schools
+
+### Part A
+
+```{r problem-2a}
+
+```
+
+
+### Part B
+
+```{r problem-2b}
+
+```
+
+
+### Part C
+
+```{r problem-2c}
+
+```
+
+
+## Problem 3 -- A claim about the Plains
+
+### Part A
+
+```{r problem-3a}
+
+```
+
+
+### Part B
+
+```{r problem-3b}
+
+```
+
+
+### Part C
+
+```{r problem-3c}
+
+```
+
+
+## Problem 4 -- Comparing regions
+
+### Part A
+
+```{r problem-4a}
+
+```
+
+
+### Part B
+
+```{r problem-4b}
+
+```
+
+
+### Part C
+
+```{r problem-4c}
+
+```
+
+
+## Problem 5 -- Where do we draw the line?
+
+### Part A
+
+```{r problem-5a}
+
+```
+
+
+### Part B
+
+```{r problem-5b}
+
+```
+
+Use the same order of subtraction for both definitions.
+
+Order of subtraction: __________ minus __________.
+
+| Result | Large: enrollment at least 10,000 | Large: enrollment at least 5,000 |
+|:---|:---:|:---:|
+| Plains sample proportion | ___ | ___ |
+| Great Lakes sample proportion | ___ | ___ |
+| Difference in sample proportions | ___ | ___ |
+| p-value | ___ | ___ |
+| Decision at $\alpha=.05$ | ___ | ___ |
+
+
+### Part C
+
+```{r problem-5c}
+
+```
+
+
+### Part D
+
+```{r problem-5d}
+
+```
+
+
