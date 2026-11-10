@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2026-11-06" />
+<meta name="date" content="2026-11-09" />
 
 <title>Homework 5</title>
 
@@ -1479,7 +1479,7 @@ border-radius: 0px;
 
 
 <h1 class="title toc-ignore">Homework 5</h1>
-<h4 class="date">2026-11-06</h4>
+<h4 class="date">2026-11-09</h4>
 
 </div>
 
@@ -1497,8 +1497,8 @@ library(ggplot2)
 knitr::opts_chunk$set(message = FALSE, warning = FALSE)
 theme_set(theme_bw())</code></pre>
 </div>
-<div id="problem-1-same-population-different-claims" class="section level2">
-<h2>Problem 1: Same population, different claims</h2>
+<div id="problem-1" class="section level2">
+<h2>Problem 1</h2>
 <p>For this constructed example, battery life for a model of wireless
 headphones has a normal distribution with <strong>true mean 10
 hours</strong>. We specify the true mean so that we can identify correct
@@ -1569,45 +1569,43 @@ observation represent? Compare the centers and spreads. Which quantities
 stayed fixed as sample size increased, and which varied from sample to
 sample?</p>
 <p><strong>Part D</strong> For each sample size, find the fraction of
-p-values below .05 for the claims 10 and 9.2 hours. You might use
-<code>ifelse()</code> to label each result as “reject” or “fail to
-reject”, then <code>table()</code> to count the decisions and
-<code>proportions()</code> to find their proportions within each sample
-size.</p>
-<p>Rejections of the claim 10 estimate the Type I error rate; rejections
-of the claim 9.2 estimate power. Explain why. Use your results to
-explain what increasing sample size does to each. Must either estimated
-Type I error rate equal .05 exactly?</p>
+p-values below .05 for the claims <span class="math inline">\(H_0: \mu =
+10\)</span> and <span class="math inline">\(H_0: \mu =  9.2\)</span>
+hours. You might use <code>ifelse()</code> to label each result as
+“reject” or “fail to reject”, then <code>table()</code> to count the
+decisions.</p>
+<p>Rejections of the claim <span class="math inline">\(H_0: \mu =
+10\)</span> (<code>p_10</code>) estimate the Type I error rate;
+rejections of the claim <span class="math inline">\(H_0: \mu
+=  9.2\)</span> (<code>P_92</code>) estimate power. Explain why. Use
+your results to explain what increasing sample size does to each.</p>
 <p><strong>Part E</strong> For the claim 9.2, calculate the estimated
 Type II error rate at each sample size. Then repeat the rejection-rate
 summaries using a threshold of .01 for the claims 10 and 9.2 hours.
 Explain the effect of lowering alpha on false positives, Type II errors,
 and power, holding the population and sample size fixed. Does the larger
 sample change the size of the true difference from 9.2 hours?</p>
-<p><strong>Part F</strong> Keep <span class="math inline">\(n=20\)</span> and compare the claims <span class="math inline">\(H_0:\mu=9.2\)</span> and <span class="math inline">\(H_0:\mu=8\)</span>. What is the true effect, <span class="math inline">\(\mu-\mu_0\)</span>, for each claim? For the claim
-8, use <code>p_8</code> to estimate power at <span class="math inline">\(\alpha=.05\)</span> and <span class="math inline">\(\alpha=.01\)</span>. Compare these with your
+<p><strong>Part F</strong> Keep <span class="math inline">\(n=20\)</span> and compare the claims <span class="math inline">\(H_0:\mu=9.2\)</span> and <span class="math inline">\(H_0:\mu=8\)</span>. What is the true effect size,
+<span class="math inline">\(\mu-\mu_0\)</span>, for each claim? For the
+claim 8, use <code>p_8</code> to estimate power at <span class="math inline">\(\alpha=.05\)</span> and <span class="math inline">\(\alpha=.01\)</span>. Compare these with your
 results for the claim 9.2. For which effect does lowering alpha cause
 the larger loss of power? Explain in terms of the sampling distribution
 and rejection boundaries. Does the larger effect make the Type I error
 rate at a fixed alpha smaller?</p>
-<p><strong>Part G</strong> Consider two changes to the study, keeping
-the true mean, null claim, and alpha fixed. Answer without running
-another simulation.</p>
-<ol style="list-style-type: lower-alpha">
-<li><p>Suppose the population SD were halved, with sample size
-unchanged. What happens to SE, power, and the Type II error rate?
-Explain.</p></li>
-<li><p>Instead, suppose we could collect four times as many observations
-from the original population. What happens to SE? Does this change the
-true effect or the population SD? If we want greater power while keeping
-the Type I error rate at .05, explain why collecting more observations
-helps. What effect should we plan to detect: a very large effect that is
-easy to find, or the smallest effect that would matter in practice?
-Explain. You do not need to calculate a required sample size.</p></li>
-</ol>
+<!-- **Part G** Consider two changes to the study, keeping the true mean, null -->
+<!-- claim, and alpha fixed. Answer without running another simulation. -->
+<!--   a. Suppose the population SD were halved, with sample size unchanged. -->
+<!--   What happens to SE, power, and the Type II error rate? Explain. -->
+<!--   b. Instead, suppose we could collect four times as many observations from -->
+<!--   the original population. What happens to SE? Does this change the true -->
+<!--   effect or the population SD? If we want greater power while keeping the -->
+<!--   Type I error rate at .05, explain why collecting more observations helps. -->
+<!--   What effect should we plan to detect: a very large effect that is easy to -->
+<!--   find, or the smallest effect that would matter in practice? Explain. -->
+<!--   You do not need to calculate a required sample size. -->
 </div>
-<div id="problem-2-which-mistakes-are-being-counted" class="section level2">
-<h2>Problem 2: Which mistakes are being counted?</h2>
+<div id="problem-2" class="section level2">
+<h2>Problem 2</h2>
 <p>A food-safety inspector tests the claim that a restaurant meets
 sanitation standards. Rejecting that claim leads to its license being
 revoked.</p>
@@ -1629,8 +1627,8 @@ revoked licenses belong to restaurants that actually meet standards? Why
 is this fraction different from 5%? Identify the denominator used in
 each calculation.</p>
 </div>
-<div id="problem-3-a-proportion-of-inspections" class="section level2">
-<h2>Problem 3: A proportion of inspections</h2>
+<div id="problem-3" class="section level2">
+<h2>Problem 3</h2>
 <p>In a separate study, an investigator randomly selects 100 restaurants
 in Des Moines. Eighteen fail a sanitation inspection. Treat the outcomes
 as independent observations and assume the conditions for
@@ -1650,8 +1648,8 @@ decision is an error, which type would it be? Do the sample results
 establish whether an error actually occurred? Explain what additional
 information would be needed.</p>
 </div>
-<div id="problem-4-comparing-two-proportions" class="section level2">
-<h2>Problem 4: Comparing two proportions</h2>
+<div id="problem-4" class="section level2">
+<h2>Problem 4</h2>
 <p>An independent random sample of 100 restaurants in Iowa City finds
 that 11 fail inspection. Use the Des Moines sample from Problem 3 and
 this new sample to investigate whether the cities differ. Define the
@@ -1671,8 +1669,8 @@ City does not, so the two cities must differ significantly.” Does your
 direct comparison support this reasoning? Explain why the two individual
 tests do not answer the same question as Part B.</p>
 </div>
-<div id="problem-5-comparing-mean-weight-changes" class="section level2">
-<h2>Problem 5: Comparing mean weight changes</h2>
+<div id="problem-5" class="section level2">
+<h2>Problem 5</h2>
 <p>The cow-growth dataset records pre-treatment and post-treatment
 weights for 72 cows in Control, Testosterone, and bST groups. For this
 problem, compare only <strong>bST and Control</strong>. Define each
@@ -1705,8 +1703,8 @@ why calculating an individual change is appropriate and why the
 comparison of those changes across groups is an independent two-sample
 comparison rather than a paired comparison between groups.</p>
 </div>
-<div id="problem-6-three-comparisons-one-study" class="section level2">
-<h2>Problem 6: Three comparisons, one study</h2>
+<div id="problem-6" class="section level2">
+<h2>Problem 6</h2>
 <p>Suppose the investigator planned all three pairwise comparisons among
 the cow-treatment groups. The unadjusted two-sided p-values are shown
 below. You do not need to rerun the three tests.</p>
