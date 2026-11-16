@@ -1,0 +1,117 @@
+---
+title: "STA 350 Exam 2: Take-Home"
+author: "Your name"
+output:
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.align = "center")
+
+## Recommended for ROC
+if (!require("pROC", quietly = TRUE)) {
+  install.packages("pROC")
+  library(pROC)
+}
+
+machine <- read.csv("https://collinn.github.io/data/machine_failures.csv")
+```
+
+<!-- Replace "Your name" above. Write your answers below each part and keep
+     only the R code and output needed to reproduce your submitted results. -->
+
+# Problem 1: Model the chance of any failure
+
+## Part A
+
+```{r problem-1a}
+```
+
+<!-- Write your answer here. -->
+
+## Part B
+
+```{r problem-1b}
+```
+
+<!-- Write your answer here. -->
+
+# Problem 2: Choose a maintenance threshold
+
+## Part A
+
+```{r problem-2a}
+```
+
+<!-- Write your answer here. -->
+
+## Part B
+
+```{r problem-2b}
+```
+
+<!-- Write your answer here. -->
+
+## Part C
+
+```{r problem-2c}
+```
+
+<!-- Write your answer here. -->
+
+# Problem 3: Model the number of failures
+
+## Part A
+
+```{r problem-3a}
+```
+
+<!-- Write your answer here. -->
+
+## Part B
+
+```{r problem-3b}
+```
+
+<!-- Write your answer here. -->
+
+## Part C
+
+```{r problem-3c}
+```
+
+<!-- Write your answer here. -->
+
+## Part D
+
+```{r problem-3d}
+```
+
+<!-- Write your answer here. -->
+
+# Problem 4: Analyze the three-way table
+
+## Part A
+
+```{r problem-4a}
+```
+
+<!-- Write your answer here. -->
+
+## Part B
+
+```{r problem-4b}
+```
+
+<!-- Write your answer here. -->
+
+## Part C
+
+```{r problem-4c}
+```
+
+<!-- Write your answer here. -->
+
+# AI-use disclosure
+
+<!-- Name the tool and say what you used it for, or write: I did not use AI on this exam. -->
